@@ -168,3 +168,4 @@ model Tips {
   id_tip                   Int                       @id @default(autoincrement())
   tip                      String                    @db.VarChar(50)
 }
+
