@@ -1,0 +1,170 @@
+// prisma/schema.prisma
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Users {
+  id_user                  Int                       @id @default(autoincrement())
+  name                     String                    @db.VarChar(100)
+  email                    String                    @unique @db.VarChar(100)
+  username                 String                    @unique @db.VarChar(50)
+  birthdate                DateTime                  @db.Date
+  money                    Decimal                   @db.Decimal(10, 2)
+  points                   Int
+  image                    String?                   @db.VarChar(200)
+  bets_visibility          Boolean                   @default(true)
+  tutorial_verification    Boolean
+  Bets                     Bets[]
+  QuestionnaireResponse    Questionnaire_Response[]
+  UserHasChallenges        User_has_Challenges[]
+}
+
+model Challenges {
+  id_challenge             Int                       @id @default(autoincrement())
+  number                   Int
+  name                     String                    @db.VarChar(50)
+  short_description        String                    @db.VarChar(100)
+  long_description         String                    @db.VarChar(150)
+  image                    String                    @db.VarChar(200)
+  Steps                    Steps[]
+  UserHasChallenges        User_has_Challenges[]
+}
+
+model User_has_Challenges {
+  ref_id_user              Int
+  ref_id_challenge         Int
+  completed                Boolean
+  blocked                  Boolean
+  detail_seen              Boolean
+  progress_percentage      Int                       @default(0)
+  user                     Users                     @relation(fields: [ref_id_user], references: [id_user])
+  challenge                Challenges                @relation(fields: [ref_id_challenge], references: [id_challenge])
+  UserHasChallengesHasSteps User_has_Challenges_has_Steps[]
+
+  @@id([ref_id_user, ref_id_challenge])
+}
+
+model Questionnaire_Response {
+  id_questionnaire_response Int                      @id @default(autoincrement())
+  budget                   Decimal                   @db.Decimal(10, 2)
+  verification             Boolean                   @default(false)
+  salary                   Int
+  expenses                 Int
+  available_amount         Int
+  debt                     Int                       @db.SmallInt
+  debt_monthly             Decimal                   @db.Decimal(10, 2)
+  income_source            Int
+  ref_id_user              Int
+  user                     Users                     @relation(fields: [ref_id_user], references: [id_user])
+}
+
+model Bets {
+  id_bets                  Int                       @id @default(autoincrement())
+  date                     DateTime
+  type                     Int                       @db.SmallInt
+  amount                   Decimal                   @db.Decimal(10, 2)
+  potential_earning        Decimal                   @db.Decimal(10, 2)
+  odd                      Decimal                   @db.Decimal(10, 2)
+  ref                      Int
+  state                    Int                       @db.SmallInt
+  result                   Int                       @db.SmallInt
+  ref_id_user              Int
+  user                     Users                     @relation(fields: [ref_id_user], references: [id_user])
+  BetsHasGames             Bets_has_Games[]
+}
+
+model Games {
+  id_game                  Int                       @id @default(autoincrement())
+  local_team               String                    @db.VarChar(50)
+  visitor_team             String                    @db.VarChar(50)
+  schedule                 DateTime
+  betted_team              String                    @db.VarChar(50)
+  odd                      Decimal                   @db.Decimal(10, 2)
+  goals_local_team         Int
+  goals_visitor_team       Int
+  image                    String                    @db.VarChar(200)
+  game_state               Int                       @db.SmallInt
+  BetsHasGames             Bets_has_Games[]
+}
+
+model Bets_has_Games {
+  ref_id_bet               Int
+  ref_id_game              Int
+  ref_id_championship      Int
+  bet                      Bets                      @relation(fields: [ref_id_bet], references: [id_bets])
+  game                     Games                     @relation(fields: [ref_id_game], references: [id_game])
+  championship             Championship              @relation(fields: [ref_id_championship], references: [id_championship])
+
+  @@id([ref_id_bet, ref_id_game, ref_id_championship])
+}
+
+model Championship {
+  id_championship          Int                       @id @default(autoincrement())
+  json                     String                    @unique @db.VarChar(200)
+  BetsHasGames             Bets_has_Games[]
+}
+
+model User_has_Challenges_has_Steps {
+  ref_user_has_Challenges_id_user     Int
+  ref_user_has_Challenges_id_challenge Int
+  ref_id_steps             Int
+  state                    Int                       @db.SmallInt
+  user_has_challenges      User_has_Challenges       @relation(fields: [ref_user_has_Challenges_id_user, ref_user_has_Challenges_id_challenge], references: [ref_id_user, ref_id_challenge])
+  step                     Steps                     @relation(fields: [ref_id_steps], references: [id_step])
+
+  @@id([ref_user_has_Challenges_id_user, ref_user_has_Challenges_id_challenge, ref_id_steps])
+}
+
+model Steps {
+  id_step                  Int                       @id @default(autoincrement())
+  ref_id_step_video        Int?
+  ref_id_step_bet          Int?
+  ref_id_step_view         Int?
+  ref_id_step_questionnaire Int?
+  ref_id_challenges        Int
+  Step_Video               Step_Video?               @relation(fields: [ref_id_step_video], references: [id_step_video])
+  Step_Bet                 Step_Bet?                 @relation(fields: [ref_id_step_bet], references: [id_step_bet])
+  Step_View                Step_View?                @relation(fields: [ref_id_step_view], references: [id_step_view])
+  Step_Questionnaire       Step_Questionnaire?       @relation(fields: [ref_id_step_questionnaire], references: [id_step_questionnaire])
+  Challenge                Challenges                @relation(fields: [ref_id_challenges], references: [id_challenge])
+  UserHasChallengesHasSteps User_has_Challenges_has_Steps[]
+}
+
+// Other supporting models
+model Step_Video {
+  id_step_video            Int                       @id @default(autoincrement())
+  video_url                String                    @db.VarChar(200)
+  video_description        String                    @db.VarChar(200)
+  Steps                    Steps[]
+}
+
+model Step_Bet {
+  id_step_bet              Int                       @id @default(autoincrement())
+  bet_description          String                    @db.VarChar(200)
+  bet_json                 String                    @db.VarChar(200)
+  Steps                    Steps[]
+}
+
+model Step_Questionnaire {
+  id_step_questionnaire    Int                       @id @default(autoincrement())
+  questionnaire_description String                   @db.VarChar(200)
+  questionnaire_json       String                    @db.VarChar(45)
+  Steps                    Steps[]
+}
+
+model Step_View {
+  id_step_view             Int                       @id @default(autoincrement())
+  view_description         String                    @db.VarChar(200)
+  view_page                String                    @db.VarChar(200)
+  Steps                    Steps[]
+}
+
+model Tips {
+  id_tip                   Int                       @id @default(autoincrement())
+  tip                      String                    @db.VarChar(50)
+}
