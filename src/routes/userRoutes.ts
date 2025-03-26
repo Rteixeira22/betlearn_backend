@@ -5,6 +5,7 @@ const router = express.Router()
 const userController = new UserController()
 
 // User Profile Routes
+router.get('/', userController.getallusers)
 router.get('/:id', userController.getUserById)
 router.put('/:id/profile', userController.updateUserProfile)
 router.put('/:id/money', userController.updateUserMoney)

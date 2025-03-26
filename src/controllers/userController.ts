@@ -4,6 +4,19 @@ import { Request, Response } from 'express'
 const prisma = new PrismaClient()
 
 export class UserController {
+
+
+    async getallusers(req: Request, res: Response) {
+        try {
+          const users = await prisma.users.findMany()
+          res.json(users)
+        } catch (error) {
+          res.status(500).json({ error: 'Failed to fetch users' })
+
+        
+    }
+}
+
   // Get user by ID
   async getUserById(req: Request, res: Response) {
     try {
