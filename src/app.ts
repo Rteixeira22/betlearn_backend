@@ -1,6 +1,8 @@
 import express from 'express'
 import cors from 'cors'
 import userRoutes from './routes/userRoutes'
+import betsRoutes from './routes/betsRoutes'   
+import tipsRoutes from './routes/tipsRoutes'
 import { PrismaClient } from '@prisma/client'
 
 class App {
@@ -23,6 +25,8 @@ class App {
 
   private initializeRoutes() {
     this.app.use('/api/users', userRoutes)
+    this.app.use('/api/bets', betsRoutes) 
+    this.app.use('/api/tips', tipsRoutes)  
   }
 
   private handleUncaughtErrors() {
