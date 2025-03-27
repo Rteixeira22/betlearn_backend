@@ -1,3 +1,14 @@
+/*
+    Tips:
+    get:
+    tips 
+
+    create
+    update
+    delete
+
+*/
+
 import { PrismaClient } from '@prisma/client'
 import { Request, Response } from 'express'
 

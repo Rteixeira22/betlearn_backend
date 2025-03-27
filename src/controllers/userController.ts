@@ -1,3 +1,15 @@
+/* Users:
+  get:
+  users/:id
+  users  → já dá para o leaderboard
+  user/:name 
+  user/:email 
+
+  create
+  update
+  delete
+ */
+
 import { PrismaClient } from '@prisma/client'
 import { Request, Response } from 'express'
 

@@ -22,6 +22,7 @@ model Users {
   Bets                     Bets[]
   QuestionnaireResponse    Questionnaire_Response[]
   UserHasChallenges        User_has_Challenges[]
+  password                 String                    @db.VarChar(255)
 }
 
 model Challenges {
@@ -167,5 +168,16 @@ model Step_View {
 model Tips {
   id_tip                   Int                       @id @default(autoincrement())
   tip                      String                    @db.VarChar(50)
+  active                   Int?                      @default(0)                      
+}
+
+model Admin {
+  id            Int       @id @default(autoincrement())
+  name          String    @db.VarChar(100)
+  email         String    @unique
+  username      String    @unique
+  password      String    
+  image         String?   @db.VarChar(200)
+
 }
 

@@ -3,6 +3,12 @@ import cors from 'cors'
 import userRoutes from './routes/userRoutes'
 import betsRoutes from './routes/betsRoutes'   
 import tipsRoutes from './routes/tipsRoutes'
+import challengesRoutes from './routes/challengesRoutes'
+import gamesRoutes from './routes/gamesRoutes'
+import leaderboardRoutes from './routes/leaderboardRoutes'
+import championshipsRoutes from './routes/championshipsRoutes'
+import questionnaireRoutes from './routes/questionnaireRoutes'
+import stepsRoutes from './routes/stepsRoutes'
 import { PrismaClient } from '@prisma/client'
 
 class App {
@@ -26,7 +32,13 @@ class App {
   private initializeRoutes() {
     this.app.use('/api/users', userRoutes)
     this.app.use('/api/bets', betsRoutes) 
-    this.app.use('/api/tips', tipsRoutes)  
+    this.app.use('/api/tips', tipsRoutes) 
+    this.app.use('/api/challenges', challengesRoutes)
+    this.app.use('/api/games', gamesRoutes)
+    this.app.use('/api/leaderboard', leaderboardRoutes)
+    this.app.use('/api/champions', championshipsRoutes)
+    this.app.use('/api/questionnaire', questionnaireRoutes) 
+    this.app.use('/api/steps', stepsRoutes)
   }
 
   private handleUncaughtErrors() {

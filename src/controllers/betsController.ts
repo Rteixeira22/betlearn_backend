@@ -1,3 +1,7 @@
+/*
+    Bet_has_Games
+*/
+
 import { PrismaClient } from '@prisma/client'
 import { Request, Response } from 'express'
 
@@ -19,7 +23,7 @@ export class BetsController {
     }
 
     // Get active user bets
-    async getActiveUserBets(req: Request, res: Response) {
+    /* async getActiveUserBets(req: Request, res: Response) {
         try {
             const userId = parseInt(req.params.id)
             const bets = await prisma.bets.findMany({
@@ -32,10 +36,10 @@ export class BetsController {
         } catch (error) {
             res.status(500).json({ error: 'Failed to fetch active bets' })
         }
-    }
+    } */
 
     // Get concluded user bets
-    async getConcludedUserBets(req: Request, res: Response) {
+   /*  async getConcludedUserBets(req: Request, res: Response) {
         try {
             const userId = parseInt(req.params.id)
             const bets = await prisma.bets.findMany({
@@ -48,10 +52,10 @@ export class BetsController {
         } catch (error) {
             res.status(500).json({ error: 'Failed to fetch concluded bets' })
         }
-    }
+    } */
 
     // Get winning user bets
-    async getWinningUserBets(req: Request, res: Response) {
+   /*  async getWinningUserBets(req: Request, res: Response) {
         try {
             const userId = parseInt(req.params.id)
             const bets = await prisma.bets.findMany({
@@ -65,10 +69,10 @@ export class BetsController {
         } catch (error) {
             res.status(500).json({ error: 'Failed to fetch winning bets' })
         }
-    }
+    } */
 
     // Get losing user bets
-    async getLosingUserBets(req: Request, res: Response) {
+   /*  async getLosingUserBets(req: Request, res: Response) {
         try {
             const userId = parseInt(req.params.id)
             const bets = await prisma.bets.findMany({
@@ -82,7 +86,7 @@ export class BetsController {
         } catch (error) {
             res.status(500).json({ error: 'Failed to fetch losing bets' })
         }
-    }
+    } */
 
     //Get last bet by user ID
     async getLastUserBets(req: Request, res: Response) {
@@ -141,5 +145,43 @@ export class BetsController {
             details: error instanceof Error ? error.message : 'Unknown error' 
           })
         }
+    }
+
+    //Falta ver a logica  de adicionar na Bets_has_Games
+
+    // Update bet state and result by ID
+    async updateBet(req: Request, res: Response) {
+        try {
+          const id_bets = Number(req.params.id)
+          
+          if (isNaN(id_bets)) {
+            return res.status(400).json({ error: 'Invalid bet ID' })
+          }
+      
+          const { state, result } = req.body
+      
+          if (!state || !result) {
+            return res.status(400).json({ error: 'Missing required fields' })
+          }
+      
+          const bet = await prisma.bets.update({
+            where: { id_bets }, 
+            data: {
+              state,
+              result
+            }
+          })
+      
+          res.json(bet)
+        } catch (error) {
+          console.error('Error updating bet:', error)
+          res.status(500).json({ error: 'Failed to update bet' })
+        }
       }
+    
+
+      
+
+
+
 }
