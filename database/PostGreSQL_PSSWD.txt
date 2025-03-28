@@ -1,0 +1,9 @@
+1- Abrir o SQL Shell
+2- Enter em tudo até aparecer password
+3- Introduzir password
+4 -Abrir pgadmin4 e tá a andar
+5- Botão direito e query tool
+
+
+
+Password: 12345.qwert
