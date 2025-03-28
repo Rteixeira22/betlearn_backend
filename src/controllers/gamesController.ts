@@ -1,8 +1,8 @@
 import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
 
+///PRISMA CLIENT
 const prisma = new PrismaClient();
-
 export class GamesController {
   //IR BUSCAR TODOS OS JOGOS PARA PODER MOSTRAR NA PAGINA DAS APOSTAS
   async getAllGames(req: Request, res: Response) {
