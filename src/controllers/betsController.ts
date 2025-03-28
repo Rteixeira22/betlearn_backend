@@ -23,7 +23,7 @@ export class BetsController {
     }
 
     // Get active user bets
-    /* async getActiveUserBets(req: Request, res: Response) {
+     async getActiveUserBets(req: Request, res: Response) {
         try {
             const userId = parseInt(req.params.id)
             const bets = await prisma.bets.findMany({
@@ -36,10 +36,10 @@ export class BetsController {
         } catch (error) {
             res.status(500).json({ error: 'Failed to fetch active bets' })
         }
-    } */
+    } 
 
     // Get concluded user bets
-   /*  async getConcludedUserBets(req: Request, res: Response) {
+    async getConcludedUserBets(req: Request, res: Response) {
         try {
             const userId = parseInt(req.params.id)
             const bets = await prisma.bets.findMany({
@@ -52,10 +52,10 @@ export class BetsController {
         } catch (error) {
             res.status(500).json({ error: 'Failed to fetch concluded bets' })
         }
-    } */
+    } 
 
     // Get winning user bets
-   /*  async getWinningUserBets(req: Request, res: Response) {
+     async getWinningUserBets(req: Request, res: Response) {
         try {
             const userId = parseInt(req.params.id)
             const bets = await prisma.bets.findMany({
@@ -69,10 +69,10 @@ export class BetsController {
         } catch (error) {
             res.status(500).json({ error: 'Failed to fetch winning bets' })
         }
-    } */
+    } 
 
     // Get losing user bets
-   /*  async getLosingUserBets(req: Request, res: Response) {
+     async getLosingUserBets(req: Request, res: Response) {
         try {
             const userId = parseInt(req.params.id)
             const bets = await prisma.bets.findMany({
@@ -86,7 +86,7 @@ export class BetsController {
         } catch (error) {
             res.status(500).json({ error: 'Failed to fetch losing bets' })
         }
-    } */
+    } 
 
     //Get last bet by user ID
     async getLastUserBets(req: Request, res: Response) {
