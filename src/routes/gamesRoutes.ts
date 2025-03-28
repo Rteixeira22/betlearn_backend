@@ -4,6 +4,19 @@ import { GamesController } from "../controllers/gamesController";
 const router = express.Router();
 const gamesController = new GamesController();
 
-//Escrever aqui as rotas
+//GETS
+//TODOS
+router.get("/", gamesController.getAllGames);
+//UM
+router.get("/:id", gamesController.getGameById);
+
+//POST
+router.post("/", gamesController.createGame);
+
+//UPDATE
+router.put("/:id/:betId", gamesController.updateGameState);
+
+//DELETE
+router.delete("/:id", gamesController.deleteGame);
 
 export default router;
