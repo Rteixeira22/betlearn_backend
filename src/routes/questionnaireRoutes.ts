@@ -5,19 +5,18 @@ const router = express.Router();
 const questionnaireController = new QuestionnaireController();
 
 // GET Questionnaire Routes
-router.get("/:id/questionnaire", questionnaireController.getQuestionnaireByUserId); // Get questionnaire responses by user ID
-router.get("/:id/questionnaire/verified", questionnaireController.getVerifiedQuestionnaires); // Get verified questionnaire responses
-router.get("/:id/questionnaire/unverified", questionnaireController.getUnverifiedQuestionnaires); // Get unverified questionnaire responses
-router.get("/:id/questionnaire/last", questionnaireController.getLastQuestionnaireResponse); // Get last questionnaire response by user ID
+router.get("/questionnaire/:id", questionnaireController.getQuestionnaireByUserId); // Get questionnaire responses by user ID
+router.get("/questionnaire/:id/verified", questionnaireController.getVerifiedQuestionnaires); // Get verified questionnaire responses
+router.get("/questionnaire/:id/unverified", questionnaireController.getUnverifiedQuestionnaires); // Get unverified questionnaire responses
+router.get("/questionnaire/:id/last", questionnaireController.getLastQuestionnaireResponse); // Get last questionnaire response by user ID
 
 // POST Questionnaire Routes
-router.post("/:id/questionnaire", questionnaireController.createQuestionnaireResponse); // Create a new questionnaire response
+router.post("/questionnaire/:id", questionnaireController.createQuestionnaireResponse); // Create a new questionnaire response
 
 // PUT Questionnaire Routes
-router.put("/:id/questionnaire/:responseId", questionnaireController.updateQuestionnaireResponse); // Update a specific questionnaire response
+router.put("/questionnaire/:id/:responseId", questionnaireController.updateQuestionnaireResponse); // Update a specific questionnaire response
 
 // DELETE Questionnaire Routes
-router.delete("/:id/questionnaire/:responseId", questionnaireController.deleteQuestionnaireResponse); // Delete a specific questionnaire response
-
+router.delete("/questionnaire/:id/:responseId", questionnaireController.deleteQuestionnaireResponse); // Delete a specific questionnaire response
 
 export default router;
