@@ -1,11 +1,10 @@
-// prisma/schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-}
-
-generator client {
-  provider = "prisma-client-js"
 }
 
 model Users {
@@ -19,10 +18,10 @@ model Users {
   image                 String?                  @db.VarChar(200)
   bets_visibility       Boolean                  @default(true)
   tutorial_verification Boolean
+  password              String                   @db.VarChar(255)
   Bets                  Bets[]
   QuestionnaireResponse Questionnaire_Response[]
   UserHasChallenges     User_has_Challenges[]
-  password              String                   @db.VarChar(255)
 }
 
 model Challenges {
@@ -43,8 +42,8 @@ model User_has_Challenges {
   blocked                   Boolean
   detail_seen               Boolean
   progress_percentage       Int                             @default(0)
-  user                      Users                           @relation(fields: [ref_id_user], references: [id_user])
   challenge                 Challenges                      @relation(fields: [ref_id_challenge], references: [id_challenge])
+  user                      Users                           @relation(fields: [ref_id_user], references: [id_user])
   UserHasChallengesHasSteps User_has_Challenges_has_Steps[]
 
   @@id([ref_id_user, ref_id_challenge])
@@ -98,8 +97,8 @@ model Bets_has_Games {
   ref_id_game         Int
   ref_id_championship Int
   bet                 Bets         @relation(fields: [ref_id_bet], references: [id_bets], onDelete: Cascade)
-  game                Games        @relation(fields: [ref_id_game], references: [id_game], onDelete: Cascade)
   championship        Championship @relation(fields: [ref_id_championship], references: [id_championship], onDelete: Cascade)
+  game                Games        @relation(fields: [ref_id_game], references: [id_game], onDelete: Cascade)
 
   @@id([ref_id_bet, ref_id_game, ref_id_championship])
 }
@@ -115,8 +114,8 @@ model User_has_Challenges_has_Steps {
   ref_user_has_Challenges_id_challenge Int
   ref_id_steps                         Int
   state                                Int                 @db.SmallInt
-  user_has_challenges                  User_has_Challenges @relation(fields: [ref_user_has_Challenges_id_user, ref_user_has_Challenges_id_challenge], references: [ref_id_user, ref_id_challenge])
   step                                 Steps               @relation(fields: [ref_id_steps], references: [id_step])
+  user_has_challenges                  User_has_Challenges @relation(fields: [ref_user_has_Challenges_id_user, ref_user_has_Challenges_id_challenge], references: [ref_id_user, ref_id_challenge])
 
   @@id([ref_user_has_Challenges_id_user, ref_user_has_Challenges_id_challenge, ref_id_steps])
 }
@@ -128,15 +127,14 @@ model Steps {
   ref_id_step_view          Int?
   ref_id_step_questionnaire Int?
   ref_id_challenges         Int
-  Step_Video                Step_Video?                     @relation(fields: [ref_id_step_video], references: [id_step_video])
-  Step_Bet                  Step_Bet?                       @relation(fields: [ref_id_step_bet], references: [id_step_bet])
-  Step_View                 Step_View?                      @relation(fields: [ref_id_step_view], references: [id_step_view])
-  Step_Questionnaire        Step_Questionnaire?             @relation(fields: [ref_id_step_questionnaire], references: [id_step_questionnaire])
   Challenge                 Challenges                      @relation(fields: [ref_id_challenges], references: [id_challenge])
+  Step_Bet                  Step_Bet?                       @relation(fields: [ref_id_step_bet], references: [id_step_bet])
+  Step_Questionnaire        Step_Questionnaire?             @relation(fields: [ref_id_step_questionnaire], references: [id_step_questionnaire])
+  Step_Video                Step_Video?                     @relation(fields: [ref_id_step_video], references: [id_step_video])
+  Step_View                 Step_View?                      @relation(fields: [ref_id_step_view], references: [id_step_view])
   UserHasChallengesHasSteps User_has_Challenges_has_Steps[]
 }
 
-// Other supporting models
 model Step_Video {
   id_step_video     Int     @id @default(autoincrement())
   video_url         String  @db.VarChar(200)
