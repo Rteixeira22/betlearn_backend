@@ -48,11 +48,12 @@ export class TipsController {
     async updateTip(req: Request, res: Response) {
         try {
             const tipId = parseInt(req.params.id)
-            const { tip } = req.body
+            const { tip, active } = req.body
             const updatedTip = await prisma.tips.update({
                 where: { id_tip: tipId },
                 data: {
                     tip,
+                    active,
                 }
             })
             res.json(updatedTip)
@@ -60,6 +61,8 @@ export class TipsController {
             res.status(500).json({ error: 'Failed to update tip' })
         }
     }
+
+    
 
     // Delete tip
     async deleteTip(req: Request, res: Response) {

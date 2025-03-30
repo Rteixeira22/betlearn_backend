@@ -12,7 +12,8 @@ router.get('/:id', tipsController.getTipById); // Get tip by ID
 router.post('/', tipsController.createTip); // Create tip
 
 // Patch Tip Routes
-router.patch('/:id', tipsController.updateTip); // Update tip
+router.put('/:id', tipsController.updateTip); // Update tip
+
 
 // DELETE Tip Routes
 router.delete('/:id', tipsController.deleteTip); // Delete tip
