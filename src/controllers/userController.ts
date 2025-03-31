@@ -1,24 +1,15 @@
-/* Users:
-  get:
-  users/:id
-  users  → já dá para o leaderboard
-  user/:name 
-  user/:email 
 
-  create
-  update
-  delete
- */
 
 import { PrismaClient } from '@prisma/client'
 import { Request, Response } from 'express'
+import bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient()
 
 export class UserController {
 
 
-    async getallusers(req: Request, res: Response) {
+ async getAllusers(req: Request, res: Response) {
         try {
           const users = await prisma.users.findMany()
           res.json(users)
@@ -41,6 +32,7 @@ export class UserController {
       res.status(500).json({ error: 'Failed to fetch user' })
     }
   }
+
 
   // Get user challenges
   async getUserChallenges(req: Request, res: Response) {
@@ -137,6 +129,119 @@ export class UserController {
     }
   }
 
+  //Get user by username
+  async getUserByUsername(req: Request, res: Response) {
+    try {
+      const username = req.params.username
+      const user = await prisma.users.findUnique({
+        where: { username }
+      })
+      if (!user) {
+        return res.status(404).json({ error: 'User not found' })
+      }
+      res.json(user)
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to fetch user' })
+    }
+  }
+  // Get user by email
+  async getUserByEmail(req: Request, res: Response) {
+    try {
+      const email = req.params.email
+      const user = await prisma.users.findUnique({
+        where: { email }
+      })
+      if (!user) {
+        return res.status(404).json({ error: 'User not found' })
+      }
+      res.json(user)
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to fetch user' })
+    }
+  }
+
+  // Create a new user
+  async createUser(req: Request, res: Response) {
+    try {
+      const { name, email, username, birthdate, password, image, money, points, tutorial_verification } = req.body
+      const hashedPassword = await bcrypt.hash(password, 10)
+      const newUser = await prisma.users.create({
+        data: {
+          name,
+          email,
+          username,
+          birthdate: new Date(birthdate),
+          password: hashedPassword,
+          image,
+          money,
+          points,
+          tutorial_verification,  
+        }
+      })
+      res.status(201).json(newUser)
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Failed to create user' })
+    }
+  }
+
+
+
+  // Delete a user
+  async deleteUser(req: Request, res: Response) {
+    try {
+      const userId = parseInt(req.params.id)
+      await prisma.users.delete({
+        where: { id_user: userId }
+      })
+      res.status(204).send()
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to delete user' })
+    }
+  }
+  // Update user password
+  async updateUserPassword(req: Request, res: Response) {
+    try {
+      console.log("Received ID:", req.params.id);
+      console.log("Received Body:", req.body);
+  
+      const userId = Number(req.params.id);
+      if (isNaN(userId)) {
+        return res.status(400).json({ error: "Invalid user ID" });
+      }
+  
+      const { password } = req.body;
+      if (!password || password.length < 8) {
+        return res.status(400).json({ error: "Password must be at least 8 characters long" });
+      }
+  
+      const existingUser = await prisma.users.findUnique({ where: { id_user: userId } });
+      if (!existingUser) {
+        return res.status(404).json({ error: "User not found" });
+      }
+  
+      const hashedPassword = await bcrypt.hash(password, 10);
+  
+      await prisma.users.update({
+        where: { id_user: userId },
+        data: { password: hashedPassword },
+      });
+  
+      console.log("Password updated successfully for user:", userId);
+      res.json({ message: "Password updated successfully" });
+    }catch (error) {
+        console.error("Password update error:", error);
+        if (error instanceof Error) {
+          console.error("Error message:", error.message);
+          console.error("Error stack:", error.stack);
+        }
+        res.status(500).json({ error: "Failed to update user password" });
+      }
+  }
+  
+  
+
+
   // Update user profile
   async updateUserProfile(req: Request, res: Response) {
     try {
@@ -176,16 +281,80 @@ export class UserController {
     }
   }
 
+  // Update user points
+  async updateUserPoints(req: Request, res: Response) {
+    try {
+      const userId = parseInt(req.params.id)
+      const { points } = req.body
+      
+      const updatedUser = await prisma.users.update({
+        where: { id_user: userId },
+        data: { points }
+      })
+      
+      res.json(updatedUser)
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to update user points' })
+    }
+  }
+
+
+  //update user bets_visibility
+async updateUserBetsVisibility(req: Request, res: Response) {
+  try {
+    const userId = parseInt(req.params.id)
+    const { bets_visibility } = req.body
+    
+    const updatedUser = await prisma.users.update({
+      where: { id_user: userId },
+      data: { bets_visibility }
+    })
+    
+    res.json(updatedUser)
+  }
+  catch (error) {
+    res.status(500).json({ error: 'Failed to update user bets visibility' })
+  }
+}
+
+//update user tutorial_verification
+async updateUserTutorialVerification(req: Request, res: Response) {
+  try {
+    const userId = parseInt(req.params.id)
+    const { tutorial_verification } = req.body
+    const updatedUser = await prisma.users.update({
+      where: { id_user: userId },
+      data: { tutorial_verification }
+    })
+    res.json(updatedUser)
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to update user tutorial verification' })
+  }
+}
+
+
+
   // Get leaderboard (users ordered by points)
   async getLeaderboard(req: Request, res: Response) {
     try {
       const leaderboard = await prisma.users.findMany({
         orderBy: { points: 'desc' }
-      })
-      res.json(leaderboard)
-    } catch (error) {
-      res.status(500).json({ error: 'Failed to fetch leaderboard' })
+      });
+      res.json(leaderboard);
+    } catch (error: any) {
+      console.error("Erro no getLeaderboard:", error);
+      res.status(500).json({ 
+        error: 'Erro ao buscar o ranking',
+        message: error.message,
+        stack: error.stack
+      });
     }
   }
+
+
+
 }
+
+
+
 
