@@ -40,6 +40,16 @@ export class ChallengesController {
     }
   }
 
+  //Get count of challenges
+  async countChallenges(req: Request, res: Response) {
+    try {
+      const count = await prisma.challenges.count();
+      res.json({ count });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to count challenges" });
+    }
+  }
+
   // create challenge
   async createChallenge(req: Request, res: Response) {
     try {
