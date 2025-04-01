@@ -9,7 +9,8 @@
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
     "build": "tsc",
     "migrate": "prisma migrate dev",
-    "generate": "prisma generate"
+    "generate": "prisma generate",
+    "postinstall": "prisma generate"
   },
   "repository": {
     "type": "git",
