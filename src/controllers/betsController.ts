@@ -1,11 +1,15 @@
-/*
-    Bet_has_Games
-*/
 
 import { PrismaClient } from '@prisma/client'
 import { Request, Response } from 'express'
+import axios from 'axios';
 
 const prisma = new PrismaClient()
+
+
+const axiosInstance = axios.create({
+    timeout: 5000, 
+    baseURL: 'http://localhost:3000'
+  });
 
 export class BetsController {
 
@@ -23,7 +27,7 @@ export class BetsController {
     }
 
     // Get active user bets
-    /* async getActiveUserBets(req: Request, res: Response) {
+/*     async getActiveUserBets(req: Request, res: Response) {
         try {
             const userId = parseInt(req.params.id)
             const bets = await prisma.bets.findMany({
@@ -36,10 +40,10 @@ export class BetsController {
         } catch (error) {
             res.status(500).json({ error: 'Failed to fetch active bets' })
         }
-    } */
+    }  */
 
     // Get concluded user bets
-   /*  async getConcludedUserBets(req: Request, res: Response) {
+    /* async getConcludedUserBets(req: Request, res: Response) {
         try {
             const userId = parseInt(req.params.id)
             const bets = await prisma.bets.findMany({
@@ -52,10 +56,10 @@ export class BetsController {
         } catch (error) {
             res.status(500).json({ error: 'Failed to fetch concluded bets' })
         }
-    } */
+    }  */
 
     // Get winning user bets
-   /*  async getWinningUserBets(req: Request, res: Response) {
+    /* async getWinningUserBets(req: Request, res: Response) {
         try {
             const userId = parseInt(req.params.id)
             const bets = await prisma.bets.findMany({
@@ -69,10 +73,10 @@ export class BetsController {
         } catch (error) {
             res.status(500).json({ error: 'Failed to fetch winning bets' })
         }
-    } */
+    }  */
 
     // Get losing user bets
-   /*  async getLosingUserBets(req: Request, res: Response) {
+     /* async getLosingUserBets(req: Request, res: Response) {
         try {
             const userId = parseInt(req.params.id)
             const bets = await prisma.bets.findMany({
@@ -86,7 +90,7 @@ export class BetsController {
         } catch (error) {
             res.status(500).json({ error: 'Failed to fetch losing bets' })
         }
-    } */
+    }  */
 
     //Get last bet by user ID
     async getLastUserBets(req: Request, res: Response) {
@@ -105,79 +109,131 @@ export class BetsController {
 
     // Create a new bet
     async createBet(req: Request, res: Response) {
-        try {
-          const { 
-            date, 
-            type, 
-            amount, 
-            potential_earning, 
-            odd, 
-            ref, 
-            state, 
-            result
-          } = req.body
-    
-          const ref_id_user = parseInt(req.params.id)
-    
-          if (!date || !type || !amount || !ref_id_user) {
-            return res.status(400).json({ error: 'Missing required fields' })
-          }
-    
-          const bet = await prisma.bets.create({
-            data: {
-              date: new Date(date),
-              type,
-              amount: Number(amount),
-              potential_earning: Number(potential_earning),
-              odd: Number(odd),
-              ref,
-              state,
-              result,
-              ref_id_user: ref_id_user
+        const transaction = await prisma.$transaction(async (prisma) => {
+            try {
+                const {
+                    type,
+                    amount,
+                    potential_earning,
+                    odd_bet,
+                    ref,
+                    state,
+                    result,
+                    // Game data
+                    local_team,
+                    visitor_team,
+                    schedule,
+                    betted_team,
+                    odd_game,
+                    goals_local_team,
+                    goals_visitor_team,
+                    image,
+                    game_state,
+                } = req.body;
+            
+                const ref_id_user = parseInt(req.params.id_user);
+                const ref_id_championship = parseInt(req.params.id_championship);
+            
+                // Create the game 
+                const gameResponse = await axiosInstance.post('/api/games/', {
+                    local_team,
+                    visitor_team,
+                    schedule,
+                    betted_team,
+                    odd: Number(odd_game),
+                    goals_local_team: goals_local_team || 0,
+                    goals_visitor_team: goals_visitor_team || 0,
+                    image: image || '',
+                    game_state: game_state || 0
+                });
+            
+                const ref_id_game = gameResponse.data.id_game;
+            
+                // Create the bet
+                const bet = await prisma.bets.create({
+                data: {
+                    date: new Date(),
+                    type,
+                    amount: Number(amount),
+                    potential_earning: Number(potential_earning),
+                    odd: Number(odd_bet),
+                    ref,
+                    state,
+                    result,
+                    ref_id_user
+                }
+                });
+            
+                const ref_id_bets = bet.id_bets;
+                
+                
+                // Create the relationship between bet, game and championship
+                const betsHasGames = await prisma.bets_has_Games.create({
+                data: {
+                    ref_id_game,
+                    ref_id_bet: ref_id_bets,
+                    ref_id_championship,
+                }
+                });
+            
+                return {
+                bet,
+                game: gameResponse.data,
+                betsHasGames
+                };
+            } catch (error) {
+                console.error('Error in bet creation process:', error);
+                throw error;
             }
-          })
-    
-          res.status(201).json(bet)
+        });
+        
+        try {
+            res.status(201).json(transaction);
         } catch (error) {
-          console.error(error)
-          res.status(500).json({ 
-            error: 'Failed to create bet', 
-            details: error instanceof Error ? error.message : 'Unknown error' 
-          })
+            console.error(error);
+            res.status(500).json({
+                error: 'Failed to create bet and game relation',
+                details: error instanceof Error ? error.message : 'Unknown error'
+            });
         }
     }
 
-    //Falta ver a logica  de adicionar na Bets_has_Games
 
     // Update bet state and result by ID
     async updateBet(req: Request, res: Response) {
         try {
-          const id_bets = Number(req.params.id)
-          
-          if (isNaN(id_bets)) {
-            return res.status(400).json({ error: 'Invalid bet ID' })
-          }
+            const id_bets = Number(req.params.id)
       
-          const { state, result } = req.body
+            const { state, result } = req.body
       
-          if (!state || !result) {
-            return res.status(400).json({ error: 'Missing required fields' })
-          }
-      
-          const bet = await prisma.bets.update({
-            where: { id_bets }, 
-            data: {
-              state,
-              result
-            }
-          })
+            const bet = await prisma.bets.update({
+                where: { id_bets: id_bets }, 
+                data: {
+                    state,
+                    result
+                }
+            })
       
           res.json(bet)
         } catch (error) {
           console.error('Error updating bet:', error)
           res.status(500).json({ error: 'Failed to update bet' })
         }
-      }
+    } 
+
+    // Delete bet by ID
+    async deleteBet(req: Request, res: Response) {
+        try {
+            const id_bets = Number(req.params.id)
+            const bet = await prisma.bets.delete({
+                where: { id_bets: id_bets }
+            })
+            res.json(bet)
+        } catch (error) {
+            console.error('Error deleting bet:', error)
+            res.status(500).json({ error: 'Failed to delete bet' })
+        }
+    }
     
 
       

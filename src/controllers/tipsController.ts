@@ -1,13 +1,3 @@
-/*
-    Tips:
-    get:
-    tips 
-
-    create
-    update
-    delete
-
-*/
 
 import { PrismaClient } from '@prisma/client'
 import { Request, Response } from 'express'
@@ -58,16 +48,32 @@ export class TipsController {
     async updateTip(req: Request, res: Response) {
         try {
             const tipId = parseInt(req.params.id)
-            const { tip } = req.body
+            const { tip, active } = req.body
             const updatedTip = await prisma.tips.update({
                 where: { id_tip: tipId },
                 data: {
                     tip,
+                    active,
                 }
             })
             res.json(updatedTip)
         } catch (error) {
             res.status(500).json({ error: 'Failed to update tip' })
+        }
+    }
+
+    
+
+    // Delete tip
+    async deleteTip(req: Request, res: Response) {
+        try {
+            const tipId = parseInt(req.params.id)
+            await prisma.tips.delete({
+                where: { id_tip: tipId }
+            })
+            res.json({ message: 'Tip deleted successfully' })
+        } catch (error) {
+            res.status(500).json({ error: 'Failed to delete tip' })
         }
     }
 
