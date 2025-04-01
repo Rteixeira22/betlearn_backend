@@ -34,7 +34,7 @@ export class QuestionnaireController {
                 where: { id_questionnaire_response: id },
             });
             if (!response) {
-                return res.status(404).json({ error: 'Questionnaire not found' });
+             res.status(404).json({ error: 'Questionnaire not found' });
             }
             res.json(response);
         } catch (error) {

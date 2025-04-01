@@ -15,6 +15,9 @@ router.get("/:id", challengeController.getChallengeById);
 // Get steps by challenge ID
 router.get("/:id/steps", challengeController.getStepsByChallengeId);
 
+// Get count of challenges
+router.get("/count", challengeController.countChallenges);
+
 
 
 

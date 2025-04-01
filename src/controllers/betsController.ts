@@ -17,7 +17,7 @@ export class BetsController {
     async getBetsByUserId(req: Request, res: Response) {
         try {
             const userId = parseInt(req.params.id)
-            const bets = await prisma.bets.count({
+            const bets = await prisma.bets.findMany({
                 where: { ref_id_user: userId }
             })
             res.json(bets)

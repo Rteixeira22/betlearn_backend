@@ -42,6 +42,16 @@ export class ChallengesController {
         }
     }
 
+    //Get count of challenges
+    async countChallenges(req: Request, res: Response) {
+        try {
+            const count = await prisma.challenges.count()
+            res.json({ count })
+        } catch (error) {
+            res.status(500).json({ error: 'Failed to count challenges' })
+        }
+    }
+
     // create challenge
     async createChallenge(req: Request, res: Response) {
         try {
@@ -66,7 +76,7 @@ export class ChallengesController {
         try {
             const challengeId = parseInt(req.params.id)
             const steps = await prisma.steps.findMany({
-                where: { ref_id_challenge: challengeId }
+                where: { ref_id_challenges: challengeId }
             })
             res.json(steps)
         } catch (error) {
@@ -114,7 +124,7 @@ export class ChallengesController {
           
           // Ensure all required fields are provided
           if (completed === undefined || blocked === undefined || detail_seen === undefined) {
-            return res.status(400).json({ 
+             res.status(400).json({ 
               error: 'Missing required fields: completed, blocked, and detail_seen are required' 
             });
           }
@@ -124,7 +134,7 @@ export class ChallengesController {
           const challengeId = parseInt(req.params.id_challenge);
           
           if (isNaN(userId) || isNaN(challengeId)) {
-            return res.status(400).json({ 
+             res.status(400).json({ 
               error: 'Invalid user ID or challenge ID' 
             });
           }
@@ -139,13 +149,13 @@ export class ChallengesController {
           });
           
           if (!userExists || !challengeExists) {
-            return res.status(404).json({
+             res.status(404).json({
               error: !userExists ? 'User not found' : 'Challenge not found'
             });
           }
           
           // Try to create the record
-          const newUserHasChallenge = await prisma.User_has_Challenges.create({
+          const newUserHasChallenge = await prisma.user_has_Challenges.create({
             data: {
               ref_id_user: userId,
               ref_id_challenge: challengeId,
@@ -161,15 +171,15 @@ export class ChallengesController {
           console.error('Error details:', error);
           
           // Check for specific error types
-          if (error.code === 'P2002') {
-            return res.status(409).json({ 
+          if ((error as any).code === "P2002") {
+            res.status(409).json({ 
               error: 'This user already has this challenge assigned' 
             });
           }
           
           res.status(500).json({ 
             error: 'Failed to create user has challenge',
-            details: error.message 
+            details: error instanceof Error ? error.message : "Unknown error",         
           });
         }
       }
@@ -186,7 +196,7 @@ export class ChallengesController {
           });
           
           if (!currentChallenge) {
-            return res.status(404).json({ error: 'Current challenge not found' });
+             res.status(404).json({ error: 'Current challenge not found' });
           }
           
           // Find the next challenge based on the number field
@@ -202,7 +212,7 @@ export class ChallengesController {
           });
           
           if (!nextChallenge) {
-            return res.status(404).json({ error: 'No next challenge found' });
+             res.status(404).json({ error: 'No next challenge found' });
           }
           
           // Check if a relationship already exists for the user and next challenge
@@ -229,7 +239,7 @@ export class ChallengesController {
               }
             });
             
-            return res.json(updatedUserHasChallenge);
+             res.json(updatedUserHasChallenge);
           } else {
             // Create a new relationship with the next challenge (unblocked)
             const newUserHasChallenge = await prisma.user_has_Challenges.create({
@@ -242,13 +252,13 @@ export class ChallengesController {
               }
             });
             
-            return res.status(201).json(newUserHasChallenge);
+             res.status(201).json(newUserHasChallenge);
           }
         } catch (error) {
           console.error('Error details:', error);
           res.status(500).json({ 
             error: 'Failed to unblock next challenge',
-            details: error.message 
+            details: error instanceof Error ? error.message : "Unknown error",       
           });
         }
       }
@@ -260,7 +270,7 @@ export class ChallengesController {
             const userId = parseInt(req.params.id_user)
             const challengeId = parseInt(req.params.id_challenge)
             const { detail_seen } = req.body
-            const updatedUserHasChallenge = await prisma.User_has_Challenges.update({
+            const updatedUserHasChallenge = await prisma.user_has_Challenges.update({
                 where: {
                     ref_id_user_ref_id_challenge: {
                         ref_id_user: userId,
@@ -286,12 +296,12 @@ export class ChallengesController {
     
             // Verificação básica de IDs
             if (isNaN(userId) || isNaN(challengeId)) {
-                return res.status(400).json({ error: "Invalid user or challenge ID" });
+                 res.status(400).json({ error: "Invalid user or challenge ID" });
             }
     
             // Verificação do progresso
             if (typeof progress_percentage !== "number" || progress_percentage < 0 || progress_percentage > 100) {
-                return res.status(400).json({ error: "Invalid progress percentage" });
+                 res.status(400).json({ error: "Invalid progress percentage" });
             }
     
             // Atualizar o progresso
@@ -330,10 +340,10 @@ export class ChallengesController {
                 }
             }
     
-            return res.json(updatedUserHasChallenge);
+             res.json(updatedUserHasChallenge);
         } catch (error) {
             console.error("Error updating challenge progress:", error);
-            return res.status(500).json({ error: "Failed to update user challenge progress" });
+             res.status(500).json({ error: "Failed to update user challenge progress" });
         }
     }
     
@@ -382,14 +392,15 @@ export class ChallengesController {
             }
           );
       
-          return res.status(200).json({
+           res.status(200).json({
             message: 'Step state updated successfully',
             progress_percentage: progressPercentage,
             progress_response: response.data,
+            updatedStep,
           });
         } catch (error) {
           console.error(error);
-          return res.status(500).json({ error: 'Something went wrong' });
+           res.status(500).json({ error: 'Something went wrong' });
         }
       };
 
