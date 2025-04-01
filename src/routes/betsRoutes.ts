@@ -11,6 +11,7 @@ router.get("/:id/bets/concluded", betsController.getConcludedUserBets); // Get c
 router.get("/:id/bets/winning", betsController.getWinningUserBets); // Get winning user bets
 router.get("/:id/bets/losing", betsController.getLosingUserBets); */ // Get losing user bets
 router.get("/last/:id", betsController.getLastUserBets); // Get last bet by user ID
+router.get("/count/:id", betsController.countUserBetsById); // Get count of bets by user ID
 
 // POST Bet Routes
 router.post("/:id_user/:id_championship", betsController.createBet); // Create a new bet

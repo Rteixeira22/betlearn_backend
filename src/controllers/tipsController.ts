@@ -48,12 +48,11 @@ export class TipsController {
     async updateTip(req: Request, res: Response) {
         try {
             const tipId = parseInt(req.params.id)
-            const { tip, active } = req.body
+            const { tip } = req.body
             const updatedTip = await prisma.tips.update({
                 where: { id_tip: tipId },
                 data: {
                     tip,
-                    active,
                 }
             })
             res.json(updatedTip)
