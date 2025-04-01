@@ -15,13 +15,27 @@ export class BetsController {
     // Get bets by user ID
     async getBetsByUserId(req: Request, res: Response) {
         try {
-            const userId = parseInt(req.params.id);
-            const bets = await prisma.bets.findMany({
-                where: { ref_id_user: userId },
-            });
-            res.json(bets);
+            const userId = parseInt(req.params.id)
+            const bets = await prisma.bets.count({
+                where: { ref_id_user: userId }
+            })
+            res.json(bets)
         } catch (error) {
-            res.status(500).json({ error: 'Failed to fetch bet history' });
+            res.status(500).json({ error: 'Failed to fetch bet history' })
+        }
+    }
+
+    // Count user bets
+    async countUserBetsById(req: Request, res: Response) {
+        try {
+            const userId = parseInt(req.params.id)
+            console.log(userId)
+            const count = await prisma.bets.count({
+                where: { ref_id_user: userId }
+            })
+            res.json({ count })
+        } catch (error) {
+            res.status(500).json({ error: 'Failed to count bets' })
         }
     }
 

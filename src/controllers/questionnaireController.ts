@@ -1,3 +1,15 @@
+/*
+    Questionnaire:
+    get:
+    questionnaires/:iduser 
+
+
+    create
+    update
+    delete
+
+*/
+
 import { PrismaClient } from '@prisma/client';
 import { Request, Response } from 'express';
 
