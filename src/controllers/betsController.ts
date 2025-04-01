@@ -123,7 +123,7 @@ export class BetsController {
 
     // Create a new bet
     async createBet(req: Request, res: Response) {
-        const transaction = await prisma.$transaction(async (prisma) => {
+        const transaction = await prisma.$transaction(async (prisma: any) => {
             try {
                 const {
                     type,
