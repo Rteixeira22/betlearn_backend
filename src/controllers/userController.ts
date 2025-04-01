@@ -134,10 +134,10 @@ export class UserController {
     try {
       const username = req.params.username
       const user = await prisma.users.findUnique({
-        where: { username }
+        where: { username: username }
       })
       if (!user) {
-        return res.status(404).json({ error: 'User not found' })
+         res.status(404).json({ error: 'User not found' })
       }
       res.json(user)
     } catch (error) {
@@ -152,7 +152,7 @@ export class UserController {
         where: { email }
       })
       if (!user) {
-        return res.status(404).json({ error: 'User not found' })
+        res.status(404).json({ error: 'User not found' })
       }
       res.json(user)
     } catch (error) {
@@ -207,17 +207,17 @@ export class UserController {
   
       const userId = Number(req.params.id);
       if (isNaN(userId)) {
-        return res.status(400).json({ error: "Invalid user ID" });
+         res.status(400).json({ error: "Invalid user ID" });
       }
   
       const { password } = req.body;
       if (!password || password.length < 8) {
-        return res.status(400).json({ error: "Password must be at least 8 characters long" });
+         res.status(400).json({ error: "Password must be at least 8 characters long" });
       }
   
       const existingUser = await prisma.users.findUnique({ where: { id_user: userId } });
       if (!existingUser) {
-        return res.status(404).json({ error: "User not found" });
+         res.status(404).json({ error: "User not found" });
       }
   
       const hashedPassword = await bcrypt.hash(password, 10);

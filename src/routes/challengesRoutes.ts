@@ -15,8 +15,8 @@ router.get("/:id", challengeController.getChallengeById);
 // Get steps by challenge ID
 router.get("/:id/steps", challengeController.getStepsByChallengeId);
 
-
-
+// Get count of challenges
+router.get("/count", challengeController.countChallenges);
 
 //POST METHOTDS
 
@@ -24,12 +24,16 @@ router.get("/:id/steps", challengeController.getStepsByChallengeId);
 router.post("/", challengeController.createChallenge);
 
 //create user has challenge
-router.post("/:id_user/:id_challenge", challengeController.createUserHasChallenges);
+router.post(
+  "/:id_user/:id_challenge",
+  challengeController.createUserHasChallenges
+);
 
 // umblock next challenge
-router.post("/:id_user/:id_challenge/unblock-next", challengeController.unblockNextChallenge);
-
-
+router.post(
+  "/:id_user/:id_challenge/unblock-next",
+  challengeController.unblockNextChallenge
+);
 
 //UPDATE METHOTDS
 
@@ -37,15 +41,23 @@ router.post("/:id_user/:id_challenge/unblock-next", challengeController.unblockN
 router.patch("/:id", challengeController.updateChallengeById);
 
 //update user has challenges detail_seen
-router.patch("/:id_user/:id_challenge", challengeController.updateUserHasChallengesDetailSeen);
+router.patch(
+  "/:id_user/:id_challenge",
+  challengeController.updateUserHasChallengesDetailSeen
+);
 
 //update user has challenges progress_percentage
-//este vai fazer com que o umblock next challenge seja chamado 
-router.patch("/:id_user/:id_challenge/progress", challengeController.updateUserHasChallengesProgressPercentage);
+//este vai fazer com que o umblock next challenge seja chamado
+router.patch(
+  "/:id_user/:id_challenge/progress",
+  challengeController.updateUserHasChallengesProgressPercentage
+);
 
 //update state dos challenges and update of progress_percentage  (aqui ter em atenção que recebe um array de steps- podemos atualizar o state de todos os steps de uma vez - depois de estarem todos ele vai puxar percentage atualize e se for 100 vai fazer o unblock next challenge)
-router.patch("/:id_user/:id_challenge/state", challengeController.updateUserHasStepState );
-
+router.patch(
+  "/:id_user/:id_challenge/state",
+  challengeController.updateUserHasStepState
+);
 
 //DELETE METHOTDS
 

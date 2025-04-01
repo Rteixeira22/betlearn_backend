@@ -23,7 +23,7 @@ router.patch('/:id/profile', userController.updateUserProfile)
 router.patch('/:id/money', userController.updateUserMoney)
 router.patch('/:id/points', userController.updateUserPoints)
 router.patch('/:id/bets-visibility', userController.updateUserBetsVisibility)
-router.patch('/:id/tuturial-verification', userController.updateUserTutorialVerification)
+router.patch('/:id/tutorial-verification', userController.updateUserTutorialVerification)
 
 
 
