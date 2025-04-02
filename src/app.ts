@@ -12,6 +12,9 @@ import stepsRoutes from "./routes/stepsRoutes";
 import adminRoutes from "./routes/adminRoutes";
 import { PrismaClient } from "@prisma/client";
 
+import SwaggerUi from "swagger-ui-express";
+import { swaggerSpecs } from "./swagger";
+
 class App {
   public app: express.Application;
   public prisma: PrismaClient;
@@ -41,6 +44,7 @@ class App {
     this.app.use("/api/questionnaire", questionnaireRoutes);
     this.app.use("/api/steps", stepsRoutes);
     this.app.use("/api/admin", adminRoutes);
+    this.app.use("/api-docs", SwaggerUi.serve, SwaggerUi.setup(swaggerSpecs));
   }
 
   private handleUncaughtErrors() {
