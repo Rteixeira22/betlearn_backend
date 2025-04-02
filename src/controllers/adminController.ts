@@ -1,6 +1,8 @@
 
 import { PrismaClient } from '@prisma/client'
 import { Request, Response } from 'express'
+import bcrypt from 'bcrypt';
+
 
 const prisma = new PrismaClient()
 
@@ -33,12 +35,13 @@ export class AdminController {
     async createAdmin(req: Request, res: Response) {
         try {
             const { name, email, username, password } = req.body
+            const hashedPassword = await bcrypt.hash(password, 10)
             const newAdmin = await prisma.admin.create({
                 data: {
                     name,
                     email,
                     username,
-                    password,
+                    password: hashedPassword,
                 }
             })
             res.json(newAdmin)
