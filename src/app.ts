@@ -12,6 +12,10 @@ import stepsRoutes from "./routes/stepsRoutes";
 import adminRoutes from "./routes/adminRoutes";
 import { PrismaClient } from "@prisma/client";
 
+
+//o kiko gostava de fazer o prisma client aqui e depois passava para o controller
+//o que achas?
+
 class App {
   public app: express.Application;
   public prisma: PrismaClient;
