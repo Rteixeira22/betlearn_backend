@@ -5,7 +5,6 @@ import betsRoutes from "./routes/betsRoutes";
 import tipsRoutes from "./routes/tipsRoutes";
 import challengesRoutes from "./routes/challengesRoutes";
 import gamesRoutes from "./routes/gamesRoutes";
-import leaderboardRoutes from "./routes/leaderboardRoutes";
 import championshipsRoutes from "./routes/championshipsRoutes";
 import questionnaireRoutes from "./routes/questionnaireRoutes";
 import stepsRoutes from "./routes/stepsRoutes";
@@ -39,7 +38,6 @@ class App {
     this.app.use("/api/tips", tipsRoutes);
     this.app.use("/api/challenges", challengesRoutes);
     this.app.use("/api/games", gamesRoutes);
-    this.app.use("/api/leaderboard", leaderboardRoutes);
     this.app.use("/api/championships", championshipsRoutes);
     this.app.use("/api/questionnaire", questionnaireRoutes);
     this.app.use("/api/steps", stepsRoutes);
