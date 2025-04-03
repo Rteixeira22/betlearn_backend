@@ -10,9 +10,9 @@ generator client {
 
 model Users {
   id_user               Int                      @id @default(autoincrement())
-  name                  String                   @db.VarChar(100)
-  email                 String                   @unique @db.VarChar(100)
-  username              String                   @unique @db.VarChar(50)
+  name                  String                   @db.VarChar(150)
+  email                 String                   @unique @db.VarChar(150)
+  username              String                   @unique @db.VarChar(100)
   birthdate             DateTime                 @db.Date
   money                 Decimal                  @db.Decimal(10, 2)
   points                Int
@@ -29,8 +29,8 @@ model Challenges {
   id_challenge      Int                   @id @default(autoincrement())
   number            Int
   name              String                @db.VarChar(50)
-  short_description String                @db.VarChar(100)
-  long_description  String                @db.VarChar(150)
+  short_description String                @db.VarChar(300)
+  long_description  String                @db.VarChar(1000)
   image             String                @db.VarChar(200)
   Steps             Steps[]
   UserHasChallenges User_has_Challenges[]
@@ -43,8 +43,8 @@ model User_has_Challenges {
   blocked                   Boolean
   detail_seen               Boolean
   progress_percentage       Int                             @default(0)
-  user                      Users                           @relation(fields: [ref_id_user], references: [id_user])
-  challenge                 Challenges                      @relation(fields: [ref_id_challenge], references: [id_challenge])
+  user                      Users                           @relation(fields: [ref_id_user], references: [id_user], onDelete: Cascade)
+  challenge                 Challenges                      @relation(fields: [ref_id_challenge], references: [id_challenge], onDelete: Cascade)
   UserHasChallengesHasSteps User_has_Challenges_has_Steps[]
 
   @@id([ref_id_user, ref_id_challenge])
@@ -61,7 +61,7 @@ model Questionnaire_Response {
   debt_monthly              Decimal @db.Decimal(10, 2)
   income_source             Int
   ref_id_user               Int
-  user                      Users   @relation(fields: [ref_id_user], references: [id_user])
+  user                      Users   @relation(fields: [ref_id_user], references: [id_user], onDelete: Cascade)
 }
 
 model Bets {
@@ -75,7 +75,7 @@ model Bets {
   state             Int              @db.SmallInt
   result            Int              @db.SmallInt
   ref_id_user       Int
-  user              Users            @relation(fields: [ref_id_user], references: [id_user])
+  user              Users            @relation(fields: [ref_id_user], references: [id_user], onDelete: Cascade)
   BetsHasGames      Bets_has_Games[]
 }
 
@@ -115,8 +115,8 @@ model User_has_Challenges_has_Steps {
   ref_user_has_Challenges_id_challenge Int
   ref_id_steps                         Int
   state                                Int                 @db.SmallInt
-  user_has_challenges                  User_has_Challenges @relation(fields: [ref_user_has_Challenges_id_user, ref_user_has_Challenges_id_challenge], references: [ref_id_user, ref_id_challenge])
-  step                                 Steps               @relation(fields: [ref_id_steps], references: [id_step])
+  user_has_challenges                  User_has_Challenges @relation(fields: [ref_user_has_Challenges_id_user, ref_user_has_Challenges_id_challenge], references: [ref_id_user, ref_id_challenge], onDelete: Cascade)
+  step                                 Steps               @relation(fields: [ref_id_steps], references: [id_step], onDelete: Cascade)
 
   @@id([ref_user_has_Challenges_id_user, ref_user_has_Challenges_id_challenge, ref_id_steps])
 }
@@ -128,11 +128,11 @@ model Steps {
   ref_id_step_view          Int?
   ref_id_step_questionnaire Int?
   ref_id_challenges         Int
-  Step_Video                Step_Video?                     @relation(fields: [ref_id_step_video], references: [id_step_video])
-  Step_Bet                  Step_Bet?                       @relation(fields: [ref_id_step_bet], references: [id_step_bet])
-  Step_View                 Step_View?                      @relation(fields: [ref_id_step_view], references: [id_step_view])
-  Step_Questionnaire        Step_Questionnaire?             @relation(fields: [ref_id_step_questionnaire], references: [id_step_questionnaire])
-  Challenge                 Challenges                      @relation(fields: [ref_id_challenges], references: [id_challenge])
+  Step_Video                Step_Video?                     @relation(fields: [ref_id_step_video], references: [id_step_video], onDelete: Cascade)
+  Step_Bet                  Step_Bet?                       @relation(fields: [ref_id_step_bet], references: [id_step_bet], onDelete: Cascade)
+  Step_View                 Step_View?                      @relation(fields: [ref_id_step_view], references: [id_step_view], onDelete: Cascade)
+  Step_Questionnaire        Step_Questionnaire?             @relation(fields: [ref_id_step_questionnaire], references: [id_step_questionnaire], onDelete: Cascade)
+  Challenge                 Challenges                      @relation(fields: [ref_id_challenges], references: [id_challenge], onDelete: Cascade)
   UserHasChallengesHasSteps User_has_Challenges_has_Steps[]
 }
 
