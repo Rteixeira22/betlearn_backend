@@ -1,0 +1,55 @@
+import { PrismaClient } from '@prisma/client'
+import { Request, Response } from 'express'
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+
+const prisma = new PrismaClient()
+
+export class AuthController {
+  async login(req: Request, res: Response) {
+    try {
+      const { username, password } = req.body;
+      
+      // Verificar se o usuário existe
+      const user = await prisma.users.findUnique({
+        where: { username }
+      });
+      
+      if (!user) {
+        return res.status(401).json({ error: 'Credenciais inválidas' });
+      }
+      
+      // Verificar a senha
+      const isPasswordValid = await bcrypt.compare(password, user.password);
+      
+      if (!isPasswordValid) {
+        return res.status(401).json({ error: 'Credenciais inválidas' });
+      }
+      
+      // Gerar token JWT
+      const token = jwt.sign(
+        {
+          userId: user.id,
+          email: user.email,
+          username: user.username
+        },
+        process.env.JWT_SECRET || 'seu_secret_key',
+        { expiresIn: '12h' }
+      );
+      
+      // Retornar usuário e token
+      const { password: _, ...userWithoutPassword } = user;
+      res.status(200).json({
+        user: userWithoutPassword,
+        token
+      });
+      
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Falha na autenticação' });
+    }
+  }
+  
+}  
+
+

@@ -10,6 +10,7 @@ import championshipsRoutes from "./routes/championshipsRoutes";
 import questionnaireRoutes from "./routes/questionnaireRoutes";
 import stepsRoutes from "./routes/stepsRoutes";
 import adminRoutes from "./routes/adminRoutes";
+import authRoutes from "./routes/authRoutes";
 import { PrismaClient } from "@prisma/client";
 
 
@@ -45,6 +46,7 @@ class App {
     this.app.use("/api/questionnaire", questionnaireRoutes);
     this.app.use("/api/steps", stepsRoutes);
     this.app.use("/api/admin", adminRoutes);
+    this.app.use("/api/auth", authRoutes);
   }
 
   private handleUncaughtErrors() {
