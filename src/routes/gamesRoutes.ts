@@ -108,11 +108,11 @@
  *                 example: 1.5
  *               goals_local_team:
  *                 type: integer
- *                 description: Gols da equipa local
+ *                 description: Golos da equipa local
  *                 example: 2
  *               goals_visitor_team:
  *                 type: integer
- *                 description: Gols da equipa visitante
+ *                 description: Golos da equipa visitante
  *                 example: 1
  *               image:
  *                 type: string
@@ -258,11 +258,11 @@
  *           example: 1.5
  *         goals_local_team:
  *           type: integer
- *           description: Gols da equipa local
+ *           description: Golos da equipa local
  *           example: 2
  *         goals_visitor_team:
  *           type: integer
- *           description: Gols da equipa visitante
+ *           description: Golos da equipa visitante
  *           example: 1
  *         image:
  *           type: string

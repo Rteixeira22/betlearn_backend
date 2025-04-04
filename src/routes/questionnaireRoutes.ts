@@ -286,7 +286,7 @@
  *               items:
  *                 $ref: '#/components/schemas/QuestionnaireResponse'
  *       500:
- *         description: Erro ao buscar respostas.
+ *         description: Erro ao procurar respostas.
  */
 
 /**
@@ -326,7 +326,7 @@
  *         schema:
  *           type: integer
  *         example: 1
- *         description: ID da resposta do questionário a ser deletada.
+ *         description: ID da resposta do questionário a ser apagada.
  *     responses:
  *       200:
  *         description: Resposta Apagada com sucesso.

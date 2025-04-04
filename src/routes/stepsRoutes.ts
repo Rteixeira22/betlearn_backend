@@ -19,7 +19,7 @@
  *             schema:
  *               type: array
  *               items:
- *                 $ref: '#/components/schemas/Step'
+ *                 $ref: '#/components/schemas/Stepss'
  *       500:
  *         description: Erro ao buscar passos.
  */
@@ -44,7 +44,7 @@
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Step'
+ *               $ref: '#/components/schemas/Stepss'
  *       500:
  *         description: Erro ao buscar o passo.
  */
@@ -71,7 +71,7 @@
  *             schema:
  *               type: array
  *               items:
- *                 $ref: '#/components/schemas/Step'
+ *                 $ref: '#/components/schemas/Steps'
  *       500:
  *         description: Erro ao buscar passos.
  */
@@ -98,7 +98,7 @@
  *             schema:
  *               type: array
  *               items:
- *                 $ref: '#/components/schemas/StepVideo'
+ *                 $ref: '#/components/schemas/StepsVideo'
  *       500:
  *         description: Erro ao buscar passos.
  */
@@ -125,7 +125,7 @@
  *             schema:
  *               type: array
  *               items:
- *                 $ref: '#/components/schemas/StepBet'
+ *                 $ref: '#/components/schemas/StepsBet'
  *       500:
  *         description: Erro ao buscar passos.
  */
@@ -152,7 +152,7 @@
  *             schema:
  *               type: array
  *               items:
- *                 $ref: '#/components/schemas/StepView'
+ *                 $ref: '#/components/schemas/StepsView'
  *       500:
  *         description: Erro ao buscar passos.
  */
@@ -179,7 +179,7 @@
  *             schema:
  *               type: array
  *               items:
- *                 $ref: '#/components/schemas/StepQuestionnaire'
+ *                 $ref: '#/components/schemas/StepsQuestionnaire'
  *       500:
  *         description: Erro ao buscar passos.
  */
@@ -211,7 +211,7 @@
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/StepVideo'
+ *               $ref: '#/components/schemas/StepsVideo'
  *       500:
  *         description: Erro ao criar o vídeo.
  */
@@ -244,7 +244,7 @@
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/StepBet'
+ *               $ref: '#/components/schemas/StepsBet'
  *       500:
  *         description: Erro ao criar a aposta.
  */
@@ -277,7 +277,7 @@
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/StepView'
+ *               $ref: '#/components/schemas/StepsView'
  *       500:
  *         description: Erro ao criar a visualização.
  */
@@ -310,7 +310,7 @@
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/StepQuestionnaire'
+ *               $ref: '#/components/schemas/StepsQuestionnaire'
  *       500:
  *         description: Erro ao criar o questionário.
  */
@@ -350,7 +350,7 @@
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Step'
+ *               $ref: '#/components/schemas/Steps'
  *       500:
  *         description: Erro ao criar o passo.
  */
@@ -438,7 +438,7 @@
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/StepVideo'
+ *               $ref: '#/components/schemas/StepsVideo'
  *       500:
  *         description: Erro ao atualizar o vídeo.
  */
@@ -479,7 +479,7 @@
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/StepBet'
+ *               $ref: '#/components/schemas/StepsBet'
  *       500:
  *         description: Erro ao atualizar a aposta.
  */
@@ -520,7 +520,7 @@
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/StepView'
+ *               $ref: '#/components/schemas/StepsView'
  *       500:
  *         description: Erro ao atualizar a visualização.
  */
@@ -561,7 +561,7 @@
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/StepQuestionnaire'
+ *               $ref: '#/components/schemas/StepsQuestionnaire'
  *       500:
  *         description: Erro ao atualizar o questionário.
  */
@@ -598,7 +598,7 @@
  * @swagger
  * components:
  *   schemas:
- *     Step:
+ *     Steps:
  *       type: object
  *       properties:
  *         id_step:
