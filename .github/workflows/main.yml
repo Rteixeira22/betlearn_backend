@@ -5,10 +5,10 @@ name: Preview_&_Build_API
 on:
   push: # Em qualquer commit para ca feito na main
     branches:
-      - main
+      - main || Pipeline
   pull_request: # Em qualquer pull request para a main
     branches:
-      - main
+      - main || Pipeline
 
 # Jobs a ser executados
 jobs:
