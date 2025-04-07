@@ -32,7 +32,7 @@ jobs:
       - name: Instalar Modulos If Cache Not Found
         if: steps.cache-npm.outputs.cache-hit != 'true'
         run: npm install
-        working-directory: ./betlearn_backend
+        working-directory: betlearn_backend
 
   deploy-vercel-preview:
     name: Deploy do Vercel em Preview
