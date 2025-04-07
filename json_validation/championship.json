@@ -1,100 +1,289 @@
 {
-    "championship_name": "Northern Star League",
-    "round": 12,
-    "classification": [
-      {"position": 1, "team": "FC Porto Alegre", "points": 29, "wins": 9, "draws": 2, "losts": 0, "goals_for": 28, "goals_against": 5, "goals_difference": 23},
-      {"position": 2, "team": "Sporting Lisboa", "points": 26, "wins": 8, "draws": 2, "losts": 1, "goals_for": 24, "goals_against": 8, "goals_difference": 16},
-      {"position": 3, "team": "Atlético Madeira", "points": 22, "wins": 7, "draws": 1, "losts": 3, "goals_for": 20, "goals_against": 11, "goals_difference": 9},
-      {"position": 4, "team": "Real Coimbra", "points": 21, "wins": 6, "draws": 3, "losts": 2, "goals_for": 19, "goals_against": 10, "goals_difference": 9},
-      {"position": 5, "team": "Estrela Braga", "points": 19, "wins": 5, "draws": 4, "losts": 2, "goals_for": 18, "goals_against": 14, "goals_difference": 4},
-      {"position": 6, "team": "Marítimo Faro", "points": 19, "wins": 6, "draws": 1, "losts": 4, "goals_for": 17, "goals_against": 13, "goals_difference": 4},
-      {"position": 7, "team": "Benfica Aveiro", "points": 16, "wins": 4, "draws": 4, "losts": 3, "goals_for": 14, "goals_against": 12, "goals_difference": 2},
-      {"position": 8, "team": "União Viseu", "points": 16, "wins": 5, "draws": 1, "losts": 5, "goals_for": 13, "goals_against": 14, "goals_difference": -1},
-      {"position": 9, "team": "Vitória Setúbal", "points": 14, "wins": 4, "draws": 2, "losts": 5, "goals_for": 15, "goals_against": 18, "goals_difference": -3},
-      {"position": 10, "team": "Académica Leiria", "points": 13, "wins": 3, "draws": 4, "losts": 4, "goals_for": 12, "goals_against": 14, "goals_difference": -2},
-      {"position": 11, "team": "Desportivo Évora", "points": 13, "wins": 3, "draws": 4, "losts": 4, "goals_for": 10, "goals_against": 13, "goals_difference": -3},
-      {"position": 12, "team": "Boavista Santarém", "points": 12, "wins": 3, "draws": 3, "losts": 5, "goals_for": 11, "goals_against": 15, "goals_difference": -4},
-      {"position": 13, "team": "Nacional Guarda", "points": 10, "wins": 3, "draws": 1, "losts": 7, "goals_for": 10, "goals_against": 19, "goals_difference": -9},
-      {"position": 14, "team": "Tondela Unidos", "points": 9, "wins": 2, "draws": 3, "losts": 6, "goals_for": 9, "goals_against": 18, "goals_difference": -9},
-      {"position": 15, "team": "Gil Varzim", "points": 8, "wins": 2, "draws": 2, "losts": 7, "goals_for": 8, "goals_against": 17, "goals_difference": -9},
-      {"position": 16, "team": "Beira-Mar FC", "points": 8, "wins": 2, "draws": 2, "losts": 7, "goals_for": 7, "goals_against": 17, "goals_difference": -10},
-      {"position": 17, "team": "Portimonense Alentejo", "points": 7, "wins": 1, "draws": 4, "losts": 6, "goals_for": 8, "goals_against": 20, "goals_difference": -12},
-      {"position": 18, "team": "Chaves Douro", "points": 5, "wins": 1, "draws": 2, "losts": 8, "goals_for": 6, "goals_against": 21, "goals_difference": -15}
-    ],
-    "games": [
-      {
-        "local_team": "FC Porto Alegre",
-        "visitor_team": "Vitória Setúbal",
-        "odds": {"1": 1.25, "x": 5.50, "2": 11.00},
-        "goals_local_team": 3,
-        "goals_visitor_team": 0,
-        "schedule": "15:30"
-      },
-      {
-        "local_team": "Sporting Lisboa",
-        "visitor_team": "Gil Varzim",
-        "odds": {"1": 1.35, "x": 5.00, "2": 9.00},
-        "goals_local_team": 2,
-        "goals_visitor_team": 0,
-        "schedule": "17:45"
-      },
-      {
-        "local_team": "Atlético Madeira",
-        "visitor_team": "Portimonense Alentejo",
-        "odds": {"1": 1.45, "x": 4.50, "2": 7.00},
-        "goals_local_team": 2,
-        "goals_visitor_team": 1,
-        "schedule": "19:15"
-      },
-      {
-        "local_team": "Real Coimbra",
-        "visitor_team": "Desportivo Évora",
-        "odds": {"1": 1.65, "x": 3.75, "2": 5.25},
-        "goals_local_team": 1,
-        "goals_visitor_team": 0,
-        "schedule": "20:30"
-      },
-      {
-        "local_team": "Benfica Aveiro",
-        "visitor_team": "Estrela Braga",
-        "odds": {"1": 2.60, "x": 3.20, "2": 2.70},
-        "goals_local_team": 1,
-        "goals_visitor_team": 1,
-        "schedule": "16:00"
-      },
-      {
-        "local_team": "União Viseu",
-        "visitor_team": "Tondela Unidos",
-        "odds": {"1": 1.85, "x": 3.50, "2": 4.25},
-        "goals_local_team": 2,
-        "goals_visitor_team": 0,
-        "schedule": "18:15"
-      },
-      {
-        "local_team": "Marítimo Faro",
-        "visitor_team": "Académica Leiria",
-        "odds": {"1": 1.75, "x": 3.60, "2": 4.75},
-        "goals_local_team": 3,
-        "goals_visitor_team": 1,
-        "schedule": "15:00"
-      },
-      {
-        "local_team": "Boavista Santarém",
-        "visitor_team": "Nacional Guarda",
-        "odds": {"1": 2.10, "x": 3.30, "2": 3.50},
-        "goals_local_team": 1,
-        "goals_visitor_team": 2,
-        "schedule": "17:00"
-      },
-      {
-        "local_team": "Chaves Douro",
-        "visitor_team": "Beira-Mar FC",
-        "odds": {"1": 2.45, "x": 3.20, "2": 2.90},
-        "goals_local_team": 0,
-        "goals_visitor_team": 0,
-        "schedule": "21:00"
-      }
-    ]
-  }
-
-  
+  "championship_id": "FC-2025",
+  "championship_name": "Liga Fictícia de Ouro",
+  "round": 14,
+  "generated_at": "2025-04-07",
+  "classification": [
+    {
+      "position": 1,
+      "team": "Atlético Solaris",
+      "points": 34,
+      "wins": 11,
+      "draws": 1,
+      "losts": 2,
+      "goals_for": 29,
+      "goals_against": 10,
+      "goals_difference": 19
+    },
+    {
+      "position": 2,
+      "team": "Tempestade Azul",
+      "points": 31,
+      "wins": 10,
+      "draws": 1,
+      "losts": 3,
+      "goals_for": 27,
+      "goals_against": 13,
+      "goals_difference": 14
+    },
+    {
+      "position": 3,
+      "team": "Vulcânicos FC",
+      "points": 29,
+      "wins": 9,
+      "draws": 2,
+      "losts": 3,
+      "goals_for": 26,
+      "goals_against": 15,
+      "goals_difference": 11
+    },
+    {
+      "position": 4,
+      "team": "Leões de Prata",
+      "points": 26,
+      "wins": 8,
+      "draws": 2,
+      "losts": 4,
+      "goals_for": 24,
+      "goals_against": 16,
+      "goals_difference": 8
+    },
+    {
+      "position": 5,
+      "team": "Estrela do Norte",
+      "points": 24,
+      "wins": 7,
+      "draws": 3,
+      "losts": 4,
+      "goals_for": 22,
+      "goals_against": 18,
+      "goals_difference": 4
+    },
+    {
+      "position": 6,
+      "team": "Dragões do Vale",
+      "points": 22,
+      "wins": 6,
+      "draws": 4,
+      "losts": 4,
+      "goals_for": 20,
+      "goals_against": 17,
+      "goals_difference": 3
+    },
+    {
+      "position": 7,
+      "team": "Falcões Rubros",
+      "points": 21,
+      "wins": 6,
+      "draws": 3,
+      "losts": 5,
+      "goals_for": 19,
+      "goals_against": 17,
+      "goals_difference": 2
+    },
+    {
+      "position": 8,
+      "team": "Maré Alta FC",
+      "points": 19,
+      "wins": 5,
+      "draws": 4,
+      "losts": 5,
+      "goals_for": 17,
+      "goals_against": 18,
+      "goals_difference": -1
+    },
+    {
+      "position": 9,
+      "team": "Raios de Aço",
+      "points": 17,
+      "wins": 5,
+      "draws": 2,
+      "losts": 7,
+      "goals_for": 16,
+      "goals_against": 20,
+      "goals_difference": -4
+    },
+    {
+      "position": 10,
+      "team": "Cavaleiros do Sul",
+      "points": 16,
+      "wins": 4,
+      "draws": 4,
+      "losts": 6,
+      "goals_for": 15,
+      "goals_against": 20,
+      "goals_difference": -5
+    },
+    {
+      "position": 11,
+      "team": "Lobos da Serra",
+      "points": 15,
+      "wins": 4,
+      "draws": 3,
+      "losts": 7,
+      "goals_for": 14,
+      "goals_against": 21,
+      "goals_difference": -7
+    },
+    {
+      "position": 12,
+      "team": "Real Aurora",
+      "points": 14,
+      "wins": 3,
+      "draws": 5,
+      "losts": 6,
+      "goals_for": 13,
+      "goals_against": 20,
+      "goals_difference": -7
+    },
+    {
+      "position": 13,
+      "team": "Troncos Verdes",
+      "points": 13,
+      "wins": 3,
+      "draws": 4,
+      "losts": 7,
+      "goals_for": 12,
+      "goals_against": 22,
+      "goals_difference": -10
+    },
+    {
+      "position": 14,
+      "team": "Montanha FC",
+      "points": 12,
+      "wins": 3,
+      "draws": 3,
+      "losts": 8,
+      "goals_for": 11,
+      "goals_against": 23,
+      "goals_difference": -12
+    },
+    {
+      "position": 15,
+      "team": "Lendas Urbanas",
+      "points": 11,
+      "wins": 2,
+      "draws": 5,
+      "losts": 7,
+      "goals_for": 10,
+      "goals_against": 22,
+      "goals_difference": -12
+    },
+    {
+      "position": 16,
+      "team": "Pioneiros FC",
+      "points": 10,
+      "wins": 2,
+      "draws": 4,
+      "losts": 8,
+      "goals_for": 9,
+      "goals_against": 24,
+      "goals_difference": -15
+    },
+    {
+      "position": 17,
+      "team": "Meteoros do Sul",
+      "points": 8,
+      "wins": 2,
+      "draws": 2,
+      "losts": 10,
+      "goals_for": 8,
+      "goals_against": 26,
+      "goals_difference": -18
+    },
+    {
+      "position": 18,
+      "team": "Império Sombrio",
+      "points": 6,
+      "wins": 1,
+      "draws": 3,
+      "losts": 10,
+      "goals_for": 7,
+      "goals_against": 28,
+      "goals_difference": -21
+    }
+  ],
+  "games": [
+    {
+      "id": 1,
+      "local_team": "Atlético Solaris",
+      "visitor_team": "Império Sombrio",
+      "odds": {"1": 1.25, "x": 5.00, "2": 9.50},
+      "goals_local_team": 3,
+      "goals_visitor_team": 0,
+      "schedule": "15:00"
+    },
+    {
+      "id": 2,
+      "local_team": "Tempestade Azul",
+      "visitor_team": "Meteoros do Sul",
+      "odds": {"1": 1.35, "x": 4.40, "2": 8.00},
+      "goals_local_team": 2,
+      "goals_visitor_team": 0,
+      "schedule": "17:00"
+    },
+    {
+      "id": 3,
+      "local_team": "Vulcânicos FC",
+      "visitor_team": "Pioneiros FC",
+      "odds": {"1": 1.40, "x": 4.20, "2": 7.50},
+      "goals_local_team": 2,
+      "goals_visitor_team": 1,
+      "schedule": "19:00"
+    },
+    {
+      "id": 4,
+      "local_team": "Leões de Prata",
+      "visitor_team": "Lendas Urbanas",
+      "odds": {"1": 1.70, "x": 3.60, "2": 5.25},
+      "goals_local_team": 2,
+      "goals_visitor_team": 1,
+      "schedule": "16:30"
+    },
+    {
+      "id": 5,
+      "local_team": "Estrela do Norte",
+      "visitor_team": "Montanha FC",
+      "odds": {"1": 1.85, "x": 3.30, "2": 4.50},
+      "goals_local_team": 1,
+      "goals_visitor_team": 0,
+      "schedule": "18:45"
+    },
+    {
+      "id": 6,
+      "local_team": "Dragões do Vale",
+      "visitor_team": "Troncos Verdes",
+      "odds": {"1": 2.00, "x": 3.20, "2": 3.80},
+      "goals_local_team": 1,
+      "goals_visitor_team": 1,
+      "schedule": "14:00"
+    },
+    {
+      "id": 7,
+      "local_team": "Falcões Rubros",
+      "visitor_team": "Real Aurora",
+      "odds": {"1": 2.10, "x": 3.10, "2": 3.60},
+      "goals_local_team": 0,
+      "goals_visitor_team": 1,
+      "schedule": "20:00"
+    },
+    {
+      "id": 8,
+      "local_team": "Maré Alta FC",
+      "visitor_team": "Lobos da Serra",
+      "odds": {"1": 2.25, "x": 3.00, "2": 3.40},
+      "goals_local_team": 2,
+      "goals_visitor_team": 2,
+      "schedule": "13:30"
+    },
+    {
+      "id": 9,
+      "local_team": "Raios de Aço",
+      "visitor_team": "Cavaleiros do Sul",
+      "odds": {"1": 2.50, "x": 2.90, "2": 3.00},
+      "goals_local_team": 1,
+      "goals_visitor_team": 1,
+      "schedule": "21:15"
+    }
+  ]
+}

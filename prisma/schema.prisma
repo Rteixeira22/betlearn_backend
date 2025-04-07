@@ -8,43 +8,35 @@ datasource db {
 }
 
 model Users {
-  id_user               Int                      @id @default(autoincrement())
-  name                  String                   @db.VarChar(100)
-  email                 String                   @unique @db.VarChar(100)
-  username              String                   @unique @db.VarChar(50)
-  birthdate             DateTime                 @db.Date
-  money                 Decimal                  @db.Decimal(10, 2)
+  id_user               Int      @id @default(autoincrement())
+  name                  String   @db.VarChar(150)
+  email                 String   @unique @db.VarChar(150)
+  username              String   @unique @db.VarChar(100)
+  birthdate             DateTime @db.Date
+  money                 Decimal  @db.Decimal(10, 2)
   points                Int
-  image                 String?                  @db.VarChar(200)
-  bets_visibility       Boolean                  @default(true)
+  image                 String?  @db.VarChar(200)
+  bets_visibility       Boolean  @default(true)
   tutorial_verification Boolean
-  password              String                   @db.VarChar(255)
-  Bets                  Bets[]
-  QuestionnaireResponse Questionnaire_Response[]
-  UserHasChallenges     User_has_Challenges[]
+  password              String   @db.VarChar(255)
 }
 
 model Challenges {
-  id_challenge      Int                   @id @default(autoincrement())
+  id_challenge      Int    @id @default(autoincrement())
   number            Int
-  name              String                @db.VarChar(50)
-  short_description String                @db.VarChar(100)
-  long_description  String                @db.VarChar(150)
-  image             String                @db.VarChar(200)
-  Steps             Steps[]
-  UserHasChallenges User_has_Challenges[]
+  name              String @db.VarChar(50)
+  short_description String @db.VarChar(300)
+  long_description  String @db.VarChar(1000)
+  image             String @db.VarChar(200)
 }
 
 model User_has_Challenges {
-  ref_id_user               Int
-  ref_id_challenge          Int
-  completed                 Boolean
-  blocked                   Boolean
-  detail_seen               Boolean
-  progress_percentage       Int                             @default(0)
-  challenge                 Challenges                      @relation(fields: [ref_id_challenge], references: [id_challenge])
-  user                      Users                           @relation(fields: [ref_id_user], references: [id_user])
-  UserHasChallengesHasSteps User_has_Challenges_has_Steps[]
+  ref_id_user         Int
+  ref_id_challenge    Int
+  completed           Boolean
+  blocked             Boolean
+  detail_seen         Boolean
+  progress_percentage Int     @default(0)
 
   @@id([ref_id_user, ref_id_challenge])
 }
@@ -60,7 +52,6 @@ model Questionnaire_Response {
   debt_monthly              Decimal @db.Decimal(10, 2)
   income_source             Int
   ref_id_user               Int
-  user                      Users   @relation(fields: [ref_id_user], references: [id_user])
 }
 
 model Bets {
@@ -74,7 +65,6 @@ model Bets {
   state             Int              @db.SmallInt
   result            Int              @db.SmallInt
   ref_id_user       Int
-  user              Users            @relation(fields: [ref_id_user], references: [id_user])
   BetsHasGames      Bets_has_Games[]
 }
 
@@ -105,7 +95,7 @@ model Bets_has_Games {
 
 model Championship {
   id_championship Int              @id @default(autoincrement())
-  json            String           @unique @db.VarChar(200)
+  json            String           @unique @db.Text
   BetsHasGames    Bets_has_Games[]
 }
 
@@ -113,54 +103,42 @@ model User_has_Challenges_has_Steps {
   ref_user_has_Challenges_id_user      Int
   ref_user_has_Challenges_id_challenge Int
   ref_id_steps                         Int
-  state                                Int                 @db.SmallInt
-  step                                 Steps               @relation(fields: [ref_id_steps], references: [id_step])
-  user_has_challenges                  User_has_Challenges @relation(fields: [ref_user_has_Challenges_id_user, ref_user_has_Challenges_id_challenge], references: [ref_id_user, ref_id_challenge])
+  state                                Int @db.SmallInt
 
   @@id([ref_user_has_Challenges_id_user, ref_user_has_Challenges_id_challenge, ref_id_steps])
 }
 
 model Steps {
-  id_step                   Int                             @id @default(autoincrement())
+  id_step                   Int  @id @default(autoincrement())
   ref_id_step_video         Int?
   ref_id_step_bet           Int?
   ref_id_step_view          Int?
   ref_id_step_questionnaire Int?
   ref_id_challenges         Int
-  Challenge                 Challenges                      @relation(fields: [ref_id_challenges], references: [id_challenge])
-  Step_Bet                  Step_Bet?                       @relation(fields: [ref_id_step_bet], references: [id_step_bet])
-  Step_Questionnaire        Step_Questionnaire?             @relation(fields: [ref_id_step_questionnaire], references: [id_step_questionnaire])
-  Step_Video                Step_Video?                     @relation(fields: [ref_id_step_video], references: [id_step_video])
-  Step_View                 Step_View?                      @relation(fields: [ref_id_step_view], references: [id_step_view])
-  UserHasChallengesHasSteps User_has_Challenges_has_Steps[]
 }
 
 model Step_Video {
-  id_step_video     Int     @id @default(autoincrement())
-  video_url         String  @db.VarChar(200)
-  video_description String  @db.VarChar(200)
-  Steps             Steps[]
+  id_step_video     Int    @id @default(autoincrement())
+  video_url         String @db.VarChar(200)
+  video_description String @db.VarChar(200)
 }
 
 model Step_Bet {
-  id_step_bet     Int     @id @default(autoincrement())
-  bet_description String  @db.VarChar(200)
-  bet_json        String  @db.VarChar(200)
-  Steps           Steps[]
+  id_step_bet     Int    @id @default(autoincrement())
+  bet_description String @db.VarChar(200)
+  bet_json        String @db.VarChar(200)
 }
 
 model Step_Questionnaire {
-  id_step_questionnaire     Int     @id @default(autoincrement())
-  questionnaire_description String  @db.VarChar(200)
-  questionnaire_json        String  @db.VarChar(45)
-  Steps                     Steps[]
+  id_step_questionnaire     Int    @id @default(autoincrement())
+  questionnaire_description String @db.VarChar(200)
+  questionnaire_json        String @db.VarChar(45)
 }
 
 model Step_View {
-  id_step_view     Int     @id @default(autoincrement())
-  view_description String  @db.VarChar(200)
-  view_page        String  @db.VarChar(200)
-  Steps            Steps[]
+  id_step_view     Int    @id @default(autoincrement())
+  view_description String @db.VarChar(200)
+  view_page        String @db.VarChar(200)
 }
 
 model Tips {

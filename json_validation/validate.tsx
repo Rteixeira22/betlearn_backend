@@ -1,15 +1,19 @@
 const Ajv = require("ajv");
+const addFormats = require("ajv-formats");
 const fs = require("fs");
 const path = require("path");
+const axios = require("axios");
 
 const ajv = new Ajv({ allErrors: true });
+addFormats(ajv); // Add support for formats like "date"
 
-// Define the schema based on the championship table structure
 const schema = {
   type: "object",
   properties: {
+    championship_id: { type: "string", minLength: 3 },
     championship_name: { type: "string", minLength: 3 },
     round: { type: "integer", minimum: 6, maximum: 27 },
+    generated_at: { type: "string", format: "date" },
     classification: {
       type: "array",
       minItems: 18,
@@ -47,6 +51,7 @@ const schema = {
       items: {
         type: "object",
         properties: {
+          id: { type: "integer", minimum: 1 },
           local_team: { type: "string", minLength: 3 },
           visitor_team: { type: "string", minLength: 3 },
           odds: {
@@ -63,6 +68,7 @@ const schema = {
           schedule: { type: "string", pattern: "^(\\d{2}):(\\d{2})$" },
         },
         required: [
+          "id",
           "local_team",
           "visitor_team",
           "odds",
@@ -73,11 +79,18 @@ const schema = {
       },
     },
   },
-  required: ["championship_name", "round", "classification", "games"],
+  required: [
+    "championship_id",
+    "championship_name",
+    "round",
+    "generated_at",
+    "classification",
+    "games",
+  ],
 };
 
-// FUNCTION TO VALIDATE JSON
-function validateChampionship(filePath) {
+// FUNCTION TO VALIDATE AND UPLOAD JSON
+async function validateAndUploadChampionship(filePath) {
   try {
     // Read the JSON file
     const data = fs.readFileSync(filePath, "utf-8");
@@ -89,18 +102,25 @@ function validateChampionship(filePath) {
 
     if (!valid) {
       console.error("Invalid JSON:", validate.errors);
-      return false;
+      return;
     }
-    console.log("Valid JSON");
-    return true;
+
+    console.log("Valid JSON. Uploading to the database...");
+
+    const serializedJson = JSON.stringify(jsonData);
+
+    // Send the serialized JSON to the correct POST route
+    const response = await axios.post("http://localhost:3000/api/championships", {
+      json: serializedJson, 
+    });
+
+    console.log("Upload successful:", response.data);
   } catch (error) {
-    console.error("Erro ao validar o JSON:", error.message);
-    return false;
+    console.error("Error:", error.message);
   }
 }
 
-// Path to the championship.json file
 const filePath = path.join(__dirname, "championship.json");
 
-// Validate the JSON file
-validateChampionship(filePath);
+// Validate and upload the JSON file
+validateAndUploadChampionship(filePath);
