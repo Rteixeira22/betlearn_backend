@@ -1,16 +1,3 @@
-/* Challenges:
-    get:
-    challenges
-    challenges→ligação com user_has_challenges→ mostrar desafios de acordo com os ativos
-    challenges/:id 
-    :id/challenges/:id/steps  ????
-
-
-    create
-    update
-    delete
- */
-
 import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
 import axios from "axios";
@@ -44,6 +31,7 @@ export class ChallengesController {
   async countChallenges(req: Request, res: Response) {
     try {
       const count = await prisma.challenges.count();
+      console.log("Count fetched successfully:", count);
       res.json({ count });
     } catch (error) {
       res.status(500).json({ error: "Failed to count challenges" });
@@ -206,7 +194,7 @@ export class ChallengesController {
       const nextChallenge = await prisma.challenges.findFirst({
         where: {
           number: {
-            gt: currentChallenge?.number ?? 0,
+            gt: currentChallenge?.number,
           },
         },
         orderBy: {

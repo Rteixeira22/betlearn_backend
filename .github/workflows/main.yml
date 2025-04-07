@@ -1,0 +1,93 @@
+# Nome da Pipeline
+name: Preview_&_Build_API
+
+# Ocasioes em que o workflow comeca a trabalhar
+on:
+  push: # Em qualquer commit para ca feito na main ou Pipeline
+    branches:
+      - main
+      # - Pipeline # Pipeline so para a construcao
+
+# Jobs a ser executados
+jobs:
+  caching:
+    name: Criar Cache
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Cache dos modulos do NPM
+        id: cache-npm
+        uses: actions/cache@v4
+        with:
+          path: ./betlearn_backend/node_modules # Para onde vai a cache
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }} #Nome da Cache e Build
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Instalar Modulos If Cache Not Found
+        if: steps.cache-npm.outputs.cache-hit != 'true'
+        run: npm install
+
+  deploy-vercel-preview:
+    name: Deploy do Vercel em Preview
+    env:
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+    needs: caching
+    runs-on: ubuntu-latest
+    steps:
+      - name: Analisar Repositorio
+        uses: actions/checkout@v4
+
+      - name: Setup do Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: Instalar as Dependencias
+        run: npm install
+
+      - name: Instalar CLI da Vercel
+        run: npm install --global vercel@latest
+
+      - name: Pull Env Vercel
+        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_ACCESS_TOKEN }}
+
+      - name: Build Vercel
+        run: |
+          vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_ACCESS_TOKEN }}
+          vercel build --token=${{ secrets.VERCEL_ACCESS_TOKEN}}
+
+      - name: Deploy Vercel
+        run: vercel deploy --prebuilt --token=${{ secrets.VERCEL_ACCESS_TOKEN }}
+
+  deploy-vercel-production:
+    name: Deploy do Vercel em Producao
+    env:
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+    needs: deploy-vercel-preview
+    runs-on: ubuntu-latest
+    steps:
+      - name: Analisar Repositorio
+        uses: actions/checkout@v4
+
+      - name: Instalar CLI da Vercel
+        run: npm install --global vercel@latest
+
+      - name: Pull Env Vercel
+        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_ACCESS_TOKEN }}
+
+      - name: Build Vercel
+        run: |
+          vercel pull --yes --environment=production --token=${{ secrets.VERCEL_ACCESS_TOKEN }}
+          vercel build --prod --token=${{ secrets.VERCEL_ACCESS_TOKEN }}
+
+      - name: Deploy Vercel
+        run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_ACCESS_TOKEN }}

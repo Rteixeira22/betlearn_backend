@@ -5,16 +5,14 @@ import betsRoutes from "./routes/betsRoutes";
 import tipsRoutes from "./routes/tipsRoutes";
 import challengesRoutes from "./routes/challengesRoutes";
 import gamesRoutes from "./routes/gamesRoutes";
-import leaderboardRoutes from "./routes/leaderboardRoutes";
 import championshipsRoutes from "./routes/championshipsRoutes";
 import questionnaireRoutes from "./routes/questionnaireRoutes";
 import stepsRoutes from "./routes/stepsRoutes";
 import adminRoutes from "./routes/adminRoutes";
 import { PrismaClient } from "@prisma/client";
 
-
-//o kiko gostava de fazer o prisma client aqui e depois passava para o controller
-//o que achas?
+import SwaggerUi from "swagger-ui-express";
+import { swaggerSpecs } from "./swagger";
 
 class App {
   public app: express.Application;
@@ -40,11 +38,11 @@ class App {
     this.app.use("/api/tips", tipsRoutes);
     this.app.use("/api/challenges", challengesRoutes);
     this.app.use("/api/games", gamesRoutes);
-    this.app.use("/api/leaderboard", leaderboardRoutes);
     this.app.use("/api/championships", championshipsRoutes);
     this.app.use("/api/questionnaire", questionnaireRoutes);
     this.app.use("/api/steps", stepsRoutes);
     this.app.use("/api/admin", adminRoutes);
+    this.app.use("/api-docs", SwaggerUi.serve, SwaggerUi.setup(swaggerSpecs));
   }
 
   private handleUncaughtErrors() {
