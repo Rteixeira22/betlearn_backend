@@ -3,7 +3,7 @@ name: Preview_&_Build_API
 
 # Ocasioes em que o workflow comeca a trabalhar
 on:
-  push: # Em qualquer commit para ca feito em main
+  push: # Em qualquer commit para ca feito na main
     branches:
       - main
   pull_request: # Em qualquer pull request para a main
@@ -22,13 +22,13 @@ jobs:
       - name: Setup do Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '22'
-          cache: 'npm'
+          node-version: "22"
+          cache: "npm"
 
       - name: Instalar as Dependencias
         run: npm install
         working-directory: ./betlearn_backend
-          
+
       - name: Instalar CLI da Vercel
         run: npm install --global vercel@latest
         working-directory: ./betlearn_backend
