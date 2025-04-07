@@ -5,7 +5,8 @@ name: Preview_&_Build_API
 on:
   push: # Em qualquer commit para ca feito na main
     branches:
-      - main || Pipeline
+      - main
+      - Pipeline # Pipeline so para a construcao
 
 # Jobs a ser executados
 jobs:
