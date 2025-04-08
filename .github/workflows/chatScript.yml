@@ -50,4 +50,3 @@ jobs:
 
       - name: Executar o Script
         run: node getDataFromAI.ts # Executar o script
-        working-directory: betlearn_backend/scripts
