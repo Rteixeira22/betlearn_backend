@@ -33,7 +33,6 @@ jobs:
       - name: Instalar Modulos If Cache Not Found
         if: steps.cache-npm.outputs.cache-hit != 'true'
         run: npm install
-        working-directory: ./betlearn_backend
 
   run-the-script:
     name: Executar o Script
