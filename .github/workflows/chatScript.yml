@@ -49,4 +49,5 @@ jobs:
           cache: "npm"
 
       - name: Executar o Script
-        run: node betlearn_backend/scripts/getDataFromAI.ts # Executar o script
+        run: node scripts/getDataFromAI.ts # Executar o script
+        working-directory: betlearn_backend/scripts
