@@ -1,4 +1,4 @@
-
+// prisma/schema.prisma
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
@@ -17,14 +17,17 @@ model Users {
   birthdate             DateTime                 @db.Date
   money                 Decimal                  @db.Decimal(10, 2)
   points                Int
-  image                 String?  @db.VarChar(200)
-  bets_visibility       Boolean  @default(true)
+  image                 String?                  @db.VarChar(200)
+  bets_visibility       Boolean                  @default(true)
   tutorial_verification Boolean
-  password              String   @db.VarChar(255)
+  Bets                  Bets[]
+  QuestionnaireResponse Questionnaire_Response[]
+  UserHasChallenges     User_has_Challenges[]
+  password              String                   @db.VarChar(255)
 }
 
 model Challenges {
-  id_challenge      Int    @id @default(autoincrement())
+  id_challenge      Int                   @id @default(autoincrement())
   number            Int
   name              String                @db.VarChar(50)
   short_description String                @db.VarChar(300)
@@ -96,15 +99,15 @@ model Bets_has_Games {
   ref_id_game         Int
   ref_id_championship Int
   bet                 Bets         @relation(fields: [ref_id_bet], references: [id_bets], onDelete: Cascade)
-  championship        Championship @relation(fields: [ref_id_championship], references: [id_championship], onDelete: Cascade)
   game                Games        @relation(fields: [ref_id_game], references: [id_game], onDelete: Cascade)
+  championship        Championship @relation(fields: [ref_id_championship], references: [id_championship], onDelete: Cascade)
 
   @@id([ref_id_bet, ref_id_game, ref_id_championship])
 }
 
 model Championship {
   id_championship Int              @id @default(autoincrement())
-  json            String           @unique @db.Text
+  json            String           @unique @db.VarChar(200)
   BetsHasGames    Bets_has_Games[]
 }
 
@@ -120,7 +123,7 @@ model User_has_Challenges_has_Steps {
 }
 
 model Steps {
-  id_step                   Int  @id @default(autoincrement())
+  id_step                   Int                             @id @default(autoincrement())
   ref_id_step_video         Int?
   ref_id_step_bet           Int?
   ref_id_step_view          Int?
@@ -136,27 +139,31 @@ model Steps {
 
 // Other supporting models
 model Step_Video {
-  id_step_video     Int    @id @default(autoincrement())
-  video_url         String @db.VarChar(200)
-  video_description String @db.VarChar(200)
+  id_step_video     Int     @id @default(autoincrement())
+  video_url         String  @db.VarChar(200)
+  video_description String  @db.VarChar(200)
+  Steps             Steps[]
 }
 
 model Step_Bet {
-  id_step_bet     Int    @id @default(autoincrement())
-  bet_description String @db.VarChar(200)
-  bet_json        String @db.VarChar(200)
+  id_step_bet     Int     @id @default(autoincrement())
+  bet_description String  @db.VarChar(200)
+  bet_json        String  @db.VarChar(200)
+  Steps           Steps[]
 }
 
 model Step_Questionnaire {
-  id_step_questionnaire     Int    @id @default(autoincrement())
-  questionnaire_description String @db.VarChar(200)
-  questionnaire_json        String @db.VarChar(45)
+  id_step_questionnaire     Int     @id @default(autoincrement())
+  questionnaire_description String  @db.VarChar(200)
+  questionnaire_json        String  @db.VarChar(45)
+  Steps                     Steps[]
 }
 
 model Step_View {
-  id_step_view     Int    @id @default(autoincrement())
-  view_description String @db.VarChar(200)
-  view_page        String @db.VarChar(200)
+  id_step_view     Int     @id @default(autoincrement())
+  view_description String  @db.VarChar(200)
+  view_page        String  @db.VarChar(200)
+  Steps            Steps[]
 }
 
 model Tips {
