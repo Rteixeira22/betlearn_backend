@@ -27,7 +27,6 @@ class App {
     this.app = express();
     this.prisma = new PrismaClient();
     this.initializeMiddlewares();
-    this.initializeRoutes();
     this.handleUncaughtErrors();
   }
 
