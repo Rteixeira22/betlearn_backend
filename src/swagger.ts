@@ -20,22 +20,13 @@ const swaggerDefinition = {
   ],
 };
 
-// Determina o caminho das rotas com base no ambiente
-const apisPath =
-  process.env.NODE_ENV === "production"
-    ? "dist/routes/*Routes.js" // Caminho para produção
-    : "src/routes/*Routes.ts"; // Caminho para desenvolvimento
-
-console.log(`Swagger está a procurar em: ${apisPath}`);
-
-// Lista os arquivos encontrados no caminho especificado
-const files = glob.sync(apisPath);
-console.log("Arquivos encontrados:");
-console.log(files);
-
 const options = {
   swaggerDefinition,
-  apis: files, // Passa os arquivos encontrados para o Swagger
+  apis: [
+    process.env.NODE_ENV === "production"
+      ? "dist/routes/*Routes.js"
+      : "src/routes/*Routes.ts",
+  ],
 };
 
 export const swaggerSpecs = swaggerJSDoc(options);
