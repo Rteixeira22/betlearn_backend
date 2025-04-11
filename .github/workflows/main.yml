@@ -53,6 +53,9 @@ jobs:
       - name: Instalar as Dependencias
         run: npm install
 
+      - name: Gerar Swagger
+        run: npm run dev
+
       - name: Instalar CLI da Vercel
         run: npm install --global vercel@latest
 
