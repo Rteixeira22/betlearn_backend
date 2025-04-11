@@ -12,16 +12,20 @@ const swaggerDefinition = {
       url: "https://api-betlearn-wine.vercel.app/api/",
       description: "API hospedada na Vercel",
     },
-    {
+    /* {
       url: "http://localhost:3000/api/",
       description: "API local para desenvolvimento",
-    },
+    }, */
   ],
 };
 
 const options = {
   swaggerDefinition,
-  apis: ["src/routes/*Routes.ts"],
+  apis: [
+    process.env.NODE_ENV === "production"
+      ? "dist/routes/*Routes.js"
+      : "src/routes/*Routes.ts",
+  ],
 };
 
 export const swaggerSpecs = swaggerJSDoc(options);
