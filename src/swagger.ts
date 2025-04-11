@@ -7,6 +7,16 @@ const swaggerDefinition = {
     description: "API da BetLearn para testar rotas.",
   },
   basePath: "/api",
+  servers: [
+    {
+      url: "https://api-betlearn-wine.vercel.app/",
+      description: "API hospedada na Vercel",
+    },
+    {
+      url: "http://localhost:3000/",
+      description: "API local para desenvolvimento",
+    },
+  ],
 };
 
 const options = {
