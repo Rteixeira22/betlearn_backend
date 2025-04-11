@@ -21,7 +21,7 @@ const swaggerDefinition = {
 
 const options = {
   swaggerDefinition,
-  apis: ["betlearn_backend/src/routes/*Routes.ts"],
+  apis: [`${__dirname}/routes/*Routes.ts`],
 };
 
 export const swaggerSpecs = swaggerJSDoc(options);
