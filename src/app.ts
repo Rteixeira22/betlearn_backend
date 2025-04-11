@@ -15,6 +15,8 @@ import { PrismaClient } from "@prisma/client";
 import SwaggerUi from "swagger-ui-express";
 import { swaggerSpecs } from "./swagger";
 
+import expressBasicAuth from "express-basic-auth";
+
 class App {
   public app: express.Application;
   public prisma: PrismaClient;
@@ -44,7 +46,19 @@ class App {
     this.app.use("/api/steps", stepsRoutes);
     this.app.use("/api/admin", adminRoutes);
     this.app.use("/api/auth", authRoutes);
-    this.app.use("/api-docs", SwaggerUi.serve, SwaggerUi.setup(swaggerSpecs));
+    this.app.use(
+      "/api-docs",
+      expressBasicAuth({
+        users: {
+          [process.env.SWAGGER_USERNAME || "admin"]:
+            process.env.SWAGGER_PASSWORD || "password",
+        },
+        challenge: true,
+        realm: "BetLearn API Documentation",
+      }),
+      SwaggerUi.serve,
+      SwaggerUi.setup(swaggerSpecs)
+    );
   }
 
   private handleUncaughtErrors() {
