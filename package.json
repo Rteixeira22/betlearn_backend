@@ -10,7 +10,8 @@
     "build": "tsc",
     "migrate": "prisma migrate dev",
     "generate": "prisma generate",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "generate-swagger": "ts-node src/swagger/swagger.ts"
   },
   "repository": {
     "type": "git",

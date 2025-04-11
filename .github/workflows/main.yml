@@ -55,7 +55,7 @@ jobs:
         run: npm install
 
       - name: Gerar Swagger
-        run: npm run dev
+        run: npm run generate-swagger
 
       - name: Instalar CLI da Vercel
         run: npm install --global vercel@latest
