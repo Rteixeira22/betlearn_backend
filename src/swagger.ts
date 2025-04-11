@@ -24,8 +24,8 @@ const options = {
   swaggerDefinition,
   apis: [
     process.env.NODE_ENV === "production"
-      ? "dist/swagger/*.swagger.js"
-      : "src/swagger/*.swagger.ts",
+      ? "dist/routes/*Routes.js"
+      : "src/routes/*Routes.ts",
   ],
 };
 
