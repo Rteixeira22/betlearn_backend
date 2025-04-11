@@ -8,7 +8,7 @@
 /**
  * @swagger
  *
- * /admin:
+ * /api/admin:
  *   get:
  *     summary: Obtém todos os administradores
  *     tags: [Admins]
