@@ -51,7 +51,6 @@ class App {
     this.app.use("/api/auth", authRoutes);
     this.app.use(
       "/api-docs",
-
       (
         req: express.Request,
         res: express.Response,
@@ -60,7 +59,6 @@ class App {
         console.log("Acessando /api-docs...");
         next();
       },
-
       expressBasicAuth({
         users: {
           [process.env.SWAGGER_USERNAME || "admin"]:
@@ -69,6 +67,14 @@ class App {
         challenge: true,
         realm: "BetLearn API Documentation",
       }),
+      (
+        req: express.Request,
+        res: express.Response,
+        next: express.NextFunction
+      ) => {
+        console.log("Autenticação do Swagger passou...");
+        next();
+      },
       SwaggerUi.serve,
       SwaggerUi.setup(swaggerSpecs)
     );

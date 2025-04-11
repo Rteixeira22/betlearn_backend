@@ -9,10 +9,6 @@ const swaggerDefinition = {
   basePath: "/api",
   servers: [
     {
-      url: "http://localhost:3000/api",
-      description: "Pedido via servidor local direto à API",
-    },
-    {
       url: "https://api-betlearn-wine.vercel.app/api/",
       description: "Pedido via API hospedada na Vercel",
     },
