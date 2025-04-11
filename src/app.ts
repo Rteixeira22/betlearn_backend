@@ -49,6 +49,7 @@ class App {
     this.app.use("/api/admin", adminRoutes);
     this.app.use("/api/auth", authRoutes);
 
+    //CONFIG SWAGGER UI PARA NÃO DAR PROBLEMA COM A VERCEL POR USAR STATIC FILES VINDOS DO NODE MODULES
     const swaggerDistPath = path.join(
       __dirname,
       "..",
@@ -60,7 +61,7 @@ class App {
       express.static(swaggerDistPath, { index: false })
     );
 
-    // Configurar o Swagger UI
+    //CONFIG SWAGGER UI PARA NÃO DAR PROBLEMA COM A VERCEL
     this.app.use(
       "/api-docs",
       expressBasicAuth({
