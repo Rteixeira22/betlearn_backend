@@ -7,6 +7,7 @@
 
 /**
  * @swagger
+ *
  * /admin:
  *   get:
  *     summary: Obtém todos os administradores
@@ -23,7 +24,25 @@
  *       500:
  *         description: Erro ao buscar administradores
  */
-
+/**
+ * @swagger
+ *
+ * /admin:
+ *   get:
+ *     summary: Obtém todos os administradores
+ *     tags: [Admins]
+ *     responses:
+ *       200:
+ *         description: Lista de administradores
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Admin'
+ *       500:
+ *         description: Erro ao buscar administradores
+ */
 /**
  * @swagger
  * /admin/{id}:
