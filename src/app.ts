@@ -61,7 +61,7 @@ class App {
       },
       expressBasicAuth({
         users: {
-          [process.env.SWAGGER_USERNAME || "admin"]:
+          [process.env.SWAGGER_USERNAME || "defaultUsername"]:
             process.env.SWAGGER_PASSWORD || "password",
         },
         challenge: true,
