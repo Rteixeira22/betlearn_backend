@@ -17,8 +17,7 @@ import { swaggerSpecs } from "./swagger";
 
 import expressBasicAuth from "express-basic-auth";
 
-import dotenv from "dotenv";
-dotenv.config();
+import path from "path";
 
 class App {
   public app: express.Application;
@@ -49,16 +48,21 @@ class App {
     this.app.use("/api/steps", stepsRoutes);
     this.app.use("/api/admin", adminRoutes);
     this.app.use("/api/auth", authRoutes);
+
+    const swaggerDistPath = path.join(
+      __dirname,
+      "..",
+      "node_modules",
+      "swagger-ui-dist"
+    );
     this.app.use(
       "/api-docs",
-      (
-        req: express.Request,
-        res: express.Response,
-        next: express.NextFunction
-      ) => {
-        console.log("Acessando /api-docs...");
-        next();
-      },
+      express.static(swaggerDistPath, { index: false })
+    );
+
+    // Configurar o Swagger UI
+    this.app.use(
+      "/api-docs",
       expressBasicAuth({
         users: {
           [process.env.SWAGGER_USERNAME || "defaultUsername"]:
@@ -67,14 +71,6 @@ class App {
         challenge: true,
         realm: "BetLearn API Documentation",
       }),
-      (
-        req: express.Request,
-        res: express.Response,
-        next: express.NextFunction
-      ) => {
-        console.log("Autenticação do Swagger passou...");
-        next();
-      },
       SwaggerUi.serve,
       SwaggerUi.setup(swaggerSpecs)
     );
@@ -96,7 +92,6 @@ class App {
 
   public async connectDatabase() {
     try {
-      console.log("Connecting to database...");
       await this.prisma.$connect();
       console.log("Database connected successfully");
     } catch (error) {
