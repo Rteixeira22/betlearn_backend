@@ -11,7 +11,7 @@
     "migrate": "prisma migrate dev",
     "generate": "prisma generate",
     "postinstall": "prisma generate",
-    "generate-swagger": "ts-node src/swagger/swagger.ts"
+    "generate-swagger": "ts-node src/swagger.ts"
   },
   "repository": {
     "type": "git",
