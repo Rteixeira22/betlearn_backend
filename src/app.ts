@@ -17,6 +17,9 @@ import { swaggerSpecs } from "./swagger";
 
 import expressBasicAuth from "express-basic-auth";
 
+import dotenv from "dotenv";
+dotenv.config();
+
 class App {
   public app: express.Application;
   public prisma: PrismaClient;
