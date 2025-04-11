@@ -27,6 +27,7 @@ class App {
     this.app = express();
     this.prisma = new PrismaClient();
     this.initializeMiddlewares();
+    this.initializeRoutes();
     this.handleUncaughtErrors();
   }
 
@@ -47,23 +48,7 @@ class App {
     this.app.use("/api/steps", stepsRoutes);
     this.app.use("/api/admin", adminRoutes);
     this.app.use("/api/auth", authRoutes);
-  }
 
-  private handleUncaughtErrors() {
-    this.app.use(
-      (
-        err: Error,
-        req: express.Request,
-        res: express.Response,
-        next: express.NextFunction
-      ) => {
-        console.error(err.stack);
-        res.status(500).send("Something broke!");
-      }
-    );
-  }
-
-  private initializeSwagger() {
     //CONFIG SWAGGER UI PARA NÃO DAR PROBLEMA COM A VERCEL POR USAR STATIC FILES VINDOS DO NODE MODULES
     const swaggerDistPath = path.join(
       __dirname,
@@ -92,13 +77,24 @@ class App {
     );
   }
 
+  private handleUncaughtErrors() {
+    this.app.use(
+      (
+        err: Error,
+        req: express.Request,
+        res: express.Response,
+        next: express.NextFunction
+      ) => {
+        console.error(err.stack);
+        res.status(500).send("Something broke!");
+      }
+    );
+  }
+
   public async connectDatabase() {
     try {
       await this.prisma.$connect();
       console.log("Database connected successfully");
-
-      this.initializeRoutes();
-      this.initializeSwagger();
     } catch (error) {
       console.error("Failed to connect to database", error);
       process.exit(1);
