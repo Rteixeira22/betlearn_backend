@@ -4,13 +4,10 @@ import dotenv from "dotenv";
 // Load environment variables
 dotenv.config();
 
-async function startApp() {
-  const app = new App();
-  const databaseConnected = await app.connectDatabase();
-  const PORT = process.env.PORT ? parseInt(process.env.PORT) : 3000;
+const PORT = process.env.PORT ? parseInt(process.env.PORT) : 3000;
 
-  // Inicie o servidor independentemente do estado da conexão do banco de dados
-  app.startServer(PORT);
-}
+const app = new App();
 
-startApp();
+// Connect to database and start server
+app.connectDatabase();
+app.startServer(PORT);

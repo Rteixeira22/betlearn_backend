@@ -1,4 +1,5 @@
 import swaggerJSDoc from "swagger-jsdoc";
+import path from "path";
 const swaggerDefinition = {
   openapi: "3.0.0",
   info: {
@@ -21,7 +22,12 @@ const swaggerDefinition = {
 
 const options = {
   swaggerDefinition,
-  apis: ["betlearn_backend/src/routes/*Routes.ts"],
+  apis: [path.join(__dirname, "routes", "*Routes.ts")],
 };
+
+console.log("Diretório atual:", process.cwd());
+const glob = require("glob");
+const files = glob.sync("./src/routes/*Routes.ts");
+console.log("Arquivos encontrados:", files);
 
 export const swaggerSpecs = swaggerJSDoc(options);
