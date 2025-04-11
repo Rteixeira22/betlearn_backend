@@ -22,11 +22,14 @@ const swaggerDefinition = {
 
 const options = {
   swaggerDefinition,
-  apis: [
-    process.env.NODE_ENV === "production"
-      ? "dist/routes/*Routes.js"
-      : "src/routes/*Routes.ts",
-  ],
+  apis: (() => {
+    const path =
+      process.env.NODE_ENV === "production"
+        ? "dist/routes/*Routes.js" // Caminho para produção
+        : "src/routes/*Routes.ts"; // Caminho para desenvolvimento
+    console.log(`Swagger está usando o caminho: ${path}`);
+    return [path];
+  })(),
 };
 
 export const swaggerSpecs = swaggerJSDoc(options);
