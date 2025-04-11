@@ -49,32 +49,6 @@ class App {
     this.app.use("/api/admin", adminRoutes);
     this.app.use("/api/auth", authRoutes);
   }
-  private setupSwagger() {
-    const swaggerDistPath = path.join(
-      __dirname,
-      "..",
-      "node_modules",
-      "swagger-ui-dist"
-    );
-    this.app.use(
-      "/api-docs",
-      express.static(swaggerDistPath, { index: false })
-    );
-
-    this.app.use(
-      "/api-docs",
-      expressBasicAuth({
-        users: {
-          [process.env.SWAGGER_USERNAME || "defaultUsername"]:
-            process.env.SWAGGER_PASSWORD || "password",
-        },
-        challenge: true,
-        realm: "BetLearn API Documentation",
-      }),
-      SwaggerUi.serve,
-      SwaggerUi.setup(swaggerSpecs)
-    );
-  }
 
   private handleUncaughtErrors() {
     this.app.use(
@@ -90,11 +64,42 @@ class App {
     );
   }
 
+  private initializeSwagger() {
+    //CONFIG SWAGGER UI PARA NÃO DAR PROBLEMA COM A VERCEL POR USAR STATIC FILES VINDOS DO NODE MODULES
+    const swaggerDistPath = path.join(
+      __dirname,
+      "..",
+      "node_modules",
+      "swagger-ui-dist"
+    );
+    this.app.use(
+      "/api-docs",
+      express.static(swaggerDistPath, { index: false })
+    );
+
+    //CONFIG SWAGGER UI PARA NÃO DAR PROBLEMA COM A VERCEL
+    this.app.use(
+      "/api-docs",
+      expressBasicAuth({
+        users: {
+          [process.env.SWAGGER_USERNAME || "defaultUsername"]:
+            process.env.SWAGGER_PASSWORD || "password",
+        },
+        challenge: true,
+        realm: "BetLearn API Documentation",
+      }),
+      SwaggerUi.serve,
+      SwaggerUi.setup(swaggerSpecs)
+    );
+  }
+
   public async connectDatabase() {
     try {
       await this.prisma.$connect();
       console.log("Database connected successfully");
-      this.setupSwagger();
+
+      this.initializeRoutes();
+      this.initializeSwagger();
     } catch (error) {
       console.error("Failed to connect to database", error);
       process.exit(1);
