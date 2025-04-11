@@ -6,7 +6,7 @@ on:
   push: # Em qualquer commit para ca feito na main ou Pipeline
     branches:
       - main
-      - Pipeline # Pipeline so para a construcao
+      # - Pipeline # Pipeline so para a construcao
 
 # Jobs a ser executados
 jobs:
@@ -53,9 +53,6 @@ jobs:
 
       - name: Instalar as Dependencias
         run: npm install
-
-      - name: Gerar Swagger
-        run: npm run generate-swagger
 
       - name: Instalar CLI da Vercel
         run: npm install --global vercel@latest
