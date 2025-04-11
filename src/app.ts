@@ -51,6 +51,16 @@ class App {
     this.app.use("/api/auth", authRoutes);
     this.app.use(
       "/api-docs",
+
+      (
+        req: express.Request,
+        res: express.Response,
+        next: express.NextFunction
+      ) => {
+        console.log("Acessando /api-docs...");
+        next();
+      },
+
       expressBasicAuth({
         users: {
           [process.env.SWAGGER_USERNAME || "admin"]:
@@ -80,6 +90,7 @@ class App {
 
   public async connectDatabase() {
     try {
+      console.log("Connecting to database...");
       await this.prisma.$connect();
       console.log("Database connected successfully");
     } catch (error) {
