@@ -18,16 +18,69 @@ const swaggerDefinition = {
       description: "API local para desenvolvimento",
     }, */
   ],
+  paths: {
+    "/users": {
+      get: {
+        tags: ["Users"],
+        summary: "Obtém todos os usuários",
+        description:
+          "Retorna uma lista de todos os usuários cadastrados no sistema",
+        responses: {
+          200: {
+            description: "Lista de usuários retornada com sucesso",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "array",
+                  items: {
+                    $ref: "#/components/schemas/User",
+                  },
+                },
+              },
+            },
+          },
+          500: {
+            description: "Erro interno do servidor",
+          },
+        },
+      },
+      post: {
+        tags: ["Users"],
+        summary: "Cria um novo usuário",
+        description: "Cria um novo usuário com as informações fornecidas",
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                $ref: "#/components/schemas/UserInput",
+              },
+            },
+          },
+        },
+        responses: {
+          201: {
+            description: "Usuário criado com sucesso",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/User",
+                },
+              },
+            },
+          },
+          400: {
+            description: "Dados inválidos",
+          },
+        },
+      },
+    },
+  },
 };
 
 const options = {
   swaggerDefinition,
   apis: [path.join(__dirname, "routes", "*Routes.ts")],
 };
-
-console.log("Diretório atual:", process.cwd());
-const glob = require("glob");
-const files = glob.sync("./src/routes/*Routes.ts");
-console.log("Arquivos encontrados:", files);
 
 export const swaggerSpecs = swaggerJSDoc(options);
