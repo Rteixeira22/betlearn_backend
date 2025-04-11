@@ -48,8 +48,8 @@ class App {
     this.app.use("/api/steps", stepsRoutes);
     this.app.use("/api/admin", adminRoutes);
     this.app.use("/api/auth", authRoutes);
-
-    //CONFIG SWAGGER UI PARA NÃO DAR PROBLEMA COM A VERCEL POR USAR STATIC FILES VINDOS DO NODE MODULES
+  }
+  private setupSwagger() {
     const swaggerDistPath = path.join(
       __dirname,
       "..",
@@ -61,7 +61,6 @@ class App {
       express.static(swaggerDistPath, { index: false })
     );
 
-    //CONFIG SWAGGER UI PARA NÃO DAR PROBLEMA COM A VERCEL
     this.app.use(
       "/api-docs",
       expressBasicAuth({
@@ -95,6 +94,7 @@ class App {
     try {
       await this.prisma.$connect();
       console.log("Database connected successfully");
+      this.setupSwagger();
     } catch (error) {
       console.error("Failed to connect to database", error);
       process.exit(1);
