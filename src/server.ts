@@ -10,7 +10,6 @@ async function startApp() {
   const PORT = process.env.PORT ? parseInt(process.env.PORT) : 3000;
 
   // Inicie o servidor independentemente do estado da conexão do banco de dados
-  const port = process.env.PORT ? parseInt(process.env.PORT) : 3000;
   app.startServer(PORT);
 }
 
