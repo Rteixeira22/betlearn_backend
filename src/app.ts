@@ -56,14 +56,22 @@ class App {
       "node_modules",
       "swagger-ui-dist"
     );
-    this.app.use(
-      "/api-docs",
-      express.static(swaggerDistPath, { index: false })
-    );
+
+    this.app.use((req, res, next) => {
+      if (req.path.startsWith("/api-docs")) {
+        console.log("Swagger request path:", req.path);
+        console.log(
+          "Swagger routes found:",
+          Object.keys((swaggerSpecs as any).paths || {}).length
+        );
+      }
+      next();
+    });
 
     //CONFIG SWAGGER UI PARA NÃO DAR PROBLEMA COM A VERCEL
     this.app.use(
       "/api-docs",
+      express.static(swaggerDistPath, { index: false }),
       expressBasicAuth({
         users: {
           [process.env.SWAGGER_USERNAME || "defaultUsername"]:
@@ -73,7 +81,7 @@ class App {
         realm: "BetLearn API Documentation",
       }),
       SwaggerUi.serve,
-      SwaggerUi.setup(swaggerSpecs)
+      SwaggerUi.setup(swaggerSpecs, { explorer: true })
     );
   }
 
