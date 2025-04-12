@@ -24,7 +24,7 @@ const options = {
   swaggerDefinition,
   apis: [
     process.env.NODE_ENV === "production"
-      ? "dist/routes/*Routes.js"
+      ? "betlearn_backend/dist/routes/*Routes.js"
       : "src/routes/*Routes.ts",
   ],
 };
