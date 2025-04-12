@@ -22,11 +22,7 @@ const swaggerDefinition = {
 
 const options = {
   swaggerDefinition,
-  apis: [
-    process.env.NODE_ENV === "production"
-      ? "betlearn_backend/dist/routes/*Routes.js"
-      : "src/routes/*Routes.ts",
-  ],
+  apis: ["src/routes/*Routes.js"],
 };
 
 export const swaggerSpecs = swaggerJSDoc(options);
