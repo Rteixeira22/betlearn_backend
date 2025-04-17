@@ -12,9 +12,9 @@ const updateTipStates = async () => {
                 where: { id_tip: activeTip.id_tip },
                 data: { active: 0 },
             });
-            console.log(`Updated tip ${activeTip.id_tip} from active 1 to 0.`);
+            console.log(`Deactivated tip ${activeTip.id_tip}.`);
         } else {
-            console.log("No active tip with active = 1 found.");
+            console.log("No active tip found.");
         }
 
         const nextTip = await prisma.tips.findFirst({
@@ -26,12 +26,12 @@ const updateTipStates = async () => {
                 where: { id_tip: nextTip.id_tip },
                 data: { active: 1 },
             });
-            console.log(`Updated tip ${nextTip.id_tip} from active 0 to 1.`);
+            console.log(`Activated tip ${nextTip.id_tip}.`);
         } else {
-            console.log("No next tip with active = 0 found.");
+            console.log("No tip to activate.");
         }
     } catch (error) {
-        console.error("Error updating tip states:", error);
+        console.error("Error updating tips:", error);
     } finally {
         await prisma.$disconnect();
     }
