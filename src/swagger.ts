@@ -28,6 +28,21 @@ const options = {
   ],
 };
 
+import fs from "fs";
+import path from "path";
 console.log("Caminho em produção:", process.cwd());
+
+// Listar arquivos no diretório atual
+fs.readdirSync(process.cwd()).forEach((file) => {
+  console.log("Arquivo ou pasta encontrado:", file);
+});
+
+// Listar arquivos no subdiretório dist (se existir)
+const distPath = path.join(process.cwd(), "dist");
+if (fs.existsSync(distPath)) {
+  fs.readdirSync(distPath).forEach((file) => {
+    console.log("Arquivo ou pasta em dist:", file);
+  });
+}
 
 export const swaggerSpecs = swaggerJSDoc(options);
