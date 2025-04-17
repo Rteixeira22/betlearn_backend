@@ -23,7 +23,7 @@ const options = {
   swaggerDefinition,
   apis: [
     process.env.NODE_ENV === "production"
-      ? "dist/routes/*Routes.js"
+      ? "src/routes/*Routes.js"
       : "src/routes/*Routes.ts",
   ],
 };
@@ -38,10 +38,10 @@ fs.readdirSync(process.cwd()).forEach((file) => {
 });
 
 // Listar arquivos no subdiretório dist (se existir)
-const distPath = path.join(process.cwd(), "dist");
+const distPath = path.join(process.cwd(), "src");
 if (fs.existsSync(distPath)) {
   fs.readdirSync(distPath).forEach((file) => {
-    console.log("Arquivo ou pasta em dist:", file);
+    console.log("Arquivo ou pasta em src:", file);
   });
 }
 
