@@ -7,7 +7,7 @@ on:
     branches:
       - main
       # - Pipeline # Pipeline so para a construcao
-      # Swagger # Para o swagger
+      - Swagger # Para o swagger
 
 # Jobs a ser executados
 jobs:
