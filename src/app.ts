@@ -39,6 +39,8 @@ class App {
 
   private initializeRoutes() {
     this.app.use("/api/users", userRoutes);
+    console.log("Rota /api/users registrada");
+
     this.app.use("/api/bets", betsRoutes);
     this.app.use("/api/tips", tipsRoutes);
     this.app.use("/api/challenges", challengesRoutes);

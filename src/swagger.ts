@@ -23,9 +23,11 @@ const options = {
   swaggerDefinition,
   apis: [
     process.env.NODE_ENV === "production"
-      ? ".vercel/output/functions/src/server.ts.func/src/routes/*Routes.js"
+      ? "dist/routes/*Routes.js"
       : "src/routes/*Routes.ts",
   ],
 };
+
+console.log("Caminho em produção:", process.cwd());
 
 export const swaggerSpecs = swaggerJSDoc(options);
