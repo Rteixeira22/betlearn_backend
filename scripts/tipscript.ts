@@ -1,39 +1,42 @@
-const { PrismaClient } = require("@prisma/client");
-const prisma = new PrismaClient();
+const axios = require("axios");
+require("dotenv").config();
+
+const API_URL = process.env.REACT_APP_API_VERCEL_URL;
 
 const updateTipStates = async () => {
     try {
-        const activeTip = await prisma.tips.findFirst({
-            where: { active: 1 },
-        });
+        console.log("Fetching active tip...");
+        // TIP ATIVA
+        const activeTipResponse = await axios.get(`${API_URL}tips`);
+        const activeTip = activeTipResponse.data.find((tip) => tip.active === 1);
 
         if (activeTip) {
-            await prisma.tips.update({
-                where: { id_tip: activeTip.id_tip },
-                data: { active: 0 },
+            console.log(`Deactivating tip ${activeTip.id_tip}...`);
+            await axios.put(`${API_URL}tips/${activeTip.id_tip}`, {
+                active: 0,
             });
             console.log(`Deactivated tip ${activeTip.id_tip}.`);
         } else {
             console.log("No active tip found.");
         }
 
-        const nextTip = await prisma.tips.findFirst({
-            where: { active: 0 },
-        });
+        console.log("Fetching next tip to activate...");
+        // VAI BUSCAR A PROXIMA TIP
+        // ATIVA A PROXIMA TIP
+        const nextTipResponse = await axios.get(`${API_URL}tips`);
+        const nextTip = nextTipResponse.data.find((tip) => tip.active === 0);
 
         if (nextTip) {
-            await prisma.tips.update({
-                where: { id_tip: nextTip.id_tip },
-                data: { active: 1 },
+            console.log(`Activating tip ${nextTip.id_tip}...`);
+            await axios.put(`${API_URL}tips/${nextTip.id_tip}`, {
+                active: 1,
             });
             console.log(`Activated tip ${nextTip.id_tip}.`);
         } else {
-            console.log("No tip to activate.");
+            console.log("No tips.");
         }
     } catch (error) {
-        console.error("Error updating tips:", error);
-    } finally {
-        await prisma.$disconnect();
+        console.error("Error updating tips:", error.response?.data || error.message);
     }
 };
 
