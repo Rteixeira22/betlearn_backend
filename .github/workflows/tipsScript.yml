@@ -1,0 +1,53 @@
+# Nome da Pipeline
+name: Swap_Viewd_Tip
+
+# Ocasioes em que o workflow comeca a trabalhar
+on:
+  push: # Em qualquer commit para ca feito na Pipeline
+    branches:
+      - Pipeline # Pipeline so para a construcao
+  schedule:
+    - cron: "59 23 * * *" # Todos os dias desbloquear a proxima
+
+# Jobs a ser executados
+jobs:
+  caching:
+    name: Criar Cache
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Cache dos modulos do NPM
+        id: cache-npm
+        uses: actions/cache@v4
+        with:
+          path: ./betlearn_backend/node_modules # Para onde vai a cache
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }} #Nome da Cache e Build
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Instalar Modulos If Cache Not Found
+        if: steps.cache-npm.outputs.cache-hit != 'true'
+        run: npm install
+
+  run-the-script:
+    name: Executar o Script
+    needs: caching
+    runs-on: ubuntu-latest
+    steps:
+      - name: Analisar Repositorio
+        uses: actions/checkout@v4
+
+      - name: Setup do Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: Executar o Script
+        run: node scripts/tipscript.ts # Executar o script
+
