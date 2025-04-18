@@ -19,7 +19,6 @@ export class ChampionsController {
   //IR BUSCAR UM CAMPEONATO PELO ID
   async getChampionshipById(req: Request, res: Response) {
     try {
-      //ID DO CAMPEONATO
       const championshipId = parseInt(req.params.id);
 
       //SAVE
@@ -38,10 +37,11 @@ export class ChampionsController {
   async createChampionship(req: Request, res: Response) {
     try {
       const { json } = req.body;
-
       //SAVE
       const championship = await prisma.championship.create({
-        data: { json },
+        data: {
+          json,
+        },
       });
 
       //ENVIAR

@@ -7,7 +7,7 @@ on:
   #branches:
   #- Pipeline # Pipeline so para a construcao
   schedule:
-    - cron: "0 0 1 * *" # Todos os dias 1 de todos os meses. Sem considerar mes especifico e dia da semana
+    - cron: "0 23 1 * *" # Todos os dias 1 de todos os meses. Sem considerar mes especifico e dia da semana
 
 # Jobs a ser executados
 jobs:

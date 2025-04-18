@@ -108,6 +108,7 @@ model Bets_has_Games {
 model Championship {
   id_championship Int              @id @default(autoincrement())
   json            String           @unique @db.VarChar(200)
+  creation_date   DateTime         @default(now())
   BetsHasGames    Bets_has_Games[]
 }
 
@@ -168,7 +169,7 @@ model Step_View {
 
 model Tips {
   id_tip Int    @id @default(autoincrement())
-  tip    String @db.VarChar(50)
+  tip    String @db.VarChar(250)
   active Int?   @default(0)
 }
 

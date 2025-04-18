@@ -114,12 +114,47 @@
  *       500:
  *         description: Erro ao atualizar a dica.
  */
-
+/**
+ * @swagger
+ * /tips/{id}/state:
+ *   put:
+ *     summary: Atualiza o estado de uma dica pelo ID.
+ *     tags: [Tips]
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         example: 1
+ *         description: ID da dica a ser atualizada.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               active:
+ *                 type: integer
+ *                 description: Novo Estado.
+ *             required:
+ *               - active
+ *     responses:
+ *       200:
+ *         description: Dica atualizada com sucesso.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Tips'
+ *       500:
+ *         description: Erro ao atualizar o estado da dica.
+ */
 /**
  * @swagger
  * /tips/{id}:
  *   delete:
- *     summary: Deleta uma dica pelo ID.
+ *     summary: Apaga uma dica pelo ID.
  *     tags: [Tips]
  *     parameters:
  *       - name: id
@@ -157,6 +192,9 @@
  *         tip:
  *           type: string
  *           description: Conteúdo da dica.
+ *         active:
+ *           type: integer
+ *           description: Estado da dica
  */
 import express from "express";
 import { TipsController } from "../controllers/tipsController";
@@ -171,8 +209,11 @@ router.get("/:id", tipsController.getTipById); // Get tip by ID
 // POST Tip Routes
 router.post("/", tipsController.createTip); // Create tip
 
-// Patch Tip Routes
+// Put Tip Routes
 router.put("/:id", tipsController.updateTip); // Update tip
+
+// Put Tip State Routes
+router.put("/:id/state", tipsController.updateTipState); // Update tip state
 
 // DELETE Tip Routes
 router.delete("/:id", tipsController.deleteTip); // Delete tip
