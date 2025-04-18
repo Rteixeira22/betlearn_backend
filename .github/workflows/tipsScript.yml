@@ -7,7 +7,7 @@ on:
     branches:
       - main # Pipeline so para a construcao
   schedule:
-    - cron: "40 17 * * *" # Todos os dias desbloquear a proxima
+    - cron: "00 23 * * *" # Todos os dias desbloquear a proxima
 
 # Jobs a ser executados
 jobs:
@@ -52,5 +52,7 @@ jobs:
         run: npm install
 
       - name: Executar o Script
+        env:
+          VERCEL_URL: ${{ secrets.VERCEL_URL }}
         run: npx ts-node scripts/tipscript.ts # Executar o script
 
