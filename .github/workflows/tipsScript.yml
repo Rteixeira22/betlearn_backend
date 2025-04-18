@@ -3,11 +3,12 @@ name: Swap_Current_Tip
 
 # Ocasioes em que o workflow comeca a trabalhar
 on:
-  #push: # Em qualquer commit para ca feito na Pipeline
-  #branches:
-  #- Pipeline # Pipeline so para a construcao
+  push: # Em qualquer commit para ca feito na Pipeline
+    branches:
+      # - Pipeline # Pipeline so para a construcao
+      - main
   schedule:
-    - cron: "30 16 * * *" # Todos os dias desbloquear a proxima
+    - cron: "55 16 * * *" # Todos os dias desbloquear a proxima
 
 # Jobs a ser executados
 jobs:
@@ -49,5 +50,5 @@ jobs:
           cache: "npm"
 
       - name: Executar o Script
-        run: npx ts-node scripts/tipscript.ts # Executar o script
+        run: node scripts/tipscript.ts # Executar o script
 

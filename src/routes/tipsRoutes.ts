@@ -220,11 +220,11 @@ import { TipsController } from "../controllers/tipsController";
 const router = express.Router();
 const tipsController = new TipsController();
 
+router.get("/active", tipsController.getActiveTip); // Get active tip
+
 // GET Tip Routes
 router.get("/", tipsController.getTips); // Get all tips
 router.get("/:id", tipsController.getTipById); // Get tip by ID
-
-router.get("/active", tipsController.getActiveTip); // Get active tipD
 
 // POST Tip Routes
 router.post("/", tipsController.createTip); // Create tip

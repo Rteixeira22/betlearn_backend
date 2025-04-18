@@ -23,7 +23,7 @@ export class TipsController {
       });
       res.json(tip);
     } catch (error) {
-      res.status(500).json({ error: "Failed to fetch tip" });
+      res.status(500).json({ error: "Failed to fetch tip vai poh caralho" });
     }
   }
 
@@ -31,9 +31,10 @@ export class TipsController {
   async getActiveTip(req: Request, res: Response) {
     try {
       //COM FIND MANY MAS SÓ VAI ENCONTRAR 1 PORQUE SÓ VAI HAVER 1
-      const tip = await prisma.tips.findMany({
+      const tip = await prisma.tips.findFirst({
         where: { active: 1 },
       });
+
       res.json(tip);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch tip" });
