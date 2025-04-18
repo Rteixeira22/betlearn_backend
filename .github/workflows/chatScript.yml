@@ -3,9 +3,9 @@ name: Get_Championships_Monthly
 
 # Ocasioes em que o workflow comeca a trabalhar
 on:
-  #push: # Em qualquer commit para ca feito na Pipeline
-  #branches:
-  #- Pipeline # Pipeline so para a construcao
+  push: # Em qualquer commit para ca feito na Pipeline
+    branches:
+      - main # Pipeline so para a construcao
   schedule:
     - cron: "0 23 1 * *" # Todos os dias 1 de todos os meses. Sem considerar mes especifico e dia da semana
 
