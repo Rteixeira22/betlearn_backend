@@ -7,7 +7,7 @@ on:
   #branches:
   #- Pipeline # Pipeline so para a construcao
   schedule:
-    - cron: "45 15 * * *" # Todos os dias desbloquear a proxima
+    - cron: "10 16 * * *" # Todos os dias desbloquear a proxima
 
 # Jobs a ser executados
 jobs:
@@ -49,5 +49,5 @@ jobs:
           cache: "npm"
 
       - name: Executar o Script
-        run: node scripts/tipscript.ts # Executar o script
+        run: npx ts-node scripts/tipscript.ts # Executar o script
 
