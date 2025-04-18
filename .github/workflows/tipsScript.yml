@@ -50,5 +50,5 @@ jobs:
           cache: "npm"
 
       - name: Executar o Script
-        run: node scripts/tipscript.ts # Executar o script
+        run: node scripts/getDataFromAI.ts # Executar o script
 
