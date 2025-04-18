@@ -48,6 +48,24 @@
  *       500:
  *         description: Erro ao buscar a dica.
  */
+/**
+ * @swagger
+ * /tips/active:
+ *   get:
+ *     summary: Obtém a dica ativa.
+ *     tags: [Tips]
+ *     responses:
+ *       200:
+ *         description: Dica ativa encontrada.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Tips'
+ *       404:
+ *         description: Nenhuma dica ativa encontrada.
+ *       500:
+ *         description: Erro ao buscar a dica ativa.
+ */
 
 /**
  * @swagger
@@ -205,6 +223,8 @@ const tipsController = new TipsController();
 // GET Tip Routes
 router.get("/", tipsController.getTips); // Get all tips
 router.get("/:id", tipsController.getTipById); // Get tip by ID
+
+router.get("/active", tipsController.getActiveTip); // Get active tipD
 
 // POST Tip Routes
 router.post("/", tipsController.createTip); // Create tip

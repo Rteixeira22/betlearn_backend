@@ -27,6 +27,19 @@ export class TipsController {
     }
   }
 
+  // Get currently active tip
+  async getActiveTip(req: Request, res: Response) {
+    try {
+      //COM FIND MANY MAS SÓ VAI ENCONTRAR 1 PORQUE SÓ VAI HAVER 1
+      const tip = await prisma.tips.findMany({
+        where: { active: 1 },
+      });
+      res.json(tip);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch tip" });
+    }
+  }
+
   // Create tip
   async createTip(req: Request, res: Response) {
     try {

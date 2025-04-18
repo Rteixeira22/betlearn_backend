@@ -7,7 +7,7 @@ on:
   #branches:
   #- Pipeline # Pipeline so para a construcao
   schedule:
-    - cron: "10 16 * * *" # Todos os dias desbloquear a proxima
+    - cron: "30 16 * * *" # Todos os dias desbloquear a proxima
 
 # Jobs a ser executados
 jobs:
