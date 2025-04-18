@@ -1,5 +1,5 @@
-const axios = require("axios");
-require("dotenv").config();
+import axios from "axios";
+import dotenv from "dotenv";
 
 const API_URL = process.env.REACT_APP_API_VERCEL_URL;
 
