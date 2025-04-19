@@ -71,7 +71,7 @@
  *             schema:
  *               type: array
  *               items:
- *                 $ref: '#/components/schemas/Challenge'
+ *                 $ref: '#/components/schemas/Challenges'
  *       500:
  *         description: Erro ao buscar desafios do utilizador.
  */
