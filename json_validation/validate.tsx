@@ -103,11 +103,9 @@ const schema = {
 // Função para validar e enviar o JSON para a API
 async function validateAndUploadChampionship(filePath) {
   try {
-    // Ler o arquivo JSON
     const data = fs.readFileSync(filePath, "utf-8");
     const jsonData = JSON.parse(data);
 
-    // Validar o JSON usando o Ajv
     const validate = ajv.compile(schema);
     const valid = validate(jsonData);
 
@@ -124,7 +122,6 @@ async function validateAndUploadChampionship(filePath) {
       throw new Error("VERCEL_URL environment variable is not defined.");
     }
 
-    // O campo `json` deve ser uma string contendo o JSON serializado
     const payload = {
       json: JSON.stringify(jsonData)
     };
