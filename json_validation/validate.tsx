@@ -35,7 +35,7 @@ const schema = {
             type: "array",
             minItems: 5,
             maxItems: 5,
-            items: { type: "string", enum: ["V", "D", "E"] } // Aceita "V", "D", "E"
+            items: { type: "string", enum: ["V", "D", "E"] } 
           }
         },
         required: [
