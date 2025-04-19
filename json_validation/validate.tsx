@@ -3,17 +3,19 @@ const addFormats = require("ajv-formats");
 const fs = require("fs");
 const path = require("path");
 const axios = require("axios");
+require("dotenv").config();
 
 const ajv = new Ajv({ allErrors: true });
-addFormats(ajv); 
+addFormats(ajv); // Adiciona suporte para formatos como "date"
 
+// Esquema de validação do JSON
 const schema = {
   type: "object",
   properties: {
-    championship_id: { type: "string", minLength: 1 }, 
+    championship_id: { type: "string", minLength: 1 },
     championship_name: { type: "string", minLength: 3 },
     round: { type: "integer", minimum: 6, maximum: 27 },
-    generated_at: { type: "string", format: "date" }, 
+    generated_at: { type: "string", format: "date" },
     classification: {
       type: "array",
       minItems: 18,
@@ -35,7 +37,7 @@ const schema = {
             type: "array",
             minItems: 5,
             maxItems: 5,
-            items: { type: "string", enum: ["V", "D", "E"] } 
+            items: { type: "string", enum: ["V", "D", "E"] }
           }
         },
         required: [
@@ -98,14 +100,14 @@ const schema = {
   ]
 };
 
-// FUNCTION TO VALIDATE AND UPLOAD JSON
+// Função para validar e enviar o JSON para a API
 async function validateAndUploadChampionship(filePath) {
   try {
-    // Read the JSON file
+    // Ler o arquivo JSON
     const data = fs.readFileSync(filePath, "utf-8");
     const jsonData = JSON.parse(data);
 
-    // Compile and validate the schema
+    // Validar o JSON usando o Ajv
     const validate = ajv.compile(schema);
     const valid = validate(jsonData);
 
@@ -114,22 +116,33 @@ async function validateAndUploadChampionship(filePath) {
       return;
     }
 
-    console.log("Valid JSON. Uploading to the database...");
+    console.log("Valid JSON. Uploading to the API...");
 
-    const serializedJson = JSON.stringify(jsonData);
+    // Enviar o JSON para a API
+    const API_URL = process.env.VERCEL_URL;
+    if (!API_URL) {
+      throw new Error("VERCEL_URL environment variable is not defined.");
+    }
 
-    // Send the serialized JSON to the correct POST route
-    const response = await axios.post("http://localhost:3000/api/championships", {
-      json: serializedJson,
+    // O campo `json` deve ser uma string contendo o JSON serializado
+    const payload = {
+      json: JSON.stringify(jsonData)
+    };
+
+    const response = await axios.post(`${API_URL}/championships`, payload, {
+      headers: {
+        "Content-Type": "application/json"
+      }
     });
 
     console.log("Upload successful:", response.data);
   } catch (error) {
-    console.error("Error:", error.message);
+    console.error("Error uploading JSON:", error.response?.data || error.message);
   }
 }
 
+// Caminho para o arquivo JSON
 const filePath = path.join(__dirname, "championship.json");
 
-// Validate and upload the JSON file
+// Validar e enviar o arquivo JSON
 validateAndUploadChampionship(filePath);
