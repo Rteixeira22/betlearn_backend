@@ -345,6 +345,7 @@ router.get("/:id/bets/winning", betsController.getWinningUserBets); // Get winni
 router.get("/:id/bets/losing", betsController.getLosingUserBets); */ // Get losing user bets
 router.get("/last/:id", betsController.getLastUserBets); // Get last bet by user ID
 router.get("/count/:id", betsController.countUserBetsById); // Get count of bets by user ID
+router.get("/count/today", betsController.getBetsByDate); // Get count of today's bets
 
 // POST Bet Routes
 router.post("/:id_user/:id_championship", betsController.createBet); // Create a new bet
