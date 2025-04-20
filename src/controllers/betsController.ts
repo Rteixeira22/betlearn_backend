@@ -37,23 +37,17 @@ export class BetsController {
     }
   }
 
-  // Get bets by date (today)
   async getBetsByDate(req: Request, res: Response) {
     try {
-      const today = new Date();
-      const bets = await prisma.bets.count({
-        where: {
-          date: {
-            gte: new Date(today.setHours(0, 0, 0, 0)),
-            lte: new Date(today.setHours(23, 59, 59, 999)),
-          },
-        },
-      });
-      res.json(bets);
+      const bets = await prisma.bets.count(); // contar todas as bets, sem filtro
+  
+      res.json({ count: bets });
     } catch (error) {
-      res.status(500).json({ error: "Failed to fetch bets by date" });
+      console.error("Erro ao buscar total de apostas:", error);
+      res.status(500).json({ error: "Failed to fetch total bets" });
     }
   }
+  
 
   // Get active user bets
   /*     async getActiveUserBets(req: Request, res: Response) {

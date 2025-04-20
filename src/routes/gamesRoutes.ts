@@ -282,8 +282,11 @@ const gamesController = new GamesController();
 //GETS
 //TODOS
 router.get("/", gamesController.getAllGames);
+//Jodo do dia
+router.get("/most-betted-today", gamesController.getMostBettedGameOfDay);
 //UM
 router.get("/:id", gamesController.getGameById);
+
 
 //POST
 router.post("/", gamesController.createGame);
