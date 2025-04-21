@@ -3,9 +3,9 @@ name: Swap_Current_Tip
 
 # Ocasioes em que o workflow comeca a trabalhar
 on:
-  push: # Em qualquer commit para ca feito na Pipeline
-    branches:
-      - Pipeline # Pipeline so para a construcao
+  #push: # Em qualquer commit para ca feito na Pipeline
+  #branches:
+  # - Pipeline # Pipeline so para a construcao
   schedule:
     - cron: "00 23 * * *" # Todos os dias desbloquear a proxima
 
