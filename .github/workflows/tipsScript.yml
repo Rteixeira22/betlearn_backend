@@ -3,16 +3,16 @@ name: Swap_Current_Tip
 
 # Ocasioes em que o workflow comeca a trabalhar
 on:
-  #push: # Em qualquer commit para ca feito na Pipeline
-  #branches:
-  #- Pipeline # Pipeline so para a construcao
+  push: # Em qualquer commit para ca feito na Pipeline
+    branches:
+      - Pipeline # Pipeline so para a construcao
   schedule:
     - cron: "00 23 * * *" # Todos os dias desbloquear a proxima
 
 # Jobs a ser executados
 jobs:
-  caching:
-    name: Criar Cache
+  caching-changeTip:
+    name: Criar Cache e Correr o Script
     runs-on: ubuntu-latest
 
     steps:
@@ -32,23 +32,6 @@ jobs:
 
       - name: Instalar Modulos If Cache Not Found
         if: steps.cache-npm.outputs.cache-hit != 'true'
-        run: npm install
-
-  run-the-script:
-    name: Executar o Script
-    needs: caching
-    runs-on: ubuntu-latest
-    steps:
-      - name: Analisar Repositorio
-        uses: actions/checkout@v4
-
-      - name: Setup do Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: "22"
-          cache: "npm"
-
-      - name: Instalar Dependências
         run: npm install
 
       - name: Executar o Script
