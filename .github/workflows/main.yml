@@ -6,7 +6,7 @@ on:
   push: # Em qualquer commit para ca feito na main ou Pipeline
     branches:
       - main
-      - Pipeline # Pipeline so para a construcao
+      # - Pipeline # Pipeline so para a construcao
       # - Swagger # Para o swagger
 
 # Jobs a ser executados
