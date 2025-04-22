@@ -553,6 +553,9 @@ router.get("/count", challengeController.countChallenges);
 // Get all challenges
 router.get("/", challengeController.getAllChallenges);
 
+// Get Count of challenges today
+router.get("/count-today", challengeController.getCountChallengesByDate);
+
 // Get challenge by ID
 router.get("/:id", challengeController.getChallengeById);
 
