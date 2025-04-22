@@ -1,13 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
-import axios from "axios";
-
+import axiosInstance from "../configs/axiosConfig";
 const prisma = new PrismaClient();
-
-const axiosInstance = axios.create({
-  timeout: 5000,
-  baseURL: "http://localhost:3000",
-});
 
 export class BetsController {
   // Get bets by user ID
