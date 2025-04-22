@@ -24,6 +24,7 @@
   },
   "homepage": "https://github.com/Rteixeira22/betlearn_backend#readme",
   "dependencies": {
+    "@google/genai": "^0.9.0",
     "@google/generative-ai": "^0.24.0",
     "@prisma/client": "^6.5.0",
     "ajv": "^8.17.1",
