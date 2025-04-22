@@ -10,7 +10,7 @@ if (!apiKey) {
   console.error("⚠️ Chave da API Gemini não encontrada!");
 }
 
-// Rota para processar perguntas usando axios
+// Rota para processar perguntas, com axios
 router.post('/', async (req: Request, res: Response) => {
   const { pergunta } = req.body;
 
