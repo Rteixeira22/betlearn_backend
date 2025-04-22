@@ -39,12 +39,11 @@ export class BetsController {
 
   async getBetsByDate(req: Request, res: Response) {
     try {
-      // Criar objeto de data para hoje
       const today = new Date();
-      today.setHours(0, 0, 0, 0); // Início do dia de hoje
+      today.setHours(0, 0, 0, 0); 
       
       const tomorrow = new Date(today);
-      tomorrow.setDate(tomorrow.getDate() + 1); // Início do dia de amanhã
+      tomorrow.setDate(tomorrow.getDate() + 1); 
       
       const bets = await prisma.bets.count({
         where: {
@@ -57,7 +56,7 @@ export class BetsController {
       
       res.json({ count: bets });
     } catch (error) {
-      console.error("Erro ao buscar apostas de hoje:", error);
+      console.error("Erro ao ir buscar apostas de hoje:", error);
       res.status(500).json({ error: "Failed to fetch today's bets" });
     }
   }

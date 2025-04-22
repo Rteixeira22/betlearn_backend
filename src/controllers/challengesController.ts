@@ -71,6 +71,30 @@ export class ChallengesController {
     }
   }
 
+  async getCountChallengesByDate(req: Request, res: Response) {
+      try {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); 
+        
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1); 
+        
+        const bets = await prisma.user_has_Challenges.count({
+          where: {
+            date: {
+              gte: today,
+              lt: tomorrow
+            }
+          }
+        });
+        
+        res.json({ count: bets });
+      } catch (error) {
+        console.error("Erro ao ir buscar desafios de hoje:", error);
+        res.status(500).json({ error: "Failed to fetch today's bets" });
+      }
+    }
+
   // Update challenge
   async updateChallengeById(req: Request, res: Response) {
     try {

@@ -46,6 +46,7 @@ model User_has_Challenges {
   progress_percentage       Int                             @default(0)
   user                      Users                           @relation(fields: [ref_id_user], references: [id_user], onDelete: Cascade)
   challenge                 Challenges                      @relation(fields: [ref_id_challenge], references: [id_challenge], onDelete: Cascade)
+  date                      DateTime                        @default(now())
   UserHasChallengesHasSteps User_has_Challenges_has_Steps[]
 
   @@id([ref_id_user, ref_id_challenge])
