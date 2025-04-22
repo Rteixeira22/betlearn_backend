@@ -95,6 +95,69 @@ export class ChallengesController {
       }
     }
 
+    async getMostCompletedChallengeToday(req: Request, res: Response) {
+      try {
+        // Set date range for today
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        
+        // Get all challenges completed today and group by challenge ID
+        const completedChallenges = await prisma.user_has_Challenges.groupBy({
+          by: ['ref_id_challenge'],
+          where: {
+            date: {
+              gte: today,
+              lt: tomorrow
+            },
+            completed: true
+          },
+          _count: {
+            ref_id_user: true
+          },
+          orderBy: {
+            _count: {
+              ref_id_user: 'desc'
+            }
+          },
+          take: 1 
+        });
+        
+        if (completedChallenges.length === 0) {
+          return res.json({ 
+            message: "No challenges were completed today",
+            mostCompleted: null
+          });
+        }
+        
+        // Get the most completed challenge ID
+        const mostCompletedChallengeId = completedChallenges[0].ref_id_challenge;
+        const completionCount = completedChallenges[0]._count.ref_id_user ;
+        
+        // Get full details of the most completed challenge
+        const challengeDetails = await prisma.challenges.findUnique({
+          where: { id_challenge: mostCompletedChallengeId }
+        });
+        
+        // Return the result
+        res.json({
+          mostCompleted: challengeDetails,
+          completionCount: completionCount,
+          date: today.toISOString().split('T')[0]
+        });
+        
+      } catch (error) {
+        console.error("Error fetching most completed challenge:", error);
+        res.status(500).json({ 
+          error: "Failed to fetch most completed challenge today",
+          details: error instanceof Error ? error.message : "Unknown error"
+        });
+      }
+    }
+
+
   // Update challenge
   async updateChallengeById(req: Request, res: Response) {
     try {
