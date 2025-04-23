@@ -19,7 +19,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   Forneça respostas concisas, amigáveis e educativas.
   Responda apenas com o conteúdo necessário, sem informações adicionais. e não ultrapasse os 200 caracteres por resposta.
   Responda sempre em português de portugal.
-Caso a pergunta não esteja relacionada com apostas, diga "Desculpe mas não sei responder a essa pergunta".    
+  Caso a pergunta não esteja relacionada com apostas, diga "Desculpe mas não sei responder a essa pergunta".    
   Pergunta do utilizador: ${pergunta}`;
   
   try {
