@@ -678,5 +678,6 @@ router.get("/:id/bets/lost", userController.getLostBets);
 
 // Leaderboard
 router.get("/classification/all", userController.getLeaderboard); // fiz com all no final para nao entrar noutra rota, ja que isto devia ter outro controlador e outro ficheiro de rotas
+router.get("/position/:id", userController.getUserPositionInLeaderboard); // Get user points
 
 export default router;

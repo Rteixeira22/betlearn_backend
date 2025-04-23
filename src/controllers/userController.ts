@@ -351,6 +351,20 @@ async updateUserTutorialVerification(req: Request, res: Response) {
     }
   }
 
+  // get user position in leaderboard
+  async getUserPositionInLeaderboard(req: Request, res: Response) {
+    try {
+      const userId = parseInt(req.params.id)
+      const leaderboard = await prisma.users.findMany({
+        orderBy: { points: 'desc' }
+      });
+      const userPosition = leaderboard.findIndex(user => user.id_user === userId) + 1;
+      res.json({ position: userPosition });
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to fetch user position in leaderboard' })
+    }
+  }
+
 
 
 }
