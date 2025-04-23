@@ -41,7 +41,7 @@ async function generateChampionshipData() {
   Gere apenas o JSON sem explicações adicionais.`;
 
   try {
-    console.log('Enviando pedido à API do Gemini...');
+    console.log('A enviar pedido à API do Gemini...');
     
     const response = await axios.post(
       'https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro:generateContent',
