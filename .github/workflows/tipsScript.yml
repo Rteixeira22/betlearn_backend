@@ -37,5 +37,5 @@ jobs:
       - name: Executar o Script
         env:
           VERCEL_URL: ${{ secrets.VERCEL_URL }}
-        run: npx ts-node scripts/tipscript.ts # Executar o script
+        run: npx ts-node src/scripts/tipscript.ts # Executar o script
 
