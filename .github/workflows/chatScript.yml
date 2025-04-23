@@ -35,5 +35,5 @@ jobs:
         run: npm install
 
       - name: Executar o Script
-        run: node src/scripts/getDataFromAI.ts # Executar o script
+        run: npx ts-node src/scripts/getDataFromAI.ts # Executar o script
 
