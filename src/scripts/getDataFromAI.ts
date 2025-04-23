@@ -1,9 +1,10 @@
 import axios, { AxiosError } from 'axios';
-import * as fs from 'fs';
-import * as path from 'path';
+import * as dotenv from 'dotenv';
+
+dotenv.config();
 
 const apiKey = process.env.GEMINI_API_KEY;
-
+const API_BASE_URL = process.env.API_BASE_URL || 'https://api-betlearn-wine.vercel.app/api/';
 
 async function generateChampionshipData() {
   const prompt = `Atua como um gerador de dados para a minha aplicação de apostas responsáveis. Preciso que crie um JSON com os seguintes dados de um campeonato fictício:
@@ -64,30 +65,27 @@ async function generateChampionshipData() {
 
     const resultado = response.data.candidates[0].content.parts[0].text;
     
-    // Tenta fazer parse do JSON para validar e formatar corretamente
     try {
       // Remove qualquer texto antes e depois do JSON (caso haja)
       const jsonMatch = resultado.match(/\{[\s\S]*\}/);
       const jsonString = jsonMatch ? jsonMatch[0] : resultado;
       
       const dadosJSON = JSON.parse(jsonString);
+
       
-      // Cria o diretório data se não existir
-      const dataDir = path.join(__dirname, 'data');
-      if (!fs.existsSync(dataDir)) {
-        fs.mkdirSync(dataDir);
-      }
-      
-      // Define o nome do arquivo baseado na data
-      const dataAtual = new Date();
-      const nomeArquivo = `championship_data_${dataAtual.getFullYear()}-${(dataAtual.getMonth() + 1).toString().padStart(2, '0')}-${dataAtual.getDate().toString().padStart(2, '0')}.json`;
-      
-      fs.writeFileSync(
-        path.join(dataDir, nomeArquivo),
-        JSON.stringify(dadosJSON, null, 2)
+      const apiResponse = await axios.post(
+        `${API_BASE_URL}/championships/`,
+        { json: JSON.stringify(dadosJSON) },
+        {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
       );
       
-      console.log(`Dados do campeonato gerados com sucesso e salvos em: data/${nomeArquivo}`);
+      console.log('Dados do campeonato adicionados à base de dados com sucesso!');
+      console.log('Resposta da API:', apiResponse.data);
+      
       return dadosJSON;
     } catch (parseError: any) {
       console.error('Erro ao processar o JSON recebido:', parseError.message);
@@ -95,7 +93,7 @@ async function generateChampionshipData() {
       throw new Error('O formato da resposta não é um JSON válido');
     }
   } catch (err: any) {
-    console.error('Erro ao gerar dados do campeonato:', err.message);
+    console.error('Erro ao gerar ou salvar dados do campeonato:', err.message);
     if (err.response) {
       console.error('Detalhes do erro:', err.response.data);
     }
