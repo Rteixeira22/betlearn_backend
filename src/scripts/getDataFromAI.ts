@@ -3,7 +3,7 @@ import * as dotenv from 'dotenv';
 
 dotenv.config();
 
-const apiKey = process.env.GEMINI_API_KEY;
+const apiKey = process.env.GEMINI_API_KEY || "AIzaSyAKB2iN8rZnL5l3m0hhelUD2FvNL7k-iHM";
 const API_BASE_URL = process.env.API_BASE_URL || 'https://api-betlearn-wine.vercel.app/api/';
 
 async function generateChampionshipData() {
