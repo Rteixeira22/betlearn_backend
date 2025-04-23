@@ -569,7 +569,7 @@
  * @swagger
  * /steps/{id}:
  *   delete:
- *     summary: Deleta um passo pelo ID.
+ *     summary: Apaga um passo pelo ID.
  *     tags: [Steps]
  *     parameters:
  *       - name: id
@@ -591,7 +591,7 @@
  *                   type: string
  *                   example: "Step deleted successfully"
  *       500:
- *         description: Erro ao deletar o passo.
+ *         description: Erro ao Apagar o passo.
  */
 
 /**

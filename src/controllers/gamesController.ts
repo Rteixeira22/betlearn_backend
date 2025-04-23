@@ -174,4 +174,80 @@ export class GamesController {
       res.status(500).json({ error: "Erro ao apagar o jogo." });
     }
   }
+
+  //JOGO MAIS APOSTADO DO DIA
+  async getMostBettedGameOfDay(req: Request, res: Response) {
+    try {
+      // Obter data atual (apenas o dia)
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      
+      const tomorrow = new Date(today);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      
+      // Procura todos os jogos apostados hoje com contagem
+      const bettedGames = await prisma.games.findMany({
+        select: {
+          id_game: true,
+          local_team: true,
+          visitor_team: true,
+          schedule: true,
+          betted_team: true,
+          odd: true,
+          goals_local_team: true,
+          goals_visitor_team: true,
+          image: true,
+          game_state: true,
+          BetsHasGames: {
+            select: {
+              championship: {
+                select: {
+                  json: true,
+                },
+              },
+              bet: true,
+            },
+            where: {
+              bet: {
+                date: {
+                  gte: today,
+                  lt: tomorrow,
+                },
+              },
+            },
+          },
+        },
+      });
+      
+      // Calcular o jogo com mais apostas
+      const gamesWithCounts = bettedGames.map(game => ({
+        ...game,
+        bet_count: game.BetsHasGames.length,
+        championship_json: game.BetsHasGames[0]?.championship.json || null,
+      })).sort((a, b) => b.bet_count - a.bet_count);
+      
+      // Remover a propriedade BetsHasGames do resultado
+      const mostBettedGame = gamesWithCounts[0];
+      if (mostBettedGame) {
+        delete (mostBettedGame.BetsHasGames as unknown as { [key: string]: any })?.BetsHasGames;
+      }
+  
+      if (!mostBettedGame) {
+        return res.status(404).json({ 
+          message: 'Não foram encontradas apostas para hoje.' 
+        });
+      }
+  
+      return res.status(200).json({
+        message: 'Jogo mais apostado do dia recuperado com sucesso',
+        data: mostBettedGame
+      });
+      
+    } catch (error) {
+      console.error('Erro ao procurar jogo mais apostado:', error);
+      return res.status(500).json({ 
+        message: 'Erro interno do servidor ao procurar o jogo mais apostado' 
+      });
+    }
+  }
 }

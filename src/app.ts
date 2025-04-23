@@ -10,10 +10,15 @@ import questionnaireRoutes from "./routes/questionnaireRoutes";
 import stepsRoutes from "./routes/stepsRoutes";
 import adminRoutes from "./routes/adminRoutes";
 import authRoutes from "./routes/authRoutes";
+import chatbotRoutes from "./routes/chatbotRoutes";
 import { PrismaClient } from "@prisma/client";
 
 import SwaggerUi from "swagger-ui-express";
 import { swaggerSpecs } from "./swagger";
+
+import expressBasicAuth from "express-basic-auth";
+
+import path from "path";
 
 class App {
   public app: express.Application;
@@ -44,7 +49,31 @@ class App {
     this.app.use("/api/steps", stepsRoutes);
     this.app.use("/api/admin", adminRoutes);
     this.app.use("/api/auth", authRoutes);
-    this.app.use("/api-docs", SwaggerUi.serve, SwaggerUi.setup(swaggerSpecs));
+    this.app.use("/api/chatbot", chatbotRoutes);
+
+    //CONFIG SWAGGER UI PARA NÃO DAR PROBLEMA COM A VERCEL POR USAR STATIC FILES VINDOS DO NODE MODULES
+    const swaggerDistPath = path.join(
+      __dirname,
+      "..",
+      "node_modules",
+      "swagger-ui-dist"
+    );
+
+    //CONFIG SWAGGER UI PARA NÃO DAR PROBLEMA COM A VERCEL
+    this.app.use(
+      "/api-docs",
+      express.static(swaggerDistPath, { index: false }),
+      expressBasicAuth({
+        users: {
+          [process.env.SWAGGER_USERNAME || "defaultUsername"]:
+            process.env.SWAGGER_PASSWORD || "password",
+        },
+        challenge: true,
+        realm: "BetLearn API Documentation",
+      }),
+      SwaggerUi.serve,
+      SwaggerUi.setup(swaggerSpecs, { explorer: true })
+    );
   }
 
   private handleUncaughtErrors() {

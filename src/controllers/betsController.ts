@@ -1,13 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
-import axios from "axios";
-
+import axiosInstance from "../configs/axiosConfig";
 const prisma = new PrismaClient();
-
-const axiosInstance = axios.create({
-  timeout: 5000,
-  baseURL: "http://localhost:3000",
-});
 
 export class BetsController {
   // Get bets by user ID, with optional 'type' filtering
@@ -47,6 +41,31 @@ async getBetsByUserId(req: Request, res: Response) {
       res.status(500).json({ error: "Failed to count bets" });
     }
   }
+
+  async getBetsByDate(req: Request, res: Response) {
+    try {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0); 
+      
+      const tomorrow = new Date(today);
+      tomorrow.setDate(tomorrow.getDate() + 1); 
+      
+      const bets = await prisma.bets.count({
+        where: {
+          date: {
+            gte: today,
+            lt: tomorrow
+          }
+        }
+      });
+      
+      res.json({ count: bets });
+    } catch (error) {
+      console.error("Erro ao ir buscar apostas de hoje:", error);
+      res.status(500).json({ error: "Failed to fetch today's bets" });
+    }
+  }
+  
 
   // Get active user bets
   /*     async getActiveUserBets(req: Request, res: Response) {

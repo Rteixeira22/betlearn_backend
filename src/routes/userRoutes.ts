@@ -71,7 +71,7 @@
  *             schema:
  *               type: array
  *               items:
- *                 $ref: '#/components/schemas/Challenge'
+ *                 $ref: '#/components/schemas/Challenges'
  *       500:
  *         description: Erro ao buscar desafios do utilizador.
  */
@@ -325,7 +325,7 @@
  * @swagger
  * /users/{id}:
  *   delete:
- *     summary: Deleta um utilizador pelo ID.
+ *     summary: Apaga um utilizador pelo ID.
  *     tags: [Users]
  *     parameters:
  *       - name: id
@@ -337,9 +337,9 @@
  *         description: ID do utilizador.
  *     responses:
  *       204:
- *         description: Utilizador deletado com sucesso.
+ *         description: Utilizador Apagado com sucesso.
  *       500:
- *         description: Erro ao deletar o utilizador.
+ *         description: Erro ao Apagar o utilizador.
  */
 /**
  * @swagger

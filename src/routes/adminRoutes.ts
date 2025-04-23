@@ -7,6 +7,7 @@
 
 /**
  * @swagger
+ *
  * /admin:
  *   get:
  *     summary: Obtém todos os administradores

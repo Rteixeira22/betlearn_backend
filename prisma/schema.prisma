@@ -46,6 +46,7 @@ model User_has_Challenges {
   progress_percentage       Int                             @default(0)
   user                      Users                           @relation(fields: [ref_id_user], references: [id_user], onDelete: Cascade)
   challenge                 Challenges                      @relation(fields: [ref_id_challenge], references: [id_challenge], onDelete: Cascade)
+  date                      DateTime                        @default(now())
   UserHasChallengesHasSteps User_has_Challenges_has_Steps[]
 
   @@id([ref_id_user, ref_id_challenge])
@@ -108,6 +109,7 @@ model Bets_has_Games {
 model Championship {
   id_championship Int              @id @default(autoincrement())
   json            String           @unique @db.VarChar(200)
+  creation_date   DateTime         @default(now())
   BetsHasGames    Bets_has_Games[]
 }
 
@@ -168,7 +170,7 @@ model Step_View {
 
 model Tips {
   id_tip Int    @id @default(autoincrement())
-  tip    String @db.VarChar(50)
+  tip    String @db.VarChar(250)
   active Int?   @default(0)
 }
 

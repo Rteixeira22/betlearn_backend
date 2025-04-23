@@ -6,7 +6,8 @@ on:
   push: # Em qualquer commit para ca feito na main ou Pipeline
     branches:
       - main
-    #  - Pipeline # Pipeline so para a construcao
+      # - Pipeline # Pipeline so para a construcao
+      # - Swagger # Para o swagger
 
 # Jobs a ser executados
 jobs:
@@ -33,24 +34,106 @@ jobs:
         if: steps.cache-npm.outputs.cache-hit != 'true'
         run: npm install
 
+  #SE HOUVER ALTERAÇÕES NAS PRISMA LEVA O OUTPUT PARA OS OUTROS JOBS SABEREM
+  check-prisma-changes:
+    name: Verificar Alterações no Prisma Schema
+    runs-on: ubuntu-latest
+    outputs:
+      has_prisma_changes: ${{ steps.check_changes.outputs.has_changes }}
+    steps:
+      - name: Analisar Repositorio
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2 #COMPARA COM O COMMIT ANTERIOR - DAI O 2
+
+      #VER NA PRISMA/schema.prisma COM GIT DIFF
+      - name: Verificar alterações no schema do prisma
+        id: check_changes
+        run: |
+          if git diff --name-only HEAD^ HEAD | grep -q "prisma/schema.prisma"; then
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+            echo "Changes to schema.prisma detected"
+          else
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+            echo "No changes to schema.prisma detected"
+          fi
+
+  update-database:
+    name: Atualizar Base de Dados
+    needs: [caching, check-prisma-changes]
+    runs-on: ubuntu-latest
+    #SE HOUVER MUDANÇAS COM BASE NO OUTPUT DO JOB ANTERIOR
+    if: needs.check-prisma-changes.outputs.has_prisma_changes == 'true'
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+    steps:
+      - name: Analisar Repositorio
+        uses: actions/checkout@v4
+
+      - name: Setup do Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: Cache dos modulos do NPM
+        id: cache-npm
+        uses: actions/cache@v4
+        with:
+          path: ./betlearn_backend/node_modules # Para onde vai a cache
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }} #Nome da Cache e Build
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Instalar Modulos If Cache Not Found
+        if: steps.cache-npm.outputs.cache-hit != 'true'
+        run: npm install
+
+      #ENVIA PARA A BD
+      - name: Cria Migration e Manda para a BD
+        run: |
+          npx prisma migrate dev --name auto-migration-${{ github.sha }}
+          npx prisma generate
+          npx prisma db pull
+            npx prisma migrate deploy
+
+      - name: Log if no changes
+        if: needs.check-prisma-changes.outputs.has_prisma_changes == 'false'
+        run: echo "No changes detected in prisma/schema.prisma. Skipping database update."
+
   deploy-vercel-preview:
     name: Deploy do Vercel em Preview
     env:
       VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
       VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-    needs: caching
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
+    #PASSA A FRENTE SE NÃO HOUVER ALTERAÇÕES NO SCHEMA
+    needs: [caching, update-database, check-prisma-changes]
+    #SE HOUVER ALTERACOES NO SCHEMA E O UPDATE DATABASE DER ERRO, CONTINUA NA MESMA
+    if: always() && (needs.update-database.result == 'success' || needs.check-prisma-changes.outputs.has_prisma_changes == 'false')
     runs-on: ubuntu-latest
     steps:
       - name: Analisar Repositorio
         uses: actions/checkout@v4
 
       - name: Setup do Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: "22"
           cache: "npm"
 
-      - name: Instalar as Dependencias
+      - name: Cache dos modulos do NPM
+        id: cache-npm
+        uses: actions/cache@v4
+        with:
+          path: ./betlearn_backend/node_modules # Para onde vai a cache
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }} #Nome da Cache e Build
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Instalar Modulos If Cache Not Found
+        if: steps.cache-npm.outputs.cache-hit != 'true'
         run: npm install
 
       - name: Instalar CLI da Vercel
@@ -73,6 +156,7 @@ jobs:
       VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
       VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
     needs: deploy-vercel-preview
+    if: always()
     runs-on: ubuntu-latest
     steps:
       - name: Analisar Repositorio

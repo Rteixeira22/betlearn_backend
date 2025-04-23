@@ -18,8 +18,10 @@
  *             example:
  *               - id_championship: 1
  *                 json: "{...}"
+ *                 creation_date: "2023-10-01T00:00:00Z"
  *               - id_championship: 2
  *                 json: "{...}"
+ *                 creation_date: "2023-10-02T00:00:00Z"
  *       500:
  *         description: Erro ao procurar todos os campeonatos
  *         content:
@@ -50,6 +52,7 @@
  *             example:
  *               id_championship: 1
  *               json: "{...}"
+ *               creation_date: "2023-10-02T00:00:00Z"
  *       500:
  *         description: Erro ao procurar campeonato
  *         content:
@@ -83,6 +86,7 @@
  *             example:
  *               id_championship: 1
  *               json: "{...}"
+ *               creation_date: "2023-10-02T00:00:00Z"
  *       500:
  *         description: Erro ao criar campeonato
  *         content:
@@ -124,6 +128,7 @@
  *             example:
  *               id_championship: 1
  *               json: "{...}"
+ *               creation_date: "2023-10-02T00:00:00Z"
  *       500:
  *         description: Erro ao atualizar campeonato
  *         content:
@@ -154,6 +159,7 @@
  *             example:
  *               id_championship: 1
  *               json: "{...}"
+ *               creation_date: "2023-10-02T00:00:00Z"
  *       500:
  *         description: Erro ao apagar campeonato
  *         content:

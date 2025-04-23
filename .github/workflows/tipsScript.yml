@@ -1,5 +1,5 @@
 # Nome da Pipeline
-name: Get_Championships_Monthly
+name: Swap_Current_Tip
 
 # Ocasioes em que o workflow comeca a trabalhar
 on:
@@ -7,11 +7,11 @@ on:
   #branches:
   # - Pipeline # Pipeline so para a construcao
   schedule:
-    - cron: "0 23 1 * *" # Todos os dias 1 de todos os meses. Sem considerar mes especifico e dia da semana
+    - cron: "00 23 * * *" # Todos os dias desbloquear a proxima
 
 # Jobs a ser executados
 jobs:
-  caching-runScript:
+  caching-changeTip:
     name: Criar Cache e Correr o Script
     runs-on: ubuntu-latest
 
@@ -35,5 +35,7 @@ jobs:
         run: npm install
 
       - name: Executar o Script
-        run: node scripts/getDataFromAI.ts # Executar o script
+        env:
+          VERCEL_URL: ${{ secrets.VERCEL_URL }}
+        run: npx ts-node scripts/tipscript.ts # Executar o script
 
