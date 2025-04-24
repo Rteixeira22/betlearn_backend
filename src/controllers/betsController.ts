@@ -175,7 +175,7 @@ async getBetsByUserId(req: Request, res: Response) {
         const ref_id_championship = parseInt(req.params.id_championship);
 
         // Create the game
-        const gameResponse = await axiosInstance.post("/api/games/", {
+        const gameResponse = await axiosInstance.post("/games/", {
           local_team,
           visitor_team,
           schedule,
