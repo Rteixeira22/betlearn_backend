@@ -44,7 +44,7 @@ async function generateChampionshipData() {
     console.log('A enviar pedido à API do Gemini...');
     
     const response = await axios.post(
-      'https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro:generateContent',
+      'https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro-002:generateContent',
       {
         contents: [{ parts: [{ text: prompt }] }],
         generationConfig: {
