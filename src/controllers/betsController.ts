@@ -5,28 +5,29 @@ const prisma = new PrismaClient();
 
 export class BetsController {
   // Get bets by user ID, with optional 'type' filtering
-async getBetsByUserId(req: Request, res: Response) {
-  try {
-    const userId = parseInt(req.params.id); 
-    const { type } = req.query; 
-    const whereClause: any = { ref_id_user: userId };
-
-    if (type) {
-      whereClause.state = type;  
-    }
+  async getBetsByUserId(req: Request, res: Response) {
+    try {
+      const userId = parseInt(req.params.id); 
+      const { type } = req.query; 
+      const whereClause: any = { ref_id_user: userId };
   
-    const bets = await prisma.bets.findMany({
-      where: whereClause,
-      orderBy: {
-        date: "desc", 
-      },
-    });
-
-    res.json(bets); 
-  } catch (error) {
-    res.status(500).json({ error: "Failed to fetch bet history" });
+      if (type === 'active') {
+        whereClause.state = 0;
+      }
+  
+      const bets = await prisma.bets.findMany({
+        where: whereClause,
+        orderBy: {
+          date: "desc",
+        },
+      });
+  
+      res.json(bets);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch bet history" });
+    }
   }
-}
+  
 
   // Count user bets
   async countUserBetsById(req: Request, res: Response) {
