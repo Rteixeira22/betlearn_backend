@@ -565,6 +565,8 @@ router.get("/:id", challengeController.getChallengeById);
 // Get steps by challenge ID
 router.get("/:id/steps", challengeController.getStepsByChallengeId);
 
+// Get Challenge in progress
+router.get('/:id/in-progress', challengeController.getChallengeInProgress);
 //POST METHOTDS
 
 // Create a new challenge

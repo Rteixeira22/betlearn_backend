@@ -491,4 +491,80 @@ export class ChallengesController {
       res.status(500).json({ error: "Something went wrong" });
     }
   }
+
+
+
+//Função para ir buscar o desafio em progresso
+async getChallengeInProgress(req: Request, res: Response) {
+  try {
+    const userId = parseInt(req.params.id);
+    
+    // Verifica se o ID do utilizador é válido
+    if (isNaN(userId)) {
+      return res.status(400).json({ error: "Invalid user ID" });
+    }
+    
+    // Vai buscar um desafio que tenha progress_percentage > 0 e < 100 (em progresso)
+    // e que não esteja completado (completed = false)
+    const challengeInProgress = await prisma.user_has_Challenges.findFirst({
+      where: {
+        ref_id_user: userId,
+        completed: false,
+        blocked: false,
+        progress_percentage: {
+          gt: 0,
+          lt: 100
+        }
+      },
+      include: {
+        challenge: true 
+      },
+    });
+    
+    if (!challengeInProgress) {
+      return res.status(404).json({ 
+        message: "No challenge in progress found for this user"
+      });
+    }
+    
+    // Vai buscar os steps do desafio em progresso
+    const steps = await prisma.user_has_Challenges_has_Steps.findMany({
+      where: {
+        ref_user_has_Challenges_id_user: userId,
+        ref_user_has_Challenges_id_challenge: challengeInProgress.ref_id_challenge
+      },
+      include: {
+        step: {
+          include: {
+            Step_Video: true,
+            Step_Bet: true,
+            Step_View: true,
+            Step_Questionnaire: true
+          }
+        }
+      },
+      orderBy: {
+        ref_id_steps: 'asc'
+      }
+    });
+    
+    // Retorna o desafio com sua informação de progresso e steps
+    res.json({
+      challenge: challengeInProgress.challenge,
+      progress: {
+        progress_percentage: challengeInProgress.progress_percentage,
+        detail_seen: challengeInProgress.detail_seen,
+      },
+      steps: steps
+    });
+    
+  } catch (error) {
+    console.error("Error fetching challenge in progress:", error);
+    res.status(500).json({ 
+      error: "Failed to fetch challenge in progress",
+      details: error instanceof Error ? error.message : "Unknown error"
+    });
+  }
+}
+
 }
