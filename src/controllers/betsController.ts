@@ -8,11 +8,18 @@ export class BetsController {
   async getBetsByUserId(req: Request, res: Response) {
     try {
       const userId = parseInt(req.params.id); 
-      const { type } = req.query; 
+      const { state, result } = req.query; 
+  
       const whereClause: any = { ref_id_user: userId };
   
-      if (type === 'active') {
-        whereClause.state = 0;
+      // Filtro por state (0 ou 1)
+      if (state === "0" || state === "1") {
+        whereClause.state = parseInt(state);
+      }
+  
+      // Filtro por result (0 ou 1)
+      if (result === "0" || result === "1") {
+        whereClause.result = parseInt(result);
       }
   
       const bets = await prisma.bets.findMany({
@@ -20,6 +27,13 @@ export class BetsController {
         orderBy: {
           date: "desc",
         },
+        include: {
+          BetsHasGames: {
+            include: {
+              game: true,
+            }
+          }
+        }
       });
   
       res.json(bets);
@@ -27,6 +41,7 @@ export class BetsController {
       res.status(500).json({ error: "Failed to fetch bet history" });
     }
   }
+  
   
 
   // Count user bets
