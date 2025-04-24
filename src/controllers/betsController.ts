@@ -140,10 +140,18 @@ async getBetsByUserId(req: Request, res: Response) {
       const bet = await prisma.bets.findFirst({
         where: { ref_id_user: userId },
         orderBy: { date: "desc" },
+        include: {
+          BetsHasGames: {
+            include: {
+              game: true,
+            }
+          }
+        }
       });
       res.json(bet);
     } catch (error) {
-      res.status(500).json({ error: "Failed to fetch last bet" });
+      console.error("Error fetching last bet with game:", error);
+      res.status(500).json({ error: "Failed to fetch last bet with game data" });
     }
   }
 
