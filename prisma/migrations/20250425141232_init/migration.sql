@@ -1,15 +1,16 @@
 -- CreateTable
 CREATE TABLE "Users" (
     "id_user" SERIAL NOT NULL,
-    "name" VARCHAR(100) NOT NULL,
-    "email" VARCHAR(100) NOT NULL,
-    "username" VARCHAR(50) NOT NULL,
+    "name" VARCHAR(150) NOT NULL,
+    "email" VARCHAR(150) NOT NULL,
+    "username" VARCHAR(100) NOT NULL,
     "birthdate" DATE NOT NULL,
     "money" DECIMAL(10,2) NOT NULL,
     "points" INTEGER NOT NULL,
     "image" VARCHAR(200),
     "bets_visibility" BOOLEAN NOT NULL DEFAULT true,
     "tutorial_verification" BOOLEAN NOT NULL,
+    "password" VARCHAR(255) NOT NULL,
 
     CONSTRAINT "Users_pkey" PRIMARY KEY ("id_user")
 );
@@ -19,8 +20,8 @@ CREATE TABLE "Challenges" (
     "id_challenge" SERIAL NOT NULL,
     "number" INTEGER NOT NULL,
     "name" VARCHAR(50) NOT NULL,
-    "short_description" VARCHAR(100) NOT NULL,
-    "long_description" VARCHAR(150) NOT NULL,
+    "short_description" VARCHAR(300) NOT NULL,
+    "long_description" VARCHAR(1000) NOT NULL,
     "image" VARCHAR(200) NOT NULL,
 
     CONSTRAINT "Challenges_pkey" PRIMARY KEY ("id_challenge")
@@ -34,6 +35,7 @@ CREATE TABLE "User_has_Challenges" (
     "blocked" BOOLEAN NOT NULL,
     "detail_seen" BOOLEAN NOT NULL,
     "progress_percentage" INTEGER NOT NULL DEFAULT 0,
+    "date" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "User_has_Challenges_pkey" PRIMARY KEY ("ref_id_user","ref_id_challenge")
 );
@@ -98,7 +100,8 @@ CREATE TABLE "Bets_has_Games" (
 -- CreateTable
 CREATE TABLE "Championship" (
     "id_championship" SERIAL NOT NULL,
-    "json" VARCHAR(200) NOT NULL,
+    "json" TEXT NOT NULL,
+    "creation_date" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "Championship_pkey" PRIMARY KEY ("id_championship")
 );
@@ -138,7 +141,7 @@ CREATE TABLE "Step_Video" (
 CREATE TABLE "Step_Bet" (
     "id_step_bet" SERIAL NOT NULL,
     "bet_description" VARCHAR(200) NOT NULL,
-    "bet_json" VARCHAR(200) NOT NULL,
+    "bet_json" TEXT NOT NULL,
 
     CONSTRAINT "Step_Bet_pkey" PRIMARY KEY ("id_step_bet")
 );
@@ -147,7 +150,7 @@ CREATE TABLE "Step_Bet" (
 CREATE TABLE "Step_Questionnaire" (
     "id_step_questionnaire" SERIAL NOT NULL,
     "questionnaire_description" VARCHAR(200) NOT NULL,
-    "questionnaire_json" VARCHAR(45) NOT NULL,
+    "questionnaire_json" TEXT NOT NULL,
 
     CONSTRAINT "Step_Questionnaire_pkey" PRIMARY KEY ("id_step_questionnaire")
 );
@@ -164,9 +167,22 @@ CREATE TABLE "Step_View" (
 -- CreateTable
 CREATE TABLE "Tips" (
     "id_tip" SERIAL NOT NULL,
-    "tip" VARCHAR(50) NOT NULL,
+    "tip" VARCHAR(250) NOT NULL,
+    "active" INTEGER DEFAULT 0,
 
     CONSTRAINT "Tips_pkey" PRIMARY KEY ("id_tip")
+);
+
+-- CreateTable
+CREATE TABLE "Admin" (
+    "id" SERIAL NOT NULL,
+    "name" VARCHAR(100) NOT NULL,
+    "email" TEXT NOT NULL,
+    "username" TEXT NOT NULL,
+    "password" TEXT NOT NULL,
+    "image" VARCHAR(200),
+
+    CONSTRAINT "Admin_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
@@ -178,44 +194,50 @@ CREATE UNIQUE INDEX "Users_username_key" ON "Users"("username");
 -- CreateIndex
 CREATE UNIQUE INDEX "Championship_json_key" ON "Championship"("json");
 
--- AddForeignKey
-ALTER TABLE "User_has_Challenges" ADD CONSTRAINT "User_has_Challenges_ref_id_user_fkey" FOREIGN KEY ("ref_id_user") REFERENCES "Users"("id_user") ON DELETE RESTRICT ON UPDATE CASCADE;
+-- CreateIndex
+CREATE UNIQUE INDEX "Admin_email_key" ON "Admin"("email");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Admin_username_key" ON "Admin"("username");
 
 -- AddForeignKey
-ALTER TABLE "User_has_Challenges" ADD CONSTRAINT "User_has_Challenges_ref_id_challenge_fkey" FOREIGN KEY ("ref_id_challenge") REFERENCES "Challenges"("id_challenge") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "User_has_Challenges" ADD CONSTRAINT "User_has_Challenges_ref_id_user_fkey" FOREIGN KEY ("ref_id_user") REFERENCES "Users"("id_user") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Questionnaire_Response" ADD CONSTRAINT "Questionnaire_Response_ref_id_user_fkey" FOREIGN KEY ("ref_id_user") REFERENCES "Users"("id_user") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "User_has_Challenges" ADD CONSTRAINT "User_has_Challenges_ref_id_challenge_fkey" FOREIGN KEY ("ref_id_challenge") REFERENCES "Challenges"("id_challenge") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Bets" ADD CONSTRAINT "Bets_ref_id_user_fkey" FOREIGN KEY ("ref_id_user") REFERENCES "Users"("id_user") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Questionnaire_Response" ADD CONSTRAINT "Questionnaire_Response_ref_id_user_fkey" FOREIGN KEY ("ref_id_user") REFERENCES "Users"("id_user") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Bets_has_Games" ADD CONSTRAINT "Bets_has_Games_ref_id_bet_fkey" FOREIGN KEY ("ref_id_bet") REFERENCES "Bets"("id_bets") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Bets" ADD CONSTRAINT "Bets_ref_id_user_fkey" FOREIGN KEY ("ref_id_user") REFERENCES "Users"("id_user") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Bets_has_Games" ADD CONSTRAINT "Bets_has_Games_ref_id_game_fkey" FOREIGN KEY ("ref_id_game") REFERENCES "Games"("id_game") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Bets_has_Games" ADD CONSTRAINT "Bets_has_Games_ref_id_bet_fkey" FOREIGN KEY ("ref_id_bet") REFERENCES "Bets"("id_bets") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Bets_has_Games" ADD CONSTRAINT "Bets_has_Games_ref_id_championship_fkey" FOREIGN KEY ("ref_id_championship") REFERENCES "Championship"("id_championship") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Bets_has_Games" ADD CONSTRAINT "Bets_has_Games_ref_id_game_fkey" FOREIGN KEY ("ref_id_game") REFERENCES "Games"("id_game") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "User_has_Challenges_has_Steps" ADD CONSTRAINT "User_has_Challenges_has_Steps_ref_user_has_Challenges_id_u_fkey" FOREIGN KEY ("ref_user_has_Challenges_id_user", "ref_user_has_Challenges_id_challenge") REFERENCES "User_has_Challenges"("ref_id_user", "ref_id_challenge") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Bets_has_Games" ADD CONSTRAINT "Bets_has_Games_ref_id_championship_fkey" FOREIGN KEY ("ref_id_championship") REFERENCES "Championship"("id_championship") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "User_has_Challenges_has_Steps" ADD CONSTRAINT "User_has_Challenges_has_Steps_ref_id_steps_fkey" FOREIGN KEY ("ref_id_steps") REFERENCES "Steps"("id_step") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "User_has_Challenges_has_Steps" ADD CONSTRAINT "User_has_Challenges_has_Steps_ref_user_has_Challenges_id_u_fkey" FOREIGN KEY ("ref_user_has_Challenges_id_user", "ref_user_has_Challenges_id_challenge") REFERENCES "User_has_Challenges"("ref_id_user", "ref_id_challenge") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Steps" ADD CONSTRAINT "Steps_ref_id_step_video_fkey" FOREIGN KEY ("ref_id_step_video") REFERENCES "Step_Video"("id_step_video") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "User_has_Challenges_has_Steps" ADD CONSTRAINT "User_has_Challenges_has_Steps_ref_id_steps_fkey" FOREIGN KEY ("ref_id_steps") REFERENCES "Steps"("id_step") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Steps" ADD CONSTRAINT "Steps_ref_id_step_bet_fkey" FOREIGN KEY ("ref_id_step_bet") REFERENCES "Step_Bet"("id_step_bet") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "Steps" ADD CONSTRAINT "Steps_ref_id_step_video_fkey" FOREIGN KEY ("ref_id_step_video") REFERENCES "Step_Video"("id_step_video") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Steps" ADD CONSTRAINT "Steps_ref_id_step_view_fkey" FOREIGN KEY ("ref_id_step_view") REFERENCES "Step_View"("id_step_view") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "Steps" ADD CONSTRAINT "Steps_ref_id_step_bet_fkey" FOREIGN KEY ("ref_id_step_bet") REFERENCES "Step_Bet"("id_step_bet") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Steps" ADD CONSTRAINT "Steps_ref_id_step_questionnaire_fkey" FOREIGN KEY ("ref_id_step_questionnaire") REFERENCES "Step_Questionnaire"("id_step_questionnaire") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "Steps" ADD CONSTRAINT "Steps_ref_id_step_view_fkey" FOREIGN KEY ("ref_id_step_view") REFERENCES "Step_View"("id_step_view") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Steps" ADD CONSTRAINT "Steps_ref_id_challenges_fkey" FOREIGN KEY ("ref_id_challenges") REFERENCES "Challenges"("id_challenge") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Steps" ADD CONSTRAINT "Steps_ref_id_step_questionnaire_fkey" FOREIGN KEY ("ref_id_step_questionnaire") REFERENCES "Step_Questionnaire"("id_step_questionnaire") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Steps" ADD CONSTRAINT "Steps_ref_id_challenges_fkey" FOREIGN KEY ("ref_id_challenges") REFERENCES "Challenges"("id_challenge") ON DELETE CASCADE ON UPDATE CASCADE;

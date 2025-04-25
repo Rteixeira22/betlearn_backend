@@ -108,7 +108,7 @@ model Bets_has_Games {
 
 model Championship {
   id_championship Int              @id @default(autoincrement())
-  json            String           @unique @db.VarChar(200)
+  json            String           @unique @db.Text
   creation_date   DateTime         @default(now())
   BetsHasGames    Bets_has_Games[]
 }
@@ -150,14 +150,14 @@ model Step_Video {
 model Step_Bet {
   id_step_bet     Int     @id @default(autoincrement())
   bet_description String  @db.VarChar(200)
-  bet_json        String  @db.VarChar(200)
+  bet_json        String  @db.Text
   Steps           Steps[]
 }
 
 model Step_Questionnaire {
   id_step_questionnaire     Int     @id @default(autoincrement())
   questionnaire_description String  @db.VarChar(200)
-  questionnaire_json        String  @db.VarChar(45)
+  questionnaire_json        String  @db.Text
   Steps                     Steps[]
 }
 

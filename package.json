@@ -12,6 +12,9 @@
     "generate": "prisma generate",
     "postinstall": "prisma generate"
   },
+  "prisma": {
+    "seed": "node prisma/seed.js"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Rteixeira22/betlearn_backend.git"
