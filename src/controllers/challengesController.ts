@@ -504,7 +504,7 @@ async getChallengeInProgress(req: Request, res: Response) {
       return res.status(400).json({ error: "Invalid user ID" });
     }
     
-    // Vai buscar um desafio que tenha progress_percentage > 0 e < 100 (em progresso)
+    // Vai buscar um desafio que tenha progress_percentage >= 0 e < 100 (em progresso)
     // e que não esteja completado (completed = false)
     const challengeInProgress = await prisma.user_has_Challenges.findFirst({
       where: {
@@ -512,7 +512,7 @@ async getChallengeInProgress(req: Request, res: Response) {
         completed: false,
         blocked: false,
         progress_percentage: {
-          gt: 0,
+          gte: 0,
           lt: 100
         }
       },
