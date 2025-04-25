@@ -4,6 +4,8 @@ import { VercelRequest, VercelResponse } from '@vercel/node';
 
 const apiKey = process.env.GEMINI_API_KEY;
 
+const model = process.env.GEMINI_MODEL || 'gemini-1.5-pro-002';
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ erro: 'Método não permitido.' });
@@ -24,7 +26,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   
   try {
     const response = await axios.post(
-      'https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro:generateContent',
+      'https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro-002:generateContent',
       {
         contents: [{ parts: [{ text: prompt }] }],
         generationConfig: {
