@@ -8,7 +8,18 @@ export class ChallengesController {
   // Get all challenges
   async getAllChallenges(req: Request, res: Response) {
     try {
-      const challenges = await prisma.challenges.findMany();
+      const minNumber = req.query.minNumber ? parseInt(req.query.minNumber as string) : undefined;
+      
+      const challenges = await prisma.challenges.findMany({
+        where: minNumber ? {
+          number: {
+            gte: minNumber
+          }
+        } : {},
+        orderBy: {
+          number: 'asc'
+        }
+      });
       res.json(challenges);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch challenges" });
