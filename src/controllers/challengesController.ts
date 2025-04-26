@@ -8,7 +8,7 @@ export class ChallengesController {
   // Get all challenges
   async getAllChallenges(req: Request, res: Response) {
     try {
-      const minNumber = req.query.minNumber ? parseInt(req.query.minNumber as string) : undefined;
+      const minNumber = typeof req.query.minNumber === 'string' ? parseInt(req.query.minNumber) : undefined;
       
       const challenges = await prisma.challenges.findMany({
         where: minNumber ? {
