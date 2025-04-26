@@ -158,6 +158,21 @@ export class ChallengesController {
     }
 
 
+  // Get ghallenge by user id
+  async getChallengeByUserId(req: Request, res: Response) {
+    try {
+      const userId = parseInt(req.params.id_user);
+      const challenges = await prisma.user_has_Challenges.findMany({
+        where: { ref_id_user: userId },
+        include: { challenge: true },
+      });
+      res.json(challenges);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch challenges" });
+    }
+  }
+
+
   // Update challenge
   async updateChallengeById(req: Request, res: Response) {
     try {
