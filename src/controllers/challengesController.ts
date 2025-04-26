@@ -165,6 +165,11 @@ export class ChallengesController {
       const challenges = await prisma.user_has_Challenges.findMany({
         where: { ref_id_user: userId },
         include: { challenge: true },
+        orderBy: {
+          challenge: {
+            number: "asc",
+          },
+        },
       });
       res.json(challenges);
     } catch (error) {
