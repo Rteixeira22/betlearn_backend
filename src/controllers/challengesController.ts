@@ -4,6 +4,30 @@ import axios from "axios";
 
 const prisma = new PrismaClient();
 
+interface CreateChallengeRequest {
+  challenge: {
+    number: number;
+    name: string;
+    short_description: string;
+    long_description: string;
+    image: string;
+  };
+  steps: Array<{
+    type: 'video' | 'bet' | 'view' | 'questionnaire';
+    data: {
+      // Dados específicos de cada tipo de step
+      video_url?: string;
+      video_description?: string;
+      bet_description?: string;
+      bet_json?: string;
+      view_description?: string;
+      view_page?: string;
+      questionnaire_description?: string;
+      questionnaire_json?: string;
+    };
+  }>;
+}
+
 export class ChallengesController {
   // Get all challenges
   async getAllChallenges(req: Request, res: Response) {
@@ -597,5 +621,106 @@ async getChallengeInProgress(req: Request, res: Response) {
     });
   }
 }
+
+async createFullChallenge(req: Request, res: Response) {
+  const data = req.body as CreateChallengeRequest;
+  
+  try {
+    // Usar transação para garantir que todas as operações sejam bem-sucedidas
+    const result = await prisma.$transaction(async (tx) => {
+      // 1. Criar o challenge
+      const challenge = await tx.challenges.create({
+        data: {
+          number: data.challenge.number,
+          name: data.challenge.name,
+          short_description: data.challenge.short_description,
+          long_description: data.challenge.long_description,
+          image: data.challenge.image,
+        },
+      });
+      
+      // 2. Criar cada step do challenge
+      const createdSteps = [];
+      
+      for (const stepData of data.steps) {
+        let stepVideoId = null;
+        let stepBetId = null;
+        let stepViewId = null;
+        let stepQuestionnaireId = null;
+        
+        // Criar o tipo específico de step
+        if (stepData.type === 'video' && stepData.data.video_url && stepData.data.video_description) {
+          const video = await tx.step_Video.create({
+            data: {
+              video_url: stepData.data.video_url,
+              video_description: stepData.data.video_description,
+            },
+          });
+          stepVideoId = video.id_step_video;
+        } 
+        else if (stepData.type === 'bet' && stepData.data.bet_description && stepData.data.bet_json) {
+          const bet = await tx.step_Bet.create({
+            data: {
+              bet_description: stepData.data.bet_description,
+              bet_json: stepData.data.bet_json,
+            },
+          });
+          stepBetId = bet.id_step_bet;
+        }
+        else if (stepData.type === 'view' && stepData.data.view_description && stepData.data.view_page) {
+          const view = await tx.step_View.create({
+            data: {
+              view_description: stepData.data.view_description,
+              view_page: stepData.data.view_page,
+            },
+          });
+          stepViewId = view.id_step_view;
+        }
+        else if (stepData.type === 'questionnaire' && stepData.data.questionnaire_description && stepData.data.questionnaire_json) {
+          const questionnaire = await tx.step_Questionnaire.create({
+            data: {
+              questionnaire_description: stepData.data.questionnaire_description,
+              questionnaire_json: stepData.data.questionnaire_json,
+            },
+          });
+          stepQuestionnaireId = questionnaire.id_step_questionnaire;
+        }
+        
+        // Criar o registro na tabela Steps
+        const step = await tx.steps.create({
+          data: {
+            ref_id_step_video: stepVideoId,
+            ref_id_step_bet: stepBetId,
+            ref_id_step_view: stepViewId,
+            ref_id_step_questionnaire: stepQuestionnaireId,
+            ref_id_challenges: challenge.id_challenge,
+          },
+        });
+        
+        createdSteps.push(step);
+      }
+      
+      // Retornar todos os dados criados
+      return {
+        challenge,
+        steps: createdSteps
+      };
+    });
+    
+    res.status(201).json({
+      message: "Challenge created successfully with all steps",
+      data: result
+    });
+    
+  } catch (error) {
+    console.error("Error creating challenge:", error);
+    res.status(500).json({ 
+      error: "Failed to create challenge with steps",
+      details: error instanceof Error ? error.message : "Unknown error"
+    });
+  }
+}
+
+
 
 }

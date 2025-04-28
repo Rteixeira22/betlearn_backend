@@ -575,11 +575,15 @@ router.get("/user/:id_user", challengeController.getChallengeByUserId);
 // Create a new challenge
 router.post("/", challengeController.createChallenge);
 
+//create full challenge
+router.post("/full", challengeController.createFullChallenge);
+
 //create user has challenge
 router.post(
   "/:id_user/:id_challenge",
   challengeController.createUserHasChallenges
 );
+
 
 // umblock next challenge
 router.post(
