@@ -176,79 +176,24 @@ const stepVideos = await Promise.all([
       data: {
         questionnaire_description: 'Avalie seu conhecimento sobre apostas',
         questionnaire_json: JSON.stringify({
-          "title": "Quiz: Compreensão sobre Odds e Probabilidades",
-          "description": "Responde às seguintes perguntas para testares o que aprendeste sobre odds e apostas desportivas.",
-          "questions": [
-            {
-              "id": 1,
-              "type": "multiple_choice",
-              "question": "O que representa uma odd de 3.00 no formato decimal?",
-              "options": [
-                "Uma probabilidade de 33,3%",
-                "Um retorno de 30% do valor apostado",
-                "Uma probabilidade de 70%",
-                "Que o evento é altamente provável"
-              ],
-              "correct_answer": [0]
-            },
-            {
-              "id": 2,
-              "type": "multiple_choice",
-              "question": "Qual destas opções representa o cálculo correto da odd decimal justa?",
-              "options": [
-                "100 dividido pela probabilidade (%)",
-                "Probabilidade (%) vezes 100",
-                "Odd decimal menos 1",
-                "100 multiplicado pela odd decimal"
-              ],
-              "correct_answer": [0]
-            },
-            {
-              "id": 3,
-              "type": "multiple_choice",
-              "question": "Se uma equipa tem 80% de probabilidade de ganhar, qual é a odd justa correspondente (decimal)?",
-              "options": [
-                "5.00",
-                "1.25",
-                "1.80",
-                "0.80"
-              ],
-              "correct_answer": [1]
-            },
-            {
-              "id": 4,
-              "type": "multiple_choice",
-              "question": "Quais das seguintes odds indicam um maior retorno em caso de vitória?",
-              "options": [
-                "1.50",
-                "2.00",
-                "3.00",
-                "1.20"
-              ],
-              "correct_answer": [2]
-            },
-            {
-              "id": 5,
-              "type": "multiple_choice",
-              "question": "Se apostas 10€ numa odd de 2.50, quanto recebes se ganhares?",
-              "options": [
-                "20€",
-                "15€",
-                "25€",
-                "30€"
-              ],
-              "correct_answer": [2]
-            }
-          ]
+          "question": "O que significam odds decimais de 2.00 nas apostas?",
+          "options": [
+            "Você duplica o valor apostado se ganhar",
+            "Você perde metade do valor apostado",
+            "Você triplica o valor apostado se ganhar",
+            "Você perde todo o valor apostado"
+          ],
+          "correctAnswer": "Você duplica o valor apostado se ganhar"
         }
+        
         
     )}
     });
 
     const stepView = await prisma.step_View.create({
       data: {
-        view_description: 'Veja o histórico de apostas e o ranking',
-        view_page: '/history, /ranking'
+        view_description: 'Veja o histórico de apostas ',
+        view_page: '/history'
       }
     });
 
