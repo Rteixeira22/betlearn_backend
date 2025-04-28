@@ -7,9 +7,12 @@ export class ChampionsController {
   //IR BUSCRAR TODOS OS CAMPEONATOS
   async getAllChampionships(req: Request, res: Response) {
     try {
-      //SAVE
-      const championships = await prisma.championship.findMany();
-
+      const championships = await prisma.championship.findMany({
+        orderBy: {
+          creation_date: 'desc', 
+        },
+      });
+  
       res.status(200).json(championships);
     } catch (error) {
       res.status(500).json({ error: "Erro ao procurar todos os campeonatos." });
