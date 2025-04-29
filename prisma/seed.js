@@ -168,7 +168,6 @@ const stepVideos = await Promise.all([
     const stepBet = await prisma.step_Bet.create({
       data: {
         bet_description: 'Faça sua primeira aposta controlada',
-        bet_json: '{"type":"single","minOdds":1.5,"maxAmount":10}'
       }
     });
 
