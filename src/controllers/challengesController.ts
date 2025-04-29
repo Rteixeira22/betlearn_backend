@@ -55,6 +55,16 @@ export class ChallengesController {
       const challengeId = parseInt(req.params.id);
       const challenge = await prisma.challenges.findUnique({
         where: { id_challenge: challengeId },
+        include: {
+          Steps: {
+            include: {
+              Step_Video: true,
+              Step_Bet: true,
+              Step_View: true,
+              Step_Questionnaire: true,
+            },
+          },
+        },
       });
       res.json(challenge);
     } catch (error) {
