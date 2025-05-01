@@ -30,25 +30,30 @@ interface CreateChallengeRequest {
 
 export class ChallengesController {
   // Get all challenges
-  async getAllChallenges(req: Request, res: Response) {
-    try {
-      const minNumber = typeof req.query.minNumber === 'string' ? parseInt(req.query.minNumber) : undefined;
-      
-      const challenges = await prisma.challenges.findMany({
-        where: minNumber ? {
-          number: {
-            gte: minNumber
-          }
-        } : {},
-        orderBy: {
-          number: 'asc'
+ 
+async getAllChallenges(req: Request, res: Response) {
+  try {
+    const minNumber = typeof req.query.minNumber === 'string' ? parseInt(req.query.minNumber) : undefined;
+    const limit = typeof req.query.limit === 'string' ? parseInt(req.query.limit) : undefined;
+    
+    // Get challenges with filters and optional limit
+    const challenges = await prisma.challenges.findMany({
+      where: minNumber ? {
+        number: {
+          gte: minNumber
         }
-      });
-      res.json(challenges);
-    } catch (error) {
-      res.status(500).json({ error: "Failed to fetch challenges" });
-    }
+      } : {},
+      orderBy: {
+        number: 'asc'
+      },
+      ...(limit ? { take: limit } : {})
+    });
+    
+    res.json(challenges);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch challenges" });
   }
+}
   // Get challenge by ID
   async getChallengeById(req: Request, res: Response) {
     try {
