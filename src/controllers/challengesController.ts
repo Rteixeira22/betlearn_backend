@@ -223,6 +223,27 @@ export class ChallengesController {
   }
 
 
+
+  //get challenges completed by user
+  
+  async getAllChallengesCompletedByUserId(req: Request, res: Response) {
+    try {
+      const userId = parseInt(req.params.id_user);
+      const challenges = await prisma.user_has_Challenges.findMany({
+        where: { ref_id_user: userId, completed: true },
+        include: { challenge: true },
+        orderBy: {
+          challenge: {
+            number: "asc",
+          },
+        },
+      });
+      res.json(challenges);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch challenges" });
+    }
+  }
+
   // Update challenge
   async updateChallengeById(req: Request, res: Response) {
     try {
@@ -430,6 +451,7 @@ export class ChallengesController {
       res.status(500).json({ error: "Failed to update user has challenge" });
     }
   }
+
 
   //update user has challenges progress_percentage
   async updateUserHasChallengesProgressPercentage(req: Request, res: Response) {

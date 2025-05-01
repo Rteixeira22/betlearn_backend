@@ -508,6 +508,47 @@
  *       500:
  *         description: Erro ao remover desafio
  */
+
+/**
+ * @swagger
+ * /challenges/completed/{id_user}:
+ *   get:
+ *     summary: Lista todos os desafios completos por um utilizador
+ *     tags: [Challenges]
+ *     parameters:
+ *       - in: path
+ *         name: id_user
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: ID do utilizador
+ *         example: 123
+ *     responses:
+ *       200:
+ *         description: Lista de desafios completados
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   ref_id_user:
+ *                     type: integer
+ *                   ref_id_challenge:
+ *                     type: integer
+ *                   completed:
+ *                     type: boolean
+ *                   challenge:
+ *                     type: object
+ *                     description: Dados completos do desafio relacionado
+ *       404:
+ *         description: Utilizador não encontrado ou sem desafios completados
+ *       500:
+ *         description: Erro ao buscar desafios completados
+ */
+
+
 /**
  * @swagger
  * components:
@@ -572,6 +613,13 @@ router.get('/:id/in-progress', challengeController.getChallengeInProgress);
 // Get all challenges by user ID
 router.get("/user/:id_user", challengeController.getChallengeByUserId);
 
+//get all challenges completed by user ID
+router.get(
+  "/completed/:id_user",
+  challengeController.getAllChallengesCompletedByUserId
+);
+
+
 // Create a new challenge
 router.post("/", challengeController.createChallenge);
 
@@ -583,6 +631,7 @@ router.post(
   "/:id_user/:id_challenge",
   challengeController.createUserHasChallenges
 );
+
 
 
 // umblock next challenge
