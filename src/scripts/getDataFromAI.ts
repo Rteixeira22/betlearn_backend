@@ -185,7 +185,7 @@ async function generateChampionshipData() {
       const dadosJSON = JSON.parse(jsonString);
       
       // Validar o JSON com o esquema
-      console.log('Validando o JSON gerado...');
+      console.log('A validar o JSON gerado...');
       const validationResult = validateJSON(dadosJSON);
       
       if (!validationResult.valid) {
@@ -193,7 +193,7 @@ async function generateChampionshipData() {
         throw new Error('O JSON gerado não passou na validação de esquema');
       }
       
-      console.log('JSON validado com sucesso. Enviando para a API...');
+      console.log('JSON validado com sucesso. A enviar para a API...');
       
       // Enviar para a API apenas se o JSON for válido
       const apiResponse = await axios.post(
