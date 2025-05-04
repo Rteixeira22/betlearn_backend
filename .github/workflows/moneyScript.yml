@@ -1,5 +1,5 @@
 # Nome da Pipeline
-name: Update_Users_Money_Montlhy
+name: Update_Users_Money_Monthly
 
 # Ocasioes em que o workflow comeca a trabalhar
 on:
@@ -8,7 +8,7 @@ on:
   #  - main
   #- Pipeline #so para a construcao
   schedule:
-    - cron: "0 23 1 * *" # Todos os dias 1 de cada mes
+    - cron: "0 23 * * *" # Todos os dias 1 de cada mes  é:  cron: "0 23 1 * *"
 
 # Jobs a ser executados
 jobs:
