@@ -1,0 +1,39 @@
+# Nome da Pipeline
+name: Update_Users_Money_Montlhy
+
+# Ocasioes em que o workflow comeca a trabalhar
+on:
+  push: # Em qualquer commit para ca feito na Pipeline
+    branches:
+      #  - main
+      - Pipeline #so para a construcao
+  schedule:
+    - cron: "0 23 1 * *" # Todos os dias 1 de cada mes
+
+# Jobs a ser executados
+jobs:
+  caching-runScript:
+    name: Criar Cache e Correr o Script
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Cache dos modulos do NPM
+        id: cache-npm
+        uses: actions/cache@v4
+        with:
+          path: ./betlearn_backend/node_modules # Para onde vai a cache
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }} #Nome da Cache e Build
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Instalar Modulos If Cache Not Found
+        if: steps.cache-npm.outputs.cache-hit != 'true'
+        run: npm install
+
+      - name: Executar o Script
+        run: GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }} npx ts-node src/scripts/updateUsersMoney.ts
