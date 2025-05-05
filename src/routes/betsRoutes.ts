@@ -19,6 +19,22 @@
  *         required: true
  *         description: ID do Utilizador
  *         example: 1
+ *       - in: query
+ *         name: state
+ *         schema:
+ *           type: string
+ *           enum: ['0', '1']
+ *         required: false
+ *         description: Filtrar por estado da aposta (0 para ativa, 1 para concluída)
+ *         example: '1'
+ *       - in: query
+ *         name: result
+ *         schema:
+ *           type: string
+ *           enum: ['0', '1']
+ *         required: false
+ *         description: Filtrar por resultado da aposta (1 para vitória, 0 para derrota)
+ *         example: '1'
  *     responses:
  *       200:
  *         description: Lista de apostas do Utilizador
@@ -29,7 +45,36 @@
  *               items:
  *                 $ref: '#/components/schemas/Bets'
  *       500:
- *         description: Erro ao buscar apostas
+ *         description: Erro ao procurar apostas
+ */
+
+/**
+ * @swagger
+ * /bets/count/{id}:
+ *   get:
+ *     summary: Conta o número de apostas de um Utilizador
+ *     tags: [Bets]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: ID do Utilizador
+ *         example: 1
+ *     responses:
+ *       200:
+ *         description: Número de apostas do Utilizador
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 count:
+ *                   type: integer
+ *                   example: 5
+ *       500:
+ *         description: Erro ao contar apostas
  */
 
 /**

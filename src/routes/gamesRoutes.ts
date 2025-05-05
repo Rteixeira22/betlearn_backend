@@ -273,6 +273,97 @@
  *           description: Estado do jogo (0 = ativo, 1 = concluído)
  *           example: 0
  */
+
+/**
+ * @swagger
+ * /games/most-betted-today:
+ *   get:
+ *     summary: Obtém o jogo mais apostado do dia atual
+ *     tags: [Games]
+ *     responses:
+ *       200:
+ *         description: Jogo mais apostado do dia atual
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: Mensagem de sucesso
+ *                   example: "Jogo mais apostado do dia recuperado com sucesso"
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     id_game:
+ *                       type: integer
+ *                       description: ID único do jogo
+ *                       example: 1
+ *                     local_team:
+ *                       type: string
+ *                       description: Nome da equipa local
+ *                       example: "Team A"
+ *                     visitor_team:
+ *                       type: string
+ *                       description: Nome da equipa visitante
+ *                       example: "Team B"
+ *                     schedule:
+ *                       type: string
+ *                       format: date-time
+ *                       description: Data e hora do jogo
+ *                       example: "2025-04-03T15:00:00.000Z"
+ *                     betted_team:
+ *                       type: string
+ *                       description: Equipa apostada
+ *                       example: "Team A"
+ *                     odd:
+ *                       type: number
+ *                       description: Odd do jogo
+ *                       example: 1.5
+ *                     goals_local_team:
+ *                       type: integer
+ *                       description: Golos da equipa local
+ *                       example: 2
+ *                     goals_visitor_team:
+ *                       type: integer
+ *                       description: Golos da equipa visitante
+ *                       example: 1
+ *                     image:
+ *                       type: string
+ *                       description: URL da imagem do jogo
+ *                       example: "image_url"
+ *                     game_state:
+ *                       type: integer
+ *                       description: Estado do jogo (0 = ativo, 1 = concluído)
+ *                       example: 0
+ *                     bet_count:
+ *                       type: integer
+ *                       description: Número de apostas feitas neste jogo
+ *                       example: 5
+ *                     championship_json:
+ *                       type: object
+ *                       description: Informações do campeonato em formato JSON
+ *                       example: {
+ *                         "name": "Premier League",
+ *                         "country": "England",
+ *                         "season": "2024/2025"
+ *                       }
+ *       404:
+ *         description: Não foram encontradas apostas para o dia atual
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "Não foram encontradas apostas para hoje."
+ *       500:
+ *         description: Erro interno do servidor
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "Erro interno do servidor ao procurar o jogo mais apostado"
+ */
+
+
+
 import express from "express";
 import { GamesController } from "../controllers/gamesController";
 
