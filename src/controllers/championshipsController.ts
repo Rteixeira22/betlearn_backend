@@ -20,6 +20,42 @@ export class ChampionsController {
     }
   }
 
+  async getYesterdayChampionship(req: Request, res: Response) {
+    try {
+      // Calcula a data de ontem
+      const today = new Date();
+      const yesterday = new Date(today);
+      yesterday.setDate(today.getDate() - 1);
+      
+      // Define o início e o fim do dia de ontem
+      const startOfYesterday = new Date(yesterday);
+      startOfYesterday.setHours(0, 0, 0, 0);
+      
+      const endOfYesterday = new Date(yesterday);
+      endOfYesterday.setHours(23, 59, 59, 999);
+      
+      const championship = await prisma.championship.findFirst({
+        where: {
+          creation_date: {
+            gte: startOfYesterday,
+            lte: endOfYesterday
+          }
+        },
+        orderBy: {
+          creation_date: 'desc'
+        }
+      });
+      
+      if (!championship) {
+        return res.status(404).json({ error: "Nenhum campeonato encontrado para ontem." });
+      }
+      
+      res.status(200).json(championship);
+    } catch (error) {
+      res.status(500).json({ error: "Erro ao buscar o campeonato de ontem." });
+    }
+  }
+
   //IR BUSCAR UM CAMPEONATO PELO ID
   async getChampionshipById(req: Request, res: Response) {
     try {

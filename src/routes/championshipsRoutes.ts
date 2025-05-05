@@ -97,6 +97,37 @@
 
 /**
  * @swagger
+ * /championships/yesterday:
+ *   get:
+ *     summary: Obtém o campeonato criado ontem
+ *     tags: [Championships]
+ *     responses:
+ *       200:
+ *         description: Campeonato encontrado com sucesso
+ *         content:
+ *           application/json:
+ *             example:
+ *               id_championship: 1
+ *               json: "{...}"
+ *               creation_date: "2023-10-02T00:00:00Z"
+ *       404:
+ *         description: Nenhum campeonato encontrado para ontem
+ *         content:
+ *           application/json:
+ *             example:
+ *               error: "Nenhum campeonato encontrado para ontem."
+ *       500:
+ *         description: Erro ao buscar campeonato de ontem
+ *         content:
+ *           application/json:
+ *             example:
+ *               error: "Erro ao buscar o campeonato de ontem."
+ */
+
+
+
+/**
+ * @swagger
  * /championships/{id}:
  *   put:
  *     summary: Atualiza um campeonato existente
@@ -167,6 +198,11 @@
  *             example:
  *               error: "Erro ao apagar campeonato."
  */
+
+
+
+
+
 /**
  * @swagger
  * components:
@@ -192,6 +228,7 @@ const championsController = new ChampionsController();
 //GETS
 //TODOS
 router.get("/", championsController.getAllChampionships);
+router.get("/yesterday", championsController.getYesterdayChampionship);
 
 //UM
 router.get("/:id", championsController.getChampionshipById);
@@ -204,5 +241,8 @@ router.put("/:id", championsController.updateChampionship);
 
 //DELETE
 router.delete("/:id", championsController.deleteChampionship);
+
+
+
 
 export default router;
