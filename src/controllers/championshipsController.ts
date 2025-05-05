@@ -9,17 +9,16 @@ export class ChampionsController {
     try {
       const championships = await prisma.championship.findMany({
         orderBy: {
-          creation_date: 'desc',
+          creation_date: 'desc', 
+          
         },
-        take: 2,
       });
   
       res.status(200).json(championships);
     } catch (error) {
-      res.status(500).json({ error: "Erro ao procurar os campeonatos." });
+      res.status(500).json({ error: "Erro ao procurar todos os campeonatos." });
     }
   }
-  
 
   //IR BUSCAR UM CAMPEONATO PELO ID
   async getChampionshipById(req: Request, res: Response) {
