@@ -581,6 +581,371 @@
  *           description: URL da imagem do desafio
  *           example: "https://example.com/image.jpg"
  */
+
+/**
+ * @swagger
+ * /challenges/in-progress/{id}:
+ *   get:
+ *     summary: Obtém o desafio em progresso de um utilizador
+ *     tags: [Challenges]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: ID do utilizador
+ *         example: 1
+ *     responses:
+ *       200:
+ *         description: Dados do desafio em progresso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 challenge:
+ *                   $ref: '#/components/schemas/Challenge'
+ *                 progress:
+ *                   type: object
+ *                   properties:
+ *                     progress_percentage:
+ *                       type: number
+ *                       example: 75
+ *                     detail_seen:
+ *                       type: boolean
+ *                       example: true
+ *                 steps:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/DetailedStep'
+ *       404:
+ *         description: Nenhum desafio em progresso encontrado para este utilizador
+ *       500:
+ *         description: Erro ao ir buscar desafio em progresso
+ */
+
+/**
+ * @swagger
+ * /challenges/full:
+ *   post:
+ *     summary: Cria um desafio completo com todos os passos
+ *     tags: [Challenges]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               challenge:
+ *                 type: object
+ *                 properties:
+ *                   number:
+ *                     type: integer
+ *                     example: 1
+ *                   name:
+ *                     type: string
+ *                     example: "Desafio Completo"
+ *                   short_description:
+ *                     type: string
+ *                     example: "Descrição curta"
+ *                   long_description:
+ *                     type: string
+ *                     example: "Descrição longa detalhada"
+ *                   image:
+ *                     type: string
+ *                     example: "https://example.com/image.jpg"
+ *               steps:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     type:
+ *                       type: string
+ *                       enum: [video, bet, view, questionnaire]
+ *                       example: "video"
+ *                     data:
+ *                       type: object
+ *                       properties:
+ *                         video_url:
+ *                           type: string
+ *                           example: "https://example.com/video.mp4"
+ *                         video_description:
+ *                           type: string
+ *                           example: "Descrição do vídeo"
+ *                         bet_description:
+ *                           type: string
+ *                           example: "Descrição da aposta"
+ *                         bet_json:
+ *                           type: string
+ *                           example: "{\"options\":[\"Opção 1\",\"Opção 2\"]}"
+ *                         view_description:
+ *                           type: string
+ *                           example: "Descrição da visualização"
+ *                         view_page:
+ *                           type: string
+ *                           example: "page_content_html"
+ *                         questionnaire_description:
+ *                           type: string
+ *                           example: "Descrição do questionário"
+ *                         questionnaire_json:
+ *                           type: string
+ *                           example: "{\"questions\":[{\"text\":\"Pergunta 1\",\"options\":[\"Opção 1\",\"Opção 2\"]}]}"
+ *     responses:
+ *       201:
+ *         description: Desafio criado com sucesso com todos os passos
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Challenge created successfully with all steps"
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     challenge:
+ *                       $ref: '#/components/schemas/Challenge'
+ *                     steps:
+ *                       type: array
+ *                       items:
+ *                         $ref: '#/components/schemas/Step'
+ *       400:
+ *         description: Dados inválidos 
+ *       500:
+ *         description: Erro ao criar desafio completo
+ */
+
+
+/**
+ * @swagger
+ * /challenges/user/{id_user}:
+ *   get:
+ *     summary: Obtém todos os desafios de um utilizador
+ *     tags: [Challenges]
+ *     parameters:
+ *       - in: path
+ *         name: id_user
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: ID do utilizador
+ *         example: 1
+ *     responses:
+ *       200:
+ *         description: Lista de desafios do utilizador
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   ref_id_user:
+ *                     type: integer
+ *                     example: 1
+ *                   ref_id_challenge:
+ *                     type: integer
+ *                     example: 3
+ *                   completed:
+ *                     type: boolean
+ *                     example: false
+ *                   blocked:
+ *                     type: boolean
+ *                     example: false
+ *                   detail_seen:
+ *                     type: boolean
+ *                     example: true
+ *                   progress_percentage:
+ *                     type: number
+ *                     example: 50
+ *                   challenge:
+ *                     $ref: '#/components/schemas/Challenge'
+ *       404:
+ *         description: Utilizador não encontrado
+ *       500:
+ *         description: Erro ao ir buscar desafios do utilizador
+ */
+
+
+/**
+ * @swagger
+ * /challenges/most-completed-today:
+ *   get:
+ *     summary: Obtém o desafio mais completado hoje
+ *     tags: [Challenges]
+ *     responses:
+ *       200:
+ *         description: Desafio mais completado hoje
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 mostCompleted:
+ *                   type: object
+ *                   $ref: '#/components/schemas/Challenge'
+ *                   nullable: true
+ *                 completionCount:
+ *                   type: integer
+ *                   example: 15
+ *                   description: Número de vezes que o desafio foi completado hoje
+ *                 date:
+ *                   type: string
+ *                   format: date
+ *                   example: "2023-11-15"
+ *       500:
+ *         description: Erro ao ir buscar desafio mais completado
+ */
+
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     Step:
+ *       type: object
+ *       properties:
+ *         id_step:
+ *           type: integer
+ *           description: ID do passo
+ *           example: 1
+ *         ref_id_step_video:
+ *           type: integer
+ *           description: ID do vídeo associado (se houver)
+ *           example: 2
+ *           nullable: true
+ *         ref_id_step_bet:
+ *           type: integer
+ *           description: ID da aposta associada (se houver)
+ *           example: null
+ *           nullable: true
+ *         ref_id_step_view:
+ *           type: integer
+ *           description: ID da visualização associada (se houver)
+ *           example: null
+ *           nullable: true
+ *         ref_id_step_questionnaire:
+ *           type: integer
+ *           description: ID do questionário associado (se houver)
+ *           example: null
+ *           nullable: true
+ *         ref_id_challenges:
+ *           type: integer
+ *           description: ID do desafio ao qual este passo pertence
+ *           example: 1
+ *     DetailedStep:
+ *       type: object
+ *       properties:
+ *         ref_user_has_Challenges_id_user:
+ *           type: integer
+ *           example: 1
+ *         ref_user_has_Challenges_id_challenge:
+ *           type: integer
+ *           example: 2
+ *         ref_id_steps:
+ *           type: integer
+ *           example: 3
+ *         state:
+ *           type: integer
+ *           description: Estado do passo (0 = incompleto, 1 = completo)
+ *           example: 1
+ *         step:
+ *           type: object
+ *           properties:
+ *             id_step:
+ *               type: integer
+ *               example: 3
+ *             ref_id_step_video:
+ *               type: integer
+ *               nullable: true
+ *             ref_id_step_bet:
+ *               type: integer
+ *               nullable: true
+ *             ref_id_step_view:
+ *               type: integer
+ *               nullable: true
+ *             ref_id_step_questionnaire:
+ *               type: integer
+ *               nullable: true
+ *             ref_id_challenges:
+ *               type: integer
+ *               example: 2
+ *             Step_Video:
+ *               type: object
+ *               nullable: true
+ *               properties:
+ *                 id_step_video:
+ *                   type: integer
+ *                 video_url:
+ *                   type: string
+ *                 video_description:
+ *                   type: string
+ *             Step_Bet:
+ *               type: object
+ *               nullable: true
+ *               properties:
+ *                 id_step_bet:
+ *                   type: integer
+ *                 bet_description:
+ *                   type: string
+ *                 bet_json:
+ *                   type: string
+ *             Step_View:
+ *               type: object
+ *               nullable: true
+ *               properties:
+ *                 id_step_view:
+ *                   type: integer
+ *                 view_description:
+ *                   type: string
+ *                 view_page:
+ *                   type: string
+ *             Step_Questionnaire:
+ *               type: object
+ *               nullable: true
+ *               properties:
+ *                 id_step_questionnaire:
+ *                   type: integer
+ *                 questionnaire_description:
+ *                   type: string
+ *                 questionnaire_json:
+ *                   type: string
+ *     Challenge:
+ *       type: object
+ *       properties:
+ *         id_challenge:
+ *           type: integer
+ *           description: ID do desafio
+ *           example: 1
+ *         number:
+ *           type: integer
+ *           description: Número do desafio
+ *           example: 1
+ *         name:
+ *           type: string
+ *           description: Nome do desafio
+ *           example: "Desafio 1"
+ *         short_description:
+ *           type: string
+ *           description: Descrição curta do desafio
+ *           example: "Descrição curta"
+ *         long_description:
+ *           type: string
+ *           description: Descrição longa do desafio
+ *           example: "Descrição longa detalhada do desafio"
+ *         image:
+ *           type: string
+ *           description: URL da imagem do desafio
+ *           example: "https://example.com/image.jpg"
+ */
+
+
+
+
+
 import express from "express";
 import { ChallengesController } from "../controllers/challengesController";
 
