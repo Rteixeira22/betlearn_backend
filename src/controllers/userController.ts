@@ -10,15 +10,19 @@ export class UserController {
 
 
  async getAllusers(req: Request, res: Response) {
-        try {
-          const users = await prisma.users.findMany()
-          res.json(users)
-        } catch (error) {
-          res.status(500).json({ error: 'Failed to fetch users' })
-
-        
+    try {
+      const users = await prisma.users.findMany(
+        {
+          include: {
+            QuestionnaireResponse: true,
+          }
+        }
+      )
+      res.json(users)
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to fetch users' })
     }
-}
+  }
 
   // Get user by ID
   async getUserById(req: Request, res: Response) {
