@@ -124,6 +124,53 @@
  *               error: "Erro ao buscar o campeonato de ontem."
  */
 
+/**
+ * @swagger
+ * /championships/lasttwo:
+ *   get:
+ *     summary: Obtém os dois campeonatos mais recentes
+ *     description: Retorna os dois últimos campeonatos criados, ordenados por data de criação, do mais recente para o mais antigo.
+ *     tags: [Championships]
+ *     responses:
+ *       200:
+ *         description: Campeonatos encontrados com sucesso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id_championship:
+ *                     type: integer
+ *                     example: 1
+ *                   json:
+ *                     type: string
+ *                     example: "{...}"
+ *                   creation_date:
+ *                     type: string
+ *                     format: date-time
+ *                     example: "2023-10-02T00:00:00Z"
+ *             example:
+ *               - id_championship: 2
+ *                 json: "{...}"
+ *                 creation_date: "2023-10-03T00:00:00Z"
+ *               - id_championship: 1
+ *                 json: "{...}"
+ *                 creation_date: "2023-10-02T00:00:00Z"
+ *       500:
+ *         description: Erro ao buscar os campeonatos
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *             example:
+ *               error: "Erro ao procurar os campeonatos."
+ */
+
 
 
 /**
@@ -203,6 +250,8 @@
 
 
 
+
+
 /**
  * @swagger
  * components:
@@ -228,7 +277,10 @@ const championsController = new ChampionsController();
 //GETS
 //TODOS
 router.get("/", championsController.getAllChampionships);
+
 router.get("/yesterday", championsController.getYesterdayChampionship);
+
+router.get("/lasttwo", championsController.getLastTwoChampionships);
 
 //UM
 router.get("/:id", championsController.getChampionshipById);
@@ -241,7 +293,6 @@ router.put("/:id", championsController.updateChampionship);
 
 //DELETE
 router.delete("/:id", championsController.deleteChampionship);
-
 
 
 

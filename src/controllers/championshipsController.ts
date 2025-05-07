@@ -20,6 +20,22 @@ export class ChampionsController {
     }
   }
 
+  //IR BUSCAR os 2 campeonatos com os ultimos ids
+
+  async getLastTwoChampionships (req: Request, res: Response) {
+    try {
+      const championships = await prisma.championship.findMany({
+        orderBy: {
+          creation_date: 'desc',
+        },
+        take: 2, // Limita a 2 campeonatos
+      });
+      res.status(200).json(championships);
+    } catch (error) {
+      res.status(500).json({ error: "Erro ao procurar os campeonatos." });
+    }
+  }
+
   async getYesterdayChampionship(req: Request, res: Response) {
     try {
       // Calcula a data de ontem
