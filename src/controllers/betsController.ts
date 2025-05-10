@@ -9,6 +9,7 @@ export class BetsController {
     try {
       const userId = parseInt(req.params.id); 
       const { state, result } = req.query; 
+      const limit = typeof req.query.limit === 'string' ? parseInt(req.query.limit) : undefined;
   
       const whereClause: any = { ref_id_user: userId };
   
@@ -33,7 +34,9 @@ export class BetsController {
               game: true,
             }
           }
-        }
+        },
+        ...(limit ? { take: limit } : {})
+
       });
   
       res.json(bets);
