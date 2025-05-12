@@ -6,44 +6,49 @@ const prisma = new PrismaClient();
 export class BetsController {
   // Get bets by user ID, with optional 'type' filtering
  async getBetsByUserId(req: Request, res: Response) {
-    try {
-      const userId = parseInt(req.params.id); 
-      const { state, result } = req.query; 
-      const limit = typeof req.query.limit === 'string' ? parseInt(req.query.limit) : undefined;
-
-      const whereClause: any = { ref_id_user: userId };
-
-      // Filtro por state (0 ou 1)
-      if (state === "0" || state === "1") {
-        whereClause.state = parseInt(state);
-      }
-
-      // Filtro por result (0 ou 1)
-      if (result === "0" || result === "1") {
-        whereClause.result = parseInt(result);
-      }
-
-      const bets = await prisma.bets.findMany({
-        where: whereClause,
-        orderBy: {
-          date: "desc",
-        },
-        include: {
-          BetsHasGames: {
-            include: {
-              game: true,
-            }
-          }
-        },
-        ...(limit ? { take: limit } : {})
-
-      });
-
-      res.json(bets);
-    } catch (error) {
-      res.status(500).json({ error: "Failed to fetch bet history" });
+  try {
+    const userId = parseInt(req.params.id); 
+    const { state, result, cursor, limit = 5 } = req.query; 
+    
+    const whereClause: any = { ref_id_user: userId };
+    
+    // Filtro por state (0 ou 1)
+    if (state === "0" || state === "1") {
+      whereClause.state = parseInt(state);
     }
+    
+    // Filtro por result (0 ou 1)
+    if (result === "0" || result === "1") {
+      whereClause.result = parseInt(result);
+    }
+    
+    // Cursor-based pagination
+    const parsedLimit = typeof limit === 'string' ? parseInt(limit) : 5;
+    const parsedCursor = cursor ? parseInt(cursor as string) : undefined;
+
+    const bets = await prisma.bets.findMany({
+      where: {
+        ...whereClause,
+        ...(parsedCursor ? { id: { lt: parsedCursor } } : {})
+      },
+      orderBy: {
+        date: "desc",
+      },
+      include: {
+        BetsHasGames: {
+          include: {
+            game: true,
+          }
+        }
+      },
+      take: parsedLimit
+    });
+
+    res.json(bets);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch bet history" });
   }
+}
   
   
 
