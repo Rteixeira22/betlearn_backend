@@ -35,8 +35,9 @@ async getAllChallenges(req: Request, res: Response) {
   try {
     const minNumber = typeof req.query.minNumber === 'string' ? parseInt(req.query.minNumber) : undefined;
     const limit = typeof req.query.limit === 'string' ? parseInt(req.query.limit) : undefined;
-    
-    // Get challenges with filters and optional limit
+    const offset = typeof req.query.offset === 'string' ? parseInt(req.query.offset) : 0;
+
+    // Get challenges with filters, optional limit, and optional offset
     const challenges = await prisma.challenges.findMany({
       where: minNumber ? {
         number: {
@@ -46,11 +47,35 @@ async getAllChallenges(req: Request, res: Response) {
       orderBy: {
         number: 'asc'
       },
-      ...(limit ? { take: limit } : {})
+      ...(limit ? { take: limit } : {}),
+      ...(offset ? { skip: offset } : {})
     });
-    
-    res.json(challenges);
+
+    // Get total count for pagination metadata
+    const totalChallenges = await prisma.challenges.count({
+      where: minNumber ? {
+        number: {
+          gte: minNumber
+        }
+      } : {}
+    });
+
+    // Determine if there are more challenges for the next page
+    const hasNextPage = limit 
+      ? (offset + challenges.length) < totalChallenges 
+      : false;
+
+    res.json({
+      challenges,
+      pagination: {
+        total: totalChallenges,
+        limit: limit || null,
+        offset: offset || 0,
+        hasNextPage
+      }
+    });
   } catch (error) {
+    console.error('Error fetching challenges:', error);
     res.status(500).json({ error: "Failed to fetch challenges" });
   }
 }
