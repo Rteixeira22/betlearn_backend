@@ -6,59 +6,44 @@ const prisma = new PrismaClient();
 export class BetsController {
   // Get bets by user ID, with optional 'type' filtering
  async getBetsByUserId(req: Request, res: Response) {
-  try {
-    const userId = parseInt(req.params.id);
-    const { state, result } = req.query;
-    const limit = typeof req.query.limit === 'string' ? parseInt(req.query.limit) : 10; 
-    const page = typeof req.query.page === 'string' ? parseInt(req.query.page) : 0; 
-    const skip = page * limit; 
-    
-    const whereClause: any = { ref_id_user: userId };
-    
-    // Filtro por state (0 ou 1)
-    if (state === "0" || state === "1") {
-      whereClause.state = parseInt(state);
-    }
-    
-    // Filtro por result (0 ou 1)
-    if (result === "0" || result === "1") {
-      whereClause.result = parseInt(result);
-    }
-    
-    const bets = await prisma.bets.findMany({
-      where: whereClause,
-      orderBy: {
-        date: "desc",
-      },
-      include: {
-        BetsHasGames: {
-          include: {
-            game: true,
-          }
-        }
-      },
-      skip: skip,  
-      take: limit  
-    });
-    
-    const total = await prisma.bets.count({
-      where: whereClause
-    });
-    
-    res.json({
-      bets,
-      pagination: {
-        page,
-        limit,
-        total,
-        hasMore: skip + bets.length < total 
+    try {
+      const userId = parseInt(req.params.id); 
+      const { state, result } = req.query; 
+      const limit = typeof req.query.limit === 'string' ? parseInt(req.query.limit) : undefined;
+
+      const whereClause: any = { ref_id_user: userId };
+
+      // Filtro por state (0 ou 1)
+      if (state === "0" || state === "1") {
+        whereClause.state = parseInt(state);
       }
-    });
-    
-  } catch (error) {
-    res.status(500).json({ error: "Failed to fetch bet history" });
+
+      // Filtro por result (0 ou 1)
+      if (result === "0" || result === "1") {
+        whereClause.result = parseInt(result);
+      }
+
+      const bets = await prisma.bets.findMany({
+        where: whereClause,
+        orderBy: {
+          date: "desc",
+        },
+        include: {
+          BetsHasGames: {
+            include: {
+              game: true,
+            }
+          }
+        },
+        ...(limit ? { take: limit } : {})
+
+      });
+
+      res.json(bets);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch bet history" });
+    }
   }
-}
   
   
 
