@@ -69,7 +69,7 @@ async getAllChallenges(req: Request, res: Response) {
       challenges,
       pagination: {
         total: totalChallenges,
-        limit: limit || null,
+        limit: limit,
         offset: offset || 0,
         hasNextPage
       }
