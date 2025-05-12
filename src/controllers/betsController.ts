@@ -7,25 +7,33 @@ export class BetsController {
   // Get bets by user ID, with optional 'type' filtering
  async getBetsByUserId(req: Request, res: Response) {
   try {
-    const userId = parseInt(req.params.id); 
-    const { state, result, cursor, limit = 5 } = req.query; 
-    
+    const userId = parseInt(req.params.id);
+    const { 
+      state, 
+      result, 
+      cursor, 
+      limit = 5, 
+      offset = 0 
+    } = req.query;
+
     const whereClause: any = { ref_id_user: userId };
-    
+
     // Filtro por state (0 ou 1)
     if (state === "0" || state === "1") {
       whereClause.state = parseInt(state);
     }
-    
+
     // Filtro por result (0 ou 1)
     if (result === "0" || result === "1") {
       whereClause.result = parseInt(result);
     }
-    
-    // Cursor-based pagination
+
+    // Parsing inputs with type safety
     const parsedLimit = typeof limit === 'string' ? parseInt(limit) : 5;
+    const parsedOffset = typeof offset === 'string' ? parseInt(offset) : 0;
     const parsedCursor = cursor ? parseInt(cursor as string) : undefined;
 
+    // Combined pagination approach
     const bets = await prisma.bets.findMany({
       where: {
         ...whereClause,
@@ -41,10 +49,24 @@ export class BetsController {
           }
         }
       },
-      take: parsedLimit
+      take: parsedLimit,
+      skip: parsedOffset
     });
 
-    res.json(bets);
+    // Optional: Get total count for pagination metadata
+    const totalCount = await prisma.bets.count({
+      where: whereClause
+    });
+
+    res.json({
+      bets,
+      pagination: {
+        total: totalCount,
+        limit: parsedLimit,
+        offset: parsedOffset,
+        hasNextPage: totalCount > (parsedOffset + parsedLimit)
+      }
+    });
   } catch (error) {
     res.status(500).json({ error: "Failed to fetch bet history" });
   }
