@@ -5,3 +5,6 @@
 [![Get_Championships_Monthly](https://github.com/Rteixeira22/betlearn_backend/actions/workflows/chatScript.yml/badge.svg?branch=main)](https://github.com/Rteixeira22/betlearn_backend/actions/workflows/chatScript.yml)
 
 [![Swap_Current_Tip](https://github.com/Rteixeira22/betlearn_backend/actions/workflows/tipsScript.yml/badge.svg?branch=main)](https://github.com/Rteixeira22/betlearn_backend/actions/workflows/tipsScript.yml)
+
+[![Update_Users_Money_Monthly](https://github.com/Rteixeira22/betlearn_backend/actions/workflows/moneyScript.yml/badge.svg?branch=main)](https://github.com/Rteixeira22/betlearn_backend/actions/workflows/moneyScript.yml)
+
