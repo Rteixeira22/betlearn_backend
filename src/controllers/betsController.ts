@@ -12,7 +12,7 @@ export class BetsController {
       state, 
       result, 
       cursor, 
-      limit = 5, 
+      limit, 
       offset = 0 
     } = req.query;
 
