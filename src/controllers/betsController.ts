@@ -29,7 +29,7 @@ export class BetsController {
     }
 
     // Parsing inputs with type safety
-    const parsedLimit = typeof limit === 'string' ? parseInt(limit) : 5;
+    const parsedLimit = typeof limit === 'string' ? parseInt(limit) : undefined;
     const parsedOffset = typeof offset === 'string' ? parseInt(offset) : 0;
     const parsedCursor = cursor ? parseInt(cursor as string) : undefined;
 
