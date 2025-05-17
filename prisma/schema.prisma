@@ -182,3 +182,13 @@ model Admin {
   password String
   image    String? @db.VarChar(200)
 }
+
+model AdminNotification {
+  id_notification Int      @id @default(autoincrement())
+  title           String   @db.VarChar(150)
+  message         String   @db.VarChar(1000)
+  type            String   @default("error") @db.VarChar(20)
+  source          String?  @db.VarChar(100)                  
+  created_at      DateTime @default(now())
+  is_read         Boolean  @default(false)
+}
