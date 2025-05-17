@@ -11,6 +11,7 @@ import stepsRoutes from "./routes/stepsRoutes";
 import adminRoutes from "./routes/adminRoutes";
 import authRoutes from "./routes/authRoutes";
 import chatbotRoutes from "./routes/chatbotRoutes";
+import adminNotificationRoutes from "./routes/adminNotificationRoutes";
 import { PrismaClient } from "@prisma/client";
 
 import SwaggerUi from "swagger-ui-express";
@@ -50,7 +51,7 @@ class App {
     this.app.use("/api/admin", adminRoutes);
     this.app.use("/api/auth", authRoutes);
     this.app.use("/api/chatbot", chatbotRoutes);
-
+    this.app.use("/api/admin-notifications", adminNotificationRoutes);
     //CONFIG SWAGGER UI PARA NÃO DAR PROBLEMA COM A VERCEL POR USAR STATIC FILES VINDOS DO NODE MODULES
     const swaggerDistPath = path.join(
       __dirname,
