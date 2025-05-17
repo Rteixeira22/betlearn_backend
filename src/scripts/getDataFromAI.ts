@@ -189,7 +189,6 @@ async function generateChampionshipData() {
       const validationResult = validateJSON(dadosJSON);
       
       if (!validationResult.valid) {
-        console.error('Erro na validação do JSON:', validationResult.errors);
         throw new Error('O JSON gerado não passou na validação de esquema');
       }
       
@@ -207,16 +206,14 @@ async function generateChampionshipData() {
       );
       
       console.log('Dados do campeonato adicionados à base de dados com sucesso!');
-      console.log('Resposta da API:', apiResponse.data);
       
       return dadosJSON;
     } catch (parseError: any) {
       console.error('Erro ao processar ou validar o JSON recebido:', parseError.message);
-      console.log('Resposta bruta recebida:', resultado);
       throw new Error('O formato da resposta não é um JSON válido ou não passou na validação');
     }
   } catch (err: any) {
-    console.error('Erro ao gerar ou salvar dados do campeonato:', err.message);
+    console.error('Erro ao gerar ou guardar dados do campeonato:', err.message);
     if (err.response) {
       console.error('Detalhes do erro:', err.response.data);
     }
