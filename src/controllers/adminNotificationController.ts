@@ -83,6 +83,22 @@ export class AdminNotificationController {
         }
     }
 
+    // Mark notification as read
+    async markAsRead(req: Request, res: Response) {
+        try {
+            const notificationId = parseInt(req.params.id);
+            const updatedNotification = await prisma.adminNotification.update({
+                where: { id_notification: notificationId },
+                data: {
+                    is_read: true,
+                }
+            });
+            res.json(updatedNotification);
+        } catch (error) {
+            res.status(500).json({ error: 'Failed to mark notification as read' });
+        }
+    }
+
     // Delete notification
     async deleteNotification(req: Request, res: Response) {
         try {
