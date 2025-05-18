@@ -19,6 +19,8 @@ router.post("/", adminNotificationController.createNotification); // Route to cr
 
 router.put("/:id", adminNotificationController.updateNotification); // Route to update a notification by ID
 
+router.put("/:id/read", adminNotificationController.markAsRead) // Route to mark a notification as read
+
 router.delete("/:id", adminNotificationController.deleteNotification); // Route to delete a notification by ID
 
 export default router; // Export router
