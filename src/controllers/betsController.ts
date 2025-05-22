@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
 import axiosInstance from "../configs/axiosConfig";
+
 const prisma = new PrismaClient();
 
 export class BetsController {
