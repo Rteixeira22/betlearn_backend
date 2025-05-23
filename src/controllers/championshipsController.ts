@@ -1,6 +1,8 @@
 import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
 
+import { retryWithFixes } from "../scripts/getDataFromAI";
+
 const prisma = new PrismaClient();
 
 export class ChampionsController {
@@ -146,4 +148,22 @@ export class ChampionsController {
       res.status(500).json({ error: "Erro ao apagado campeonato." });
     }
   }
+
+  //Generate a new championship automatically
+  async generateChampionship(req: Request, res: Response) {
+
+    try {
+
+      const championshipData = await retryWithFixes();
+
+      return res.status(200).json(championshipData);
+
+    } catch (error) {
+      console.error("Error generating championship:", error);
+      return res.status(500).json({ error: "Failed to generate championship" });
+    }
+
+
+  }
+
 }

@@ -42,12 +42,33 @@ const UpdateMoney = async () => {
     
     await Promise.all(updatePromises);
     console.log("All users updated successfully.");
+
+    const notification = await axiosInstance.post(
+        "/admin-notifications/",
+        {
+          title: "Atualização de saldo",
+          message: `Os saldos dos utilizadores foram atualizados com sucesso!`,
+          source: "tipscript",
+          type: "success",
+        }
+      );
  
     } catch (error: any) {
-    console.error(
-      "Error updating users money:",
-      error.response?.data || error.message
-    );
+      console.error(
+        "Error updating users money:",
+        error.response?.data || error.message
+      );
+
+      const notification = await axiosInstance.post(
+        "/admin-notifications/",
+        {
+          title: "Atualização de saldo",
+          message: `Erro ao atualizar os saldos dos utilizadores.`,
+          source: "tipscript",
+          type: "error",
+        }
+      );
+
   }
 };
 

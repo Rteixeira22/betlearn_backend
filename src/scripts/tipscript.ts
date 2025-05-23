@@ -1,5 +1,8 @@
 import axios from "axios";
 import dotenv from "dotenv";
+
+import axiosInstance from "../configs/axiosConfig";
+
 dotenv.config();
 
 const API_URL = process.env.VERCEL_URL;
@@ -50,14 +53,42 @@ const updateTipStates = async () => {
         active: 1,
       });
       console.log(`Activated tip ${nextTip.id_tip}.`);
+
+      const notification = await axiosInstance.post(
+        "/admin-notifications/",
+        {
+          title: "Dica do dia",
+          message: `Dica alterada com sucesso!`,
+          source: "tipscript",
+          type: "success",
+        }
+      );
     } else {
       console.log("No tips.");
+      const notification = await axiosInstance.post(
+        "/admin-notifications/",
+        {
+          title: "Dica do dia",
+          message: `Nenhuma dica encontrada.`,
+          source: "tipscript",
+          type: "warning",
+        }
+      );
     }
   } catch (error: any) {
     console.error(
       "Error updating tips:",
       error.response?.data || error.message
     );
+    const notification = await axiosInstance.post(
+        "/admin-notifications/",
+        {
+          title: "Dica do dia",
+          message: `Erro ao atualizar dicas: ${error.message}`,
+          source: "tipscript",
+          type: "error",
+        }
+      );
   }
 };
 

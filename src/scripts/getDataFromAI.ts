@@ -2,6 +2,8 @@ import axios from 'axios';
 import * as dotenv from 'dotenv';
 import Ajv from 'ajv';
 import addFormats from 'ajv-formats';
+import axiosInstance from "../configs/axiosConfig";
+
 
 dotenv.config();
 
@@ -195,7 +197,7 @@ async function generateChampionshipData() {
       console.log('JSON validado com sucesso. A enviar para a API...');
       
       // Enviar para a API apenas se o JSON for válido
-      const apiResponse = await axios.post(
+      /* const apiResponse = await axios.post(
         `${API_BASE_URL}/championships/`,
         { json: JSON.stringify(dadosJSON) },
         {
@@ -203,7 +205,24 @@ async function generateChampionshipData() {
             'Content-Type': 'application/json'
           }
         }
+      ); */
+
+      const apiResponse = await axiosInstance.post(
+        "/championships/",
+        { json: JSON.stringify(dadosJSON) },
+        
       );
+
+      const notification = await axiosInstance.post(
+        "/admin-notifications/",
+        {
+          title: "Novo campeonato criado",
+          message: `Um novo campeonato foi criado com sucesso.`,
+          source: "getDataFromAI",
+          type: "success",
+        }
+      );
+
       
       console.log('Dados do campeonato adicionados à base de dados com sucesso!');
       
@@ -235,6 +254,17 @@ async function retryWithFixes(maxAttempts = 3): Promise<any> {
       
       if (attempts >= maxAttempts) {
         console.error('Número máximo de tentativas atingido.');
+
+      const notification = await axiosInstance.post(
+        "/admin-notifications/",
+        {
+          title: "Erro ao gerar campeonato",
+          message: `Não foi possível gerar um campeonato após ${maxAttempts} tentativas.`,
+          source: "getDataFromAI",
+          type: "error",
+        }
+      );
+
         throw new Error(`Não foi possível gerar um JSON válido após ${maxAttempts} tentativas.`);
       }
       
