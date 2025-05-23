@@ -1,12 +1,11 @@
-// prisma/schema.prisma
-datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-}
-
 generator client {
   provider      = "prisma-client-js"
   binaryTargets = ["native", "debian-openssl-3.0.x", "rhel-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model Users {
@@ -20,10 +19,10 @@ model Users {
   image                 String?                  @db.VarChar(200)
   bets_visibility       Boolean                  @default(true)
   tutorial_verification Boolean
+  password              String                   @db.VarChar(255)
   Bets                  Bets[]
   QuestionnaireResponse Questionnaire_Response[]
   UserHasChallenges     User_has_Challenges[]
-  password              String                   @db.VarChar(255)
 }
 
 model Challenges {
@@ -44,9 +43,9 @@ model User_has_Challenges {
   blocked                   Boolean
   detail_seen               Boolean
   progress_percentage       Int                             @default(0)
-  user                      Users                           @relation(fields: [ref_id_user], references: [id_user], onDelete: Cascade)
-  challenge                 Challenges                      @relation(fields: [ref_id_challenge], references: [id_challenge], onDelete: Cascade)
   date                      DateTime                        @default(now())
+  challenge                 Challenges                      @relation(fields: [ref_id_challenge], references: [id_challenge], onDelete: Cascade)
+  user                      Users                           @relation(fields: [ref_id_user], references: [id_user], onDelete: Cascade)
   UserHasChallengesHasSteps User_has_Challenges_has_Steps[]
 
   @@id([ref_id_user, ref_id_challenge])
@@ -100,15 +99,15 @@ model Bets_has_Games {
   ref_id_game         Int
   ref_id_championship Int
   bet                 Bets         @relation(fields: [ref_id_bet], references: [id_bets], onDelete: Cascade)
-  game                Games        @relation(fields: [ref_id_game], references: [id_game], onDelete: Cascade)
   championship        Championship @relation(fields: [ref_id_championship], references: [id_championship], onDelete: Cascade)
+  game                Games        @relation(fields: [ref_id_game], references: [id_game], onDelete: Cascade)
 
   @@id([ref_id_bet, ref_id_game, ref_id_championship])
 }
 
 model Championship {
   id_championship Int              @id @default(autoincrement())
-  json            String           @unique @db.Text
+  json            String           @unique
   creation_date   DateTime         @default(now())
   BetsHasGames    Bets_has_Games[]
 }
@@ -118,8 +117,8 @@ model User_has_Challenges_has_Steps {
   ref_user_has_Challenges_id_challenge Int
   ref_id_steps                         Int
   state                                Int                 @db.SmallInt
-  user_has_challenges                  User_has_Challenges @relation(fields: [ref_user_has_Challenges_id_user, ref_user_has_Challenges_id_challenge], references: [ref_id_user, ref_id_challenge], onDelete: Cascade)
   step                                 Steps               @relation(fields: [ref_id_steps], references: [id_step], onDelete: Cascade)
+  user_has_challenges                  User_has_Challenges @relation(fields: [ref_user_has_Challenges_id_user, ref_user_has_Challenges_id_challenge], references: [ref_id_user, ref_id_challenge], onDelete: Cascade)
 
   @@id([ref_user_has_Challenges_id_user, ref_user_has_Challenges_id_challenge, ref_id_steps])
 }
@@ -131,15 +130,14 @@ model Steps {
   ref_id_step_view          Int?
   ref_id_step_questionnaire Int?
   ref_id_challenges         Int
-  Step_Video                Step_Video?                     @relation(fields: [ref_id_step_video], references: [id_step_video], onDelete: Cascade)
-  Step_Bet                  Step_Bet?                       @relation(fields: [ref_id_step_bet], references: [id_step_bet], onDelete: Cascade)
-  Step_View                 Step_View?                      @relation(fields: [ref_id_step_view], references: [id_step_view], onDelete: Cascade)
-  Step_Questionnaire        Step_Questionnaire?             @relation(fields: [ref_id_step_questionnaire], references: [id_step_questionnaire], onDelete: Cascade)
   Challenge                 Challenges                      @relation(fields: [ref_id_challenges], references: [id_challenge], onDelete: Cascade)
+  Step_Bet                  Step_Bet?                       @relation(fields: [ref_id_step_bet], references: [id_step_bet], onDelete: Cascade)
+  Step_Questionnaire        Step_Questionnaire?             @relation(fields: [ref_id_step_questionnaire], references: [id_step_questionnaire], onDelete: Cascade)
+  Step_Video                Step_Video?                     @relation(fields: [ref_id_step_video], references: [id_step_video], onDelete: Cascade)
+  Step_View                 Step_View?                      @relation(fields: [ref_id_step_view], references: [id_step_view], onDelete: Cascade)
   UserHasChallengesHasSteps User_has_Challenges_has_Steps[]
 }
 
-// Other supporting models
 model Step_Video {
   id_step_video     Int     @id @default(autoincrement())
   video_url         String  @db.VarChar(200)
@@ -150,14 +148,13 @@ model Step_Video {
 model Step_Bet {
   id_step_bet     Int     @id @default(autoincrement())
   bet_description String  @db.VarChar(200)
-  bet_json        String  @db.Text
   Steps           Steps[]
 }
 
 model Step_Questionnaire {
   id_step_questionnaire     Int     @id @default(autoincrement())
   questionnaire_description String  @db.VarChar(200)
-  questionnaire_json        String  @db.Text
+  questionnaire_json        String
   Steps                     Steps[]
 }
 
@@ -188,7 +185,7 @@ model AdminNotification {
   title           String   @db.VarChar(150)
   message         String   @db.VarChar(1000)
   type            String   @default("error") @db.VarChar(20)
-  source          String?  @db.VarChar(100)                  
+  source          String?  @db.VarChar(100)
   created_at      DateTime @default(now())
   is_read         Boolean  @default(false)
 }

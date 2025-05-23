@@ -288,6 +288,9 @@ router.get("/:id", championsController.getChampionshipById);
 //POST
 router.post("/", championsController.createChampionship);
 
+router.get("/generate", championsController.generateChampionship); //Gera novo campeonato atraves do script
+
+
 //UPDATE
 router.put("/:id", championsController.updateChampionship);
 
