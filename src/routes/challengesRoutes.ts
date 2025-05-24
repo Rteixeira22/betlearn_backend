@@ -1025,7 +1025,7 @@ router.patch(
 
 //update state dos challenges and update of progress_percentage  (aqui ter em atenção que recebe um array de steps- podemos atualizar o state de todos os steps de uma vez - depois de estarem todos ele vai puxar percentage atualize e se for 100 vai fazer o unblock next challenge)
 router.patch(
-  "/:id_user/:id_challenge/state",
+  "/:id_user/:id_challenge/:id_step/state",
   challengeController.updateUserHasStepState
 );
 

@@ -552,8 +552,8 @@ async getAllChallenges(req: Request, res: Response) {
   }
 
   async updateUserHasStepState(req: Request, res: Response) {
-    const { id_user, id_challenge } = req.params;
-    const { ref_id_steps, state } = req.body; // Esperamos um body com os IDs dos steps e o novo estado
+    const { id_user, id_challenge, id_step } = req.params;
+    const { state } = req.body; // Esperamos um body com o novo estado
 
     try {
       // Atualizar o estado do step na tabela `user_has_challenges_has_steps`
@@ -562,7 +562,7 @@ async getAllChallenges(req: Request, res: Response) {
           where: {
             ref_user_has_Challenges_id_user: parseInt(id_user),
             ref_user_has_Challenges_id_challenge: parseInt(id_challenge),
-            ref_id_steps: { in: ref_id_steps },
+            ref_id_steps: parseInt(id_step),
           },
           data: {
             state: state, // Atualizando o estado do step
