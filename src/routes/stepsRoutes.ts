@@ -681,6 +681,7 @@ router.get(
   "/ref_id_challenges/:ref_id_challenges",
   stepsController.getStepByRefIdChallenges
 ); // Get step by ref_id_challenges
+router.get("/user_challenge_step/:id_user/:id_challenge/:id_step", stepsController.getUserHasChallengesByUserAndChallengeId); // Get step by User ID and Challenge ID and Step ID
 router.get("/step_video/:id_video", stepsController.getStepByVideoId); // Get step by video ID
 router.get("/step_bet/:id_bet", stepsController.getStepByBetId); // Get step by bet ID
 router.get("/step_view/:id_view", stepsController.getStepByViewId); // Get step by step view ID
