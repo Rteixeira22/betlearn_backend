@@ -92,6 +92,24 @@ export class StepsController {
     }
   }
 
+
+  //Get User_has_Challenges_has_Steps by User ID and Challenge ID
+  async getUserHasChallengesByUserAndChallengeId(req: Request, res: Response) {
+    try {
+
+      const userHasChallengesHasSteps = await prisma.user_has_Challenges_has_Steps.findMany({
+        where: {
+          ref_user_has_Challenges_id_user: parseInt(req.params.id_user),
+          ref_user_has_Challenges_id_challenge: parseInt(req.params.id_challenge),
+          ref_id_steps: parseInt(req.params.id_step),
+        },
+      });
+      res.json(userHasChallengesHasSteps);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch user challenge step" });
+    }
+  }
+
   //Create New Video
   async createNewVideo(req: Request, res: Response) {
     try {
@@ -118,7 +136,6 @@ export class StepsController {
       const newStepBet = await prisma.step_Bet.create({
         data: {
           bet_description,
-          bet_json,
         },
       });
 
@@ -234,11 +251,11 @@ export class StepsController {
   async updateStepBet(req: Request, res: Response) {
     try {
       const betId = parseInt(req.params.id_bet);
-      const { bet_description, bet_json } = req.body;
+      const { bet_description } = req.body;
 
       const updatedStepBet = await prisma.step_Bet.update({
         where: { id_step_bet: betId },
-        data: { bet_description, bet_json },
+        data: { bet_description },
       });
 
       res.json(updatedStepBet);
