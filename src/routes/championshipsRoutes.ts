@@ -282,13 +282,15 @@ router.get("/yesterday", championsController.getYesterdayChampionship);
 
 router.get("/lasttwo", championsController.getLastTwoChampionships);
 
+router.get("/generate", championsController.generateChampionship); //Gera novo campeonato atraves do script
+
+
 //UM
 router.get("/:id", championsController.getChampionshipById);
 
 //POST
 router.post("/", championsController.createChampionship);
 
-router.get("/generate", championsController.generateChampionship); //Gera novo campeonato atraves do script
 
 
 //UPDATE
