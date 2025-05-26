@@ -580,6 +580,8 @@ async getAllChallenges(req: Request, res: Response) {
         },
       });
 
+      console.log("Total Steps:", totalSteps);
+
 
       const completedSteps = await prisma.user_has_Challenges_has_Steps.count({
         where: {
@@ -593,6 +595,8 @@ async getAllChallenges(req: Request, res: Response) {
       // Calcular a percentagem de progresso
       const progressPercentage = 100 / totalSteps;
 
+      console.log("Progress Percentage:", progressPercentage);
+
       
 
       // Enviar o progresso para o endpoint especificado
@@ -602,6 +606,8 @@ async getAllChallenges(req: Request, res: Response) {
           progress_percentage: progressPercentage,
         }
       );
+
+      console.log("Response from progress endpoint:", response.data);
 
       res.status(200).json({
         message: "Step state updated successfully",
