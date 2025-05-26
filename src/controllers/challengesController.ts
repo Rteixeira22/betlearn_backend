@@ -552,131 +552,114 @@ async getAllChallenges(req: Request, res: Response) {
   }
 
   
-async updateUserHasStepState(req: Request, res: Response) {
-    const { id_user, id_challenge, id_step } = req.params;
-    const { state } = req.body;
+ async updateUserHasStepState(req: Request, res: Response) {
+  const { id_user, id_challenge, id_step } = req.params;
+  const { state } = req.body;
 
-    // Array para guardar logs de debug
-    const debugLogs: string[] = [];
+  const debugLogs: string[] = [];
 
-    try {
-      debugLogs.push(`Starting update for user: ${id_user}, challenge: ${id_challenge}, step: ${id_step}, state: ${state}`);
+  try {
+    debugLogs.push(`Starting update for user: ${id_user}, challenge: ${id_challenge}, step: ${id_step}, state: ${state}`);
 
-      // Verificar se os parâmetros são válidos
-      if (!id_user || !id_challenge || !id_step) {
-        debugLogs.push("Missing required parameters");
-        return res.status(400).json({ 
-          error: "Missing required parameters",
-          debug_logs: debugLogs 
-        });
-      }
+    if (!id_user || !id_challenge || !id_step) {
+      debugLogs.push("Missing required parameters");
+      return res.status(400).json({ error: "Missing parameters", debug_logs: debugLogs });
+    }
 
-      // Verificar se o registro existe antes de atualizar
-      const existingRecord = await prisma.user_has_Challenges_has_Steps.findFirst({
-        where: {
-          ref_user_has_Challenges_id_user: parseInt(id_user),
-          ref_user_has_Challenges_id_challenge: parseInt(id_challenge),
-          ref_id_steps: parseInt(id_step),
-        },
-      });
+    const userId = parseInt(id_user);
+    const challengeId = parseInt(id_challenge);
+    const stepId = parseInt(id_step);
 
-      debugLogs.push(`Database query completed. Record found: ${!!existingRecord}`);
+    const existingRecord = await prisma.user_has_Challenges_has_Steps.findFirst({
+      where: {
+        ref_user_has_Challenges_id_user: userId,
+        ref_user_has_Challenges_id_challenge: challengeId,
+        ref_id_steps: stepId,
+      },
+    });
 
-      if (!existingRecord) {
-        debugLogs.push("Step record not found in database");
-        return res.status(404).json({ 
-          error: "Step record not found",
-          debug_logs: debugLogs 
-        });
-      }
+    if (!existingRecord) {
+      debugLogs.push("Step record not found");
+      return res.status(404).json({ error: "Step not found", debug_logs: debugLogs });
+    }
 
-      debugLogs.push(`Existing state: ${existingRecord.state}, New state: ${state}`);
+    debugLogs.push(`Existing state: ${existingRecord.state}, New state: ${state}`);
 
-      // Só atualizar se o estado for diferente
-      if (existingRecord.state === state) {
-        debugLogs.push("State is already up to date - no changes made");
-        return res.status(200).json({
-          message: "Step state is already up to date",
-          progress_percentage: 0,
-          current_state: existingRecord.state,
-          debug_logs: debugLogs,
-        });
-      }
-
-      // Atualizar o estado do step
-      const updatedStep = await prisma.user_has_Challenges_has_Steps.updateMany({
-        where: {
-          ref_user_has_Challenges_id_user: parseInt(id_user),
-          ref_user_has_Challenges_id_challenge: parseInt(id_challenge),
-          ref_id_steps: parseInt(id_step),
-        },
-        data: {
-          state: state,
-        },
-      });
-
-      debugLogs.push(`Updated ${updatedStep.count} records`);
-
-      // Obter o número total de steps
-      const totalSteps = await prisma.user_has_Challenges_has_Steps.count({
-        where: {
-          ref_user_has_Challenges_id_user: parseInt(id_user),
-          ref_user_has_Challenges_id_challenge: parseInt(id_challenge),
-        },
-      });
-
-      const completedSteps = await prisma.user_has_Challenges_has_Steps.count({
-       where: {
-          ref_user_has_Challenges_id_user: parseInt(id_user),
-          ref_user_has_Challenges_id_challenge: parseInt(id_challenge),
-          state: 1,
-    },
-  });
-
-  const stepPercentage = totalSteps > 0
-  ? Math.round((completedSteps / totalSteps) * 100)
-  : 0;
-
-      debugLogs.push(`Total Steps: ${totalSteps}`);
-      debugLogs.push(`Step Percentage: ${stepPercentage}`);
-
-      console.log("Debug logs:", debugLogs); // Log no servidor
-
-      
-      try {
-        const response = await axios.patch(
-          `http://localhost:3000/api/challenges/${id_user}/${id_challenge}/progress`,
-          {
-            progress_percentage: stepPercentage,
-          }
-        );
-        debugLogs.push("Progress endpoint called successfully");
-      } catch (progressError) {
-        debugLogs.push(`Progress endpoint error: ${progressError}`);
-      }
-      
-
-      debugLogs.push("Sending successful response");
-
-      res.status(200).json({
-        message: "Step state updated successfully",
-        progress_percentage: stepPercentage,
-        updatedStep,
-        total_steps: totalSteps,
-        debug_logs: debugLogs,
-      });
-
-    } catch (error) {
-      debugLogs.push(`Main error: ${error instanceof Error ? error.message : String(error)}`);
-      console.error("Error in updateUserHasStepState:", error);
-      
-      res.status(500).json({ 
-        error: "Something went wrong",
-        details: error instanceof Error ? error.message : "Unknown error",
+    if (existingRecord.state === state) {
+      debugLogs.push("State is already up to date");
+      return res.status(200).json({
+        message: "Step already updated",
+        progress_percentage: 0,
         debug_logs: debugLogs,
       });
     }
+
+    // Atualizar o estado do step
+    const updatedStep = await prisma.user_has_Challenges_has_Steps.updateMany({
+      where: {
+        ref_user_has_Challenges_id_user: userId,
+        ref_user_has_Challenges_id_challenge: challengeId,
+        ref_id_steps: stepId,
+      },
+      data: {
+        state: state,
+      },
+    });
+
+    debugLogs.push(`Updated ${updatedStep.count} step(s)`);
+
+    // Recalcular percentagem
+    const totalSteps = await prisma.user_has_Challenges_has_Steps.count({
+      where: {
+        ref_user_has_Challenges_id_user: userId,
+        ref_user_has_Challenges_id_challenge: challengeId,
+      },
+    });
+
+    const completedSteps = await prisma.user_has_Challenges_has_Steps.count({
+      where: {
+        ref_user_has_Challenges_id_user: userId,
+        ref_user_has_Challenges_id_challenge: challengeId,
+        state: 1,
+      },
+    });
+
+    const stepPercentage = totalSteps > 0 ? Math.round((completedSteps / totalSteps) * 100) : 0;
+
+    debugLogs.push(`Completed Steps: ${completedSteps}, Total Steps: ${totalSteps}, Progress: ${stepPercentage}%`);
+
+    // Atualizar a tabela user_has_Challenges com a percentagem
+    const progressUpdate = await prisma.user_has_Challenges.updateMany({
+      where: {
+        ref_id_user: userId,
+        ref_id_challenge: challengeId,
+      },
+      data: {
+        progress_percentage: stepPercentage,
+      },
+    });
+
+    debugLogs.push(`Updated user_has_Challenges: ${progressUpdate.count} record(s)`);
+
+    res.status(200).json({
+      message: "Step updated and progress recalculated",
+      progress_percentage: stepPercentage,
+      updatedStep,
+      total_steps: totalSteps,
+      debug_logs: debugLogs,
+    });
+
+  } catch (error) {
+    debugLogs.push(`Main error: ${error instanceof Error ? error.message : String(error)}`);
+    console.error("Error:", error);
+
+    res.status(500).json({
+      error: "Internal server error",
+      details: error instanceof Error ? error.message : "Unknown error",
+      debug_logs: debugLogs,
+    });
   }
+}
 
 
 //Função para ir buscar o desafio em progresso
