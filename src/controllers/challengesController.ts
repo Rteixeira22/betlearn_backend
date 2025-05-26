@@ -633,9 +633,7 @@ async updateUserHasStepState(req: Request, res: Response) {
 
       console.log("Debug logs:", debugLogs); // Log no servidor
 
-      // TEMPORARIAMENTE: não chamar o endpoint de progresso para testar
-      // Comentar esta secção para debug
-      /*
+      
       try {
         const response = await axios.patch(
           `http://localhost:3000/api/challenges/${id_user}/${id_challenge}/progress`,
@@ -647,7 +645,7 @@ async updateUserHasStepState(req: Request, res: Response) {
       } catch (progressError) {
         debugLogs.push(`Progress endpoint error: ${progressError}`);
       }
-      */
+      
 
       debugLogs.push("Sending successful response");
 
