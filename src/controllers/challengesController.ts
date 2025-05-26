@@ -625,8 +625,17 @@ async updateUserHasStepState(req: Request, res: Response) {
         },
       });
 
-      // Calcular a percentagem que cada step representa
-      const stepPercentage = totalSteps > 0 ? 100 / totalSteps : 0;
+      const completedSteps = await prisma.user_has_Challenges_has_Steps.count({
+       where: {
+          ref_user_has_Challenges_id_user: parseInt(id_user),
+          ref_user_has_Challenges_id_challenge: parseInt(id_challenge),
+          state: 1,
+    },
+  });
+
+  const stepPercentage = totalSteps > 0
+  ? Math.round((completedSteps / totalSteps) * 100)
+  : 0;
 
       debugLogs.push(`Total Steps: ${totalSteps}`);
       debugLogs.push(`Step Percentage: ${stepPercentage}`);
