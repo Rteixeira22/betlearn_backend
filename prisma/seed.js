@@ -197,7 +197,7 @@ async function main() {
     const stepView = await prisma.step_View.create({
       data: {
         view_description: "Veja o histórico de apostas ",
-        view_page: "/history",
+        view_page: "/historico",
       },
     });
 
