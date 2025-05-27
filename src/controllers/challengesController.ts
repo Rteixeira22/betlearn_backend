@@ -606,6 +606,8 @@ async getAllChallenges(req: Request, res: Response) {
       },
     });
 
+    
+
     debugLogs.push(`Updated ${updatedStep.count} step(s)`);
 
     // Recalcular percentagem
@@ -638,6 +640,31 @@ async getAllChallenges(req: Request, res: Response) {
         progress_percentage: stepPercentage,
       },
     });
+
+    // Se completou o desafio (progress_percentage == 100)
+      if (stepPercentage === 100) {
+        // Atualizar como completado
+        await prisma.user_has_Challenges.update({
+          where: {
+            ref_id_user_ref_id_challenge: {
+              ref_id_user: userId,
+              ref_id_challenge: challengeId,
+            },
+          },
+          data: {
+            completed: true,
+          },
+        });
+
+        // Desbloquear o próximo desafio chamando diretamente a função (se possível)
+        try {
+          await axios.post(
+            `http://localhost:3000/api/challenges/${userId}/${challengeId}/unblock-next`
+          );
+        } catch (axiosError) {
+          console.error("Failed to unblock next challenge:", axiosError);
+        }
+      }
 
     debugLogs.push(`Updated user_has_Challenges: ${progressUpdate.count} record(s)`);
 
