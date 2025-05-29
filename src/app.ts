@@ -21,6 +21,11 @@ import expressBasicAuth from "express-basic-auth";
 
 import path from "path";
 
+const allowedOrigins = [
+  "http://localhost:8081", 
+  "http://api-betlearn-wine.vercel.app", 
+];
+
 class App {
   public app: express.Application;
   public prisma: PrismaClient;
@@ -33,13 +38,21 @@ class App {
     this.handleUncaughtErrors();
   }
 
+  
+
   private initializeMiddlewares() {
     this.app.use(
-      cors(/* {
-        origin: "https://api-betlearn-wine.vercel.app",
-        methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-      } */)
-    );
+  cors({
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+  })
+);
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: true }));
   }
