@@ -38,7 +38,6 @@ class App {
       cors({
         origin: "https://api-betlearn-wine.vercel.app",
         methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-        credentials: ,
       })
     );
     this.app.use(express.json());
