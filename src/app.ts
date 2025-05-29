@@ -35,10 +35,10 @@ class App {
 
   private initializeMiddlewares() {
     this.app.use(
-      cors({
+      cors(/* {
         origin: "https://api-betlearn-wine.vercel.app",
         methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-      })
+      } */)
     );
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: true }));
