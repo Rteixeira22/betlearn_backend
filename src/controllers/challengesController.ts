@@ -360,6 +360,25 @@ async getAllChallenges(req: Request, res: Response) {
         },
       });
 
+      //Pra ir buscar os passos do desafio
+      const steps = await prisma.steps.findMany({
+        where: { ref_id_challenges: challengeId },
+      });
+
+      // Cria relação de cada step para este user/challenge
+    const stepsToCreate = steps.map((step) =>
+      prisma.user_has_Challenges_has_Steps.create({
+        data: {
+          ref_user_has_Challenges_id_user: userId,
+          ref_user_has_Challenges_id_challenge: challengeId,
+          ref_id_steps: step.id_step,
+          state: 0, 
+        },
+      })
+    );
+
+    await Promise.all(stepsToCreate); // executa tudo em paralelo
+
       res.status(201).json(newUserHasChallenge);
     } catch (error) {
       console.error("Error details:", error);
