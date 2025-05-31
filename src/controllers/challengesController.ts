@@ -377,7 +377,7 @@ async getAllChallenges(req: Request, res: Response) {
       })
     );
 
-    await Promise.all(stepsToCreate); // executa tudo em paralelo
+    await Promise.all(stepsToCreate); 
 
       res.status(201).json(newUserHasChallenge);
     } catch (error) {
@@ -399,84 +399,96 @@ async getAllChallenges(req: Request, res: Response) {
 
   //update user has challenges blocked
   async unblockNextChallenge(req: Request, res: Response) {
-    try {
-      const userId = parseInt(req.params.id_user);
-      const currentChallengeId = parseInt(req.params.id_challenge);
+  try {
+    const userId = parseInt(req.params.id_user);
+    const currentChallengeId = parseInt(req.params.id_challenge);
 
-      // First, get the current challenge to find its number
-      const currentChallenge = await prisma.challenges.findUnique({
-        where: { id_challenge: currentChallengeId },
-      });
+    const currentChallenge = await prisma.challenges.findUnique({
+      where: { id_challenge: currentChallengeId },
+    });
 
-      if (!currentChallenge) {
-        res.status(404).json({ error: "Current challenge not found" });
-      }
+    if (!currentChallenge) {
+      return res.status(404).json({ error: "Current challenge not found" });
+    }
 
-      // Find the next challenge based on the number field
-      const nextChallenge = await prisma.challenges.findFirst({
-        where: {
-          number: {
-            gt: currentChallenge?.number,
-          },
+    const nextChallenge = await prisma.challenges.findFirst({
+      where: {
+        number: {
+          gt: currentChallenge.number,
         },
-        orderBy: {
-          number: "asc",
+      },
+      orderBy: {
+        number: "asc",
+      },
+    });
+
+    if (!nextChallenge) {
+      return res.status(404).json({ error: "No next challenge found" });
+    }
+
+    const existingRelationship = await prisma.user_has_Challenges.findUnique({
+      where: {
+        ref_id_user_ref_id_challenge: {
+          ref_id_user: userId,
+          ref_id_challenge: nextChallenge.id_challenge,
         },
-      });
+      },
+    });
 
-      if (!nextChallenge) {
-        res.status(404).json({ error: "No next challenge found" });
-      }
-
-      // Check if a relationship already exists for the user and next challenge
-      const existingRelationship = await prisma.user_has_Challenges.findUnique({
+    if (existingRelationship) {
+      // Unblock challenge if it already exists
+      const updatedUserHasChallenge = await prisma.user_has_Challenges.update({
         where: {
           ref_id_user_ref_id_challenge: {
             ref_id_user: userId,
-            ref_id_challenge: nextChallenge?.id_challenge ?? 0,
+            ref_id_challenge: nextChallenge.id_challenge,
           },
+        },
+        data: {
+          blocked: false,
         },
       });
 
-      if (existingRelationship) {
-        // Update the existing relationship to unblock it
-        const updatedUserHasChallenge = await prisma.user_has_Challenges.update(
-          {
-            where: {
-              ref_id_user_ref_id_challenge: {
-                ref_id_user: userId,
-                ref_id_challenge: nextChallenge?.id_challenge ?? 0,
-              },
-            },
-            data: {
-              blocked: false,
-            },
-          }
-        );
-
-        res.json(updatedUserHasChallenge);
-      } else {
-        // Create a new relationship with the next challenge (unblocked)
-        const newUserHasChallenge = await prisma.user_has_Challenges.create({
-          data: {
-            ref_id_user: userId,
-            ref_id_challenge: nextChallenge?.id_challenge ?? 0,
-            completed: false,
-            blocked: false,
-            detail_seen: false,
-          },
-        });
-
-        res.status(201).json(newUserHasChallenge);
-      }
-    } catch (error) {
-      console.error("Error details:", error);
-      res.status(500).json({
-        error: "Failed to unblock next challenge",
-        details: error instanceof Error ? error.message : "Unknown error",
+      return res.json(updatedUserHasChallenge);
+    } else {
+      // Create new relation
+      const newUserHasChallenge = await prisma.user_has_Challenges.create({
+        data: {
+          ref_id_user: userId,
+          ref_id_challenge: nextChallenge.id_challenge,
+          completed: false,
+          blocked: false,
+          detail_seen: false,
+        },
       });
+
+      // Get steps for that challenge
+      const steps = await prisma.steps.findMany({
+        where: { ref_id_challenges: nextChallenge.id_challenge },
+      });
+
+      // Create relation between user/challenge and steps
+      await prisma.user_has_Challenges_has_Steps.createMany({
+        data: steps.map((step) => ({
+          ref_user_has_Challenges_id_user: userId,
+          ref_user_has_Challenges_id_challenge: nextChallenge.id_challenge,
+          ref_id_steps: step.id_step,
+          state: 0,
+        })),
+        skipDuplicates: true, 
+      });
+
+      return res.status(201).json(newUserHasChallenge);
     }
+  } catch (error) {
+    console.error("Error details:", error);
+    return res.status(500).json({
+      error: "Failed to unblock next challenge",
+      details: error instanceof Error ? error.message : "Unknown error",
+    });
   }
+}
+
 
   //update user has challenges detail_seen
   async updateUserHasChallengesDetailSeen(req: Request, res: Response) {
@@ -597,6 +609,7 @@ async getAllChallenges(req: Request, res: Response) {
       },
     });
 
+
     if (!existingRecord) {
       debugLogs.push("Step record not found");
       return res.status(404).json({ error: "Step not found", debug_logs: debugLogs });
@@ -609,7 +622,7 @@ async getAllChallenges(req: Request, res: Response) {
       return res.status(200).json({
         message: "Step already updated",
         progress_percentage: 0,
-        debug_logs: debugLogs,
+        
       });
     }
 
@@ -624,10 +637,6 @@ async getAllChallenges(req: Request, res: Response) {
         state: state,
       },
     });
-
-    
-
-    debugLogs.push(`Updated ${updatedStep.count} step(s)`);
 
     // Recalcular percentagem
     const totalSteps = await prisma.user_has_Challenges_has_Steps.count({
@@ -647,7 +656,6 @@ async getAllChallenges(req: Request, res: Response) {
 
     const stepPercentage = totalSteps > 0 ? Math.round((completedSteps / totalSteps) * 100) : 0;
 
-    debugLogs.push(`Completed Steps: ${completedSteps}, Total Steps: ${totalSteps}, Progress: ${stepPercentage}%`);
 
     // Atualizar a tabela user_has_Challenges com a percentagem
     const progressUpdate = await prisma.user_has_Challenges.updateMany({
