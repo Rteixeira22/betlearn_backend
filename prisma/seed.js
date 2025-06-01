@@ -288,7 +288,7 @@ async function main() {
           ref_id_user: users[2].id_user,
           ref_id_challenge: challenges[0].id_challenge,
           completed: false,
-          blocked: true,
+          blocked: false,
           detail_seen: false,
           progress_percentage: 0,
         },
