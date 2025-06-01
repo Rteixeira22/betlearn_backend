@@ -103,7 +103,7 @@ async function main() {
           short_description: "Descubra como navegar na plataforma",
           long_description:
             "Este desafio é uma introdução à plataforma, ensina como navegar e utilizar as principais funcionalidades disponíveis.",
-          image: "/images/challenges/challenge_1.jpg",
+          image: "https://res.cloudinary.com/dw3aj5xgm/image/upload/v1748471464/9746403_w0o9p8.png",
         },
       }),
       prisma.challenges.create({
@@ -113,7 +113,7 @@ async function main() {
           short_description: "Aprenda a gerir sua banca e emoções",
           long_description:
             "Este desafio foca na importância da gestão de banca e emocional ao fazer apostas. Aprenda a controlar as suas emoções e a tomar decisões racionais.",
-          image: "/images/challenges/challenge_2.jpg",
+          image: "https://res.cloudinary.com/dw3aj5xgm/image/upload/v1748471606/4838640_lzve8c.png",
         },
       }),
       prisma.challenges.create({
@@ -123,7 +123,7 @@ async function main() {
           short_description: "Entenda o que são odds e como funcionam",
           long_description:
             "Neste desafio, você aprenderá o que são odds, como funcionam e como utilizá-las a seu favor nas apostas.",
-          image: "/images/challenges/challenge_3.jpg",
+          image: "https://res.cloudinary.com/dw3aj5xgm/image/upload/v1748465719/challenge2_yfhsme.png",
         },
       }),
 
@@ -134,7 +134,7 @@ async function main() {
           short_description: "Aposte num evento simples",
           long_description:
             "Neste desafio, aprenderá a fazer uma aposta simples num evento desportivo. Aprenda a escolher o evento certo e a calcular as suas odds.",
-          image: "/images/challenges/challenge_4.jpg",
+          image: "https://res.cloudinary.com/dw3aj5xgm/image/upload/v1748471810/8959073_qa8fqk.png",
         },
       }),
     ]);
@@ -147,7 +147,7 @@ async function main() {
       prisma.step_Video.create({
         data: {
           video_url: "https://www.youtube.com/watch?v=oOrLdaEgqsU",
-          video_description: "Navegação na plataforma",
+          video_description: "Observar o video de Navegação na plataforma",
         },
       }),
       prisma.step_Video.create({
