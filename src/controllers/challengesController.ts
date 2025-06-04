@@ -13,7 +13,7 @@ interface CreateChallengeRequest {
     image: string;
   };
   steps: Array<{
-    type: 'video' | 'bet' | 'view' | 'questionnaire';
+    type: "video" | "bet" | "view" | "questionnaire";
     data: {
       // Dados específicos de cada tipo de step
       video_url?: string;
@@ -30,55 +30,66 @@ interface CreateChallengeRequest {
 
 export class ChallengesController {
   // Get all challenges
- 
-async getAllChallenges(req: Request, res: Response) {
-  try {
-    const minNumber = typeof req.query.minNumber === 'string' ? parseInt(req.query.minNumber) : undefined;
-    const limit = typeof req.query.limit === 'string' ? parseInt(req.query.limit) : undefined;
-    const offset = typeof req.query.offset === 'string' ? parseInt(req.query.offset) : 0;
 
-    // Get challenges with filters, optional limit, and optional offset
-    const challenges = await prisma.challenges.findMany({
-      where: minNumber ? {
-        number: {
-          gte: minNumber
-        }
-      } : {},
-      orderBy: {
-        number: 'asc'
-      },
-      ...(limit ? { take: limit } : {}),
-      ...(offset ? { skip: offset } : {})
-    });
+  async getAllChallenges(req: Request, res: Response) {
+    try {
+      const minNumber =
+        typeof req.query.minNumber === "string"
+          ? parseInt(req.query.minNumber)
+          : undefined;
+      const limit =
+        typeof req.query.limit === "string"
+          ? parseInt(req.query.limit)
+          : undefined;
+      const offset =
+        typeof req.query.offset === "string" ? parseInt(req.query.offset) : 0;
 
-    // Get total count for pagination metadata
-    const totalChallenges = await prisma.challenges.count({
-      where: minNumber ? {
-        number: {
-          gte: minNumber
-        }
-      } : {}
-    });
+      // Get challenges with filters, optional limit, and optional offset
+      const challenges = await prisma.challenges.findMany({
+        where: minNumber
+          ? {
+              number: {
+                gte: minNumber,
+              },
+            }
+          : {},
+        orderBy: {
+          number: "asc",
+        },
+        ...(limit ? { take: limit } : {}),
+        ...(offset ? { skip: offset } : {}),
+      });
 
-    // Determine if there are more challenges for the next page
-    const hasNextPage = limit 
-      ? (offset + challenges.length) < totalChallenges 
-      : false;
+      // Get total count for pagination metadata
+      const totalChallenges = await prisma.challenges.count({
+        where: minNumber
+          ? {
+              number: {
+                gte: minNumber,
+              },
+            }
+          : {},
+      });
 
-    res.json({
-      challenges,
-      pagination: {
-        total: totalChallenges,
-        limit: limit,
-        offset: offset || 0,
-        hasNextPage
-      }
-    });
-  } catch (error) {
-    console.error('Error fetching challenges:', error);
-    res.status(500).json({ error: "Failed to fetch challenges" });
+      // Determine if there are more challenges for the next page
+      const hasNextPage = limit
+        ? offset + challenges.length < totalChallenges
+        : false;
+
+      res.json({
+        challenges,
+        pagination: {
+          total: totalChallenges,
+          limit: limit,
+          offset: offset || 0,
+          hasNextPage,
+        },
+      });
+    } catch (error) {
+      console.error("Error fetching challenges:", error);
+      res.status(500).json({ error: "Failed to fetch challenges" });
+    }
   }
-}
   // Get challenge by ID
   async getChallengeById(req: Request, res: Response) {
     try {
@@ -147,91 +158,89 @@ async getAllChallenges(req: Request, res: Response) {
   }
 
   async getCountChallengesByDate(req: Request, res: Response) {
-      try {
-        const today = new Date();
-        today.setHours(0, 0, 0, 0); 
-        
-        const tomorrow = new Date(today);
-        tomorrow.setDate(tomorrow.getDate() + 1); 
-        
-        const bets = await prisma.user_has_Challenges.count({
-          where: {
-            date: {
-              gte: today,
-              lt: tomorrow
-            }
-          }
-        });
-        
-        res.json({ count: bets });
-      } catch (error) {
-        console.error("Erro ao ir buscar desafios de hoje:", error);
-        res.status(500).json({ error: "Failed to fetch today's bets" });
-      }
-    }
+    try {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
 
-    async getMostCompletedChallengeToday(req: Request, res: Response) {
-      try {
-        // Set date range for today
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        
-        const tomorrow = new Date(today);
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        
-        // Get all challenges completed today and group by challenge ID
-        const completedChallenges = await prisma.user_has_Challenges.groupBy({
-          by: ['ref_id_challenge'],
-          where: {
-            date: {
-              gte: today,
-              lt: tomorrow
-            },
-            completed: true
+      const tomorrow = new Date(today);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+
+      const bets = await prisma.user_has_Challenges.count({
+        where: {
+          date: {
+            gte: today,
+            lt: tomorrow,
           },
+        },
+      });
+
+      res.json({ count: bets });
+    } catch (error) {
+      console.error("Erro ao ir buscar desafios de hoje:", error);
+      res.status(500).json({ error: "Failed to fetch today's bets" });
+    }
+  }
+
+  async getMostCompletedChallengeToday(req: Request, res: Response) {
+    try {
+      // Set date range for today
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      const tomorrow = new Date(today);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+
+      // Get all challenges completed today and group by challenge ID
+      const completedChallenges = await prisma.user_has_Challenges.groupBy({
+        by: ["ref_id_challenge"],
+        where: {
+          date: {
+            gte: today,
+            lt: tomorrow,
+          },
+          completed: true,
+        },
+        _count: {
+          ref_id_user: true,
+        },
+        orderBy: {
           _count: {
-            ref_id_user: true
+            ref_id_user: "desc",
           },
-          orderBy: {
-            _count: {
-              ref_id_user: 'desc'
-            }
-          },
-          take: 1 
-        });
-        
-        if (completedChallenges.length === 0) {
-          return res.json({ 
-            message: "No challenges were completed today",
-            mostCompleted: null
-          });
-        }
-        
-        // Get the most completed challenge ID
-        const mostCompletedChallengeId = completedChallenges[0].ref_id_challenge;
-        const completionCount = completedChallenges[0]._count.ref_id_user ;
-        
-        // Get full details of the most completed challenge
-        const challengeDetails = await prisma.challenges.findUnique({
-          where: { id_challenge: mostCompletedChallengeId }
-        });
-        
-        // Return the result
-        res.json({
-          mostCompleted: challengeDetails,
-          completionCount: completionCount,
-          date: today.toISOString().split('T')[0]
-        });
-        
-      } catch (error) {
-        console.error("Error fetching most completed challenge:", error);
-        res.status(500).json({ 
-          error: "Failed to fetch most completed challenge today",
-          details: error instanceof Error ? error.message : "Unknown error"
+        },
+        take: 1,
+      });
+
+      if (completedChallenges.length === 0) {
+        return res.json({
+          message: "No challenges were completed today",
+          mostCompleted: null,
         });
       }
-    }
 
+      // Get the most completed challenge ID
+      const mostCompletedChallengeId = completedChallenges[0].ref_id_challenge;
+      const completionCount = completedChallenges[0]._count.ref_id_user;
+
+      // Get full details of the most completed challenge
+      const challengeDetails = await prisma.challenges.findUnique({
+        where: { id_challenge: mostCompletedChallengeId },
+      });
+
+      // Return the result
+      res.json({
+        mostCompleted: challengeDetails,
+        completionCount: completionCount,
+        date: today.toISOString().split("T")[0],
+      });
+    } catch (error) {
+      console.error("Error fetching most completed challenge:", error);
+      res.status(500).json({
+        error: "Failed to fetch most completed challenge today",
+        details: error instanceof Error ? error.message : "Unknown error",
+      });
+    }
+  }
 
   // Get ghallenge by user id
   async getChallengeByUserId(req: Request, res: Response) {
@@ -252,10 +261,8 @@ async getAllChallenges(req: Request, res: Response) {
     }
   }
 
-
-
   //get challenges completed by user
-  
+
   async getAllChallengesCompletedByUserId(req: Request, res: Response) {
     try {
       const userId = parseInt(req.params.id_user);
@@ -366,18 +373,18 @@ async getAllChallenges(req: Request, res: Response) {
       });
 
       // Cria relação de cada step para este user/challenge
-    const stepsToCreate = steps.map((step) =>
-      prisma.user_has_Challenges_has_Steps.create({
-        data: {
-          ref_user_has_Challenges_id_user: userId,
-          ref_user_has_Challenges_id_challenge: challengeId,
-          ref_id_steps: step.id_step,
-          state: 0, 
-        },
-      })
-    );
+      const stepsToCreate = steps.map((step) =>
+        prisma.user_has_Challenges_has_Steps.create({
+          data: {
+            ref_user_has_Challenges_id_user: userId,
+            ref_user_has_Challenges_id_challenge: challengeId,
+            ref_id_steps: step.id_step,
+            state: 0,
+          },
+        })
+      );
 
-    await Promise.all(stepsToCreate); 
+      await Promise.all(stepsToCreate);
 
       res.status(201).json(newUserHasChallenge);
     } catch (error) {
@@ -399,96 +406,97 @@ async getAllChallenges(req: Request, res: Response) {
 
   //update user has challenges blocked
   async unblockNextChallenge(req: Request, res: Response) {
-  try {
-    const userId = parseInt(req.params.id_user);
-    const currentChallengeId = parseInt(req.params.id_challenge);
+    try {
+      const userId = parseInt(req.params.id_user);
+      const currentChallengeId = parseInt(req.params.id_challenge);
 
-    const currentChallenge = await prisma.challenges.findUnique({
-      where: { id_challenge: currentChallengeId },
-    });
+      const currentChallenge = await prisma.challenges.findUnique({
+        where: { id_challenge: currentChallengeId },
+      });
 
-    if (!currentChallenge) {
-      return res.status(404).json({ error: "Current challenge not found" });
-    }
+      if (!currentChallenge) {
+        return res.status(404).json({ error: "Current challenge not found" });
+      }
 
-    const nextChallenge = await prisma.challenges.findFirst({
-      where: {
-        number: {
-          gt: currentChallenge.number,
+      const nextChallenge = await prisma.challenges.findFirst({
+        where: {
+          number: {
+            gt: currentChallenge.number,
+          },
         },
-      },
-      orderBy: {
-        number: "asc",
-      },
-    });
-
-    if (!nextChallenge) {
-      return res.status(404).json({ error: "No next challenge found" });
-    }
-
-    const existingRelationship = await prisma.user_has_Challenges.findUnique({
-      where: {
-        ref_id_user_ref_id_challenge: {
-          ref_id_user: userId,
-          ref_id_challenge: nextChallenge.id_challenge,
+        orderBy: {
+          number: "asc",
         },
-      },
-    });
+      });
 
-    if (existingRelationship) {
-      // Unblock challenge if it already exists
-      const updatedUserHasChallenge = await prisma.user_has_Challenges.update({
+      if (!nextChallenge) {
+        return res.status(404).json({ error: "No next challenge found" });
+      }
+
+      const existingRelationship = await prisma.user_has_Challenges.findUnique({
         where: {
           ref_id_user_ref_id_challenge: {
             ref_id_user: userId,
             ref_id_challenge: nextChallenge.id_challenge,
           },
         },
-        data: {
-          blocked: false,
-        },
       });
 
-      return res.json(updatedUserHasChallenge);
-    } else {
-      // Create new relation
-      const newUserHasChallenge = await prisma.user_has_Challenges.create({
-        data: {
-          ref_id_user: userId,
-          ref_id_challenge: nextChallenge.id_challenge,
-          completed: false,
-          blocked: false,
-          detail_seen: false,
-        },
-      });
+      if (existingRelationship) {
+        // Unblock challenge if it already exists
+        const updatedUserHasChallenge = await prisma.user_has_Challenges.update(
+          {
+            where: {
+              ref_id_user_ref_id_challenge: {
+                ref_id_user: userId,
+                ref_id_challenge: nextChallenge.id_challenge,
+              },
+            },
+            data: {
+              blocked: false,
+            },
+          }
+        );
 
-      // Get steps for that challenge
-      const steps = await prisma.steps.findMany({
-        where: { ref_id_challenges: nextChallenge.id_challenge },
-      });
+        return res.json(updatedUserHasChallenge);
+      } else {
+        // Create new relation
+        const newUserHasChallenge = await prisma.user_has_Challenges.create({
+          data: {
+            ref_id_user: userId,
+            ref_id_challenge: nextChallenge.id_challenge,
+            completed: false,
+            blocked: false,
+            detail_seen: false,
+          },
+        });
 
-      // Create relation between user/challenge and steps
-      await prisma.user_has_Challenges_has_Steps.createMany({
-        data: steps.map((step) => ({
-          ref_user_has_Challenges_id_user: userId,
-          ref_user_has_Challenges_id_challenge: nextChallenge.id_challenge,
-          ref_id_steps: step.id_step,
-          state: 0,
-        })),
-        skipDuplicates: true, 
-      });
+        // Get steps for that challenge
+        const steps = await prisma.steps.findMany({
+          where: { ref_id_challenges: nextChallenge.id_challenge },
+        });
 
-      return res.status(201).json(newUserHasChallenge);
+        // Create relation between user/challenge and steps
+        await prisma.user_has_Challenges_has_Steps.createMany({
+          data: steps.map((step) => ({
+            ref_user_has_Challenges_id_user: userId,
+            ref_user_has_Challenges_id_challenge: nextChallenge.id_challenge,
+            ref_id_steps: step.id_step,
+            state: 0,
+          })),
+          skipDuplicates: true,
+        });
+
+        return res.status(201).json(newUserHasChallenge);
+      }
+    } catch (error) {
+      console.error("Error details:", error);
+      return res.status(500).json({
+        error: "Failed to unblock next challenge",
+        details: error instanceof Error ? error.message : "Unknown error",
+      });
     }
-  } catch (error) {
-    console.error("Error details:", error);
-    return res.status(500).json({
-      error: "Failed to unblock next challenge",
-      details: error instanceof Error ? error.message : "Unknown error",
-    });
   }
-}
-
 
   //update user has challenges detail_seen
   async updateUserHasChallengesDetailSeen(req: Request, res: Response) {
@@ -512,7 +520,6 @@ async getAllChallenges(req: Request, res: Response) {
       res.status(500).json({ error: "Failed to update user has challenge" });
     }
   }
-
 
   //update user has challenges progress_percentage
   async updateUserHasChallengesProgressPercentage(req: Request, res: Response) {
@@ -586,93 +593,101 @@ async getAllChallenges(req: Request, res: Response) {
     }
   }
 
-  
- async updateUserHasStepState(req: Request, res: Response) {
-  const { id_user, id_challenge, id_step } = req.params;
-  const { state } = req.body;
+  async updateUserHasStepState(req: Request, res: Response) {
+    const { id_user, id_challenge, id_step } = req.params;
+    const { state } = req.body;
 
-  const debugLogs: string[] = [];
+    const debugLogs: string[] = [];
 
-  try {
-    debugLogs.push(`Starting update for user: ${id_user}, challenge: ${id_challenge}, step: ${id_step}, state: ${state}`);
+    try {
+      debugLogs.push(
+        `Starting update for user: ${id_user}, challenge: ${id_challenge}, step: ${id_step}, state: ${state}`
+      );
 
-    if (!id_user || !id_challenge || !id_step) {
-      debugLogs.push("Missing required parameters");
-      return res.status(400).json({ error: "Missing parameters", debug_logs: debugLogs });
-    }
+      if (!id_user || !id_challenge || !id_step) {
+        debugLogs.push("Missing required parameters");
+        return res
+          .status(400)
+          .json({ error: "Missing parameters", debug_logs: debugLogs });
+      }
 
-    const userId = parseInt(id_user);
-    const challengeId = parseInt(id_challenge);
-    const stepId = parseInt(id_step);
+      const userId = parseInt(id_user);
+      const challengeId = parseInt(id_challenge);
+      const stepId = parseInt(id_step);
 
-    const existingRecord = await prisma.user_has_Challenges_has_Steps.findFirst({
-      where: {
-        ref_user_has_Challenges_id_user: userId,
-        ref_user_has_Challenges_id_challenge: challengeId,
-        ref_id_steps: stepId,
-      },
-    });
+      const existingRecord =
+        await prisma.user_has_Challenges_has_Steps.findFirst({
+          where: {
+            ref_user_has_Challenges_id_user: userId,
+            ref_user_has_Challenges_id_challenge: challengeId,
+            ref_id_steps: stepId,
+          },
+        });
 
+      if (!existingRecord) {
+        debugLogs.push("Step record not found");
+        return res
+          .status(404)
+          .json({ error: "Step not found", debug_logs: debugLogs });
+      }
 
-    if (!existingRecord) {
-      debugLogs.push("Step record not found");
-      return res.status(404).json({ error: "Step not found", debug_logs: debugLogs });
-    }
+      debugLogs.push(
+        `Existing state: ${existingRecord.state}, New state: ${state}`
+      );
 
-    debugLogs.push(`Existing state: ${existingRecord.state}, New state: ${state}`);
+      if (existingRecord.state === state) {
+        debugLogs.push("State is already up to date");
+        return res.status(200).json({
+          message: "Step already updated",
+          progress_percentage: 0,
+        });
+      }
 
-    if (existingRecord.state === state) {
-      debugLogs.push("State is already up to date");
-      return res.status(200).json({
-        message: "Step already updated",
-        progress_percentage: 0,
-        
+      // Atualizar o estado do step
+      const updatedStep = await prisma.user_has_Challenges_has_Steps.updateMany(
+        {
+          where: {
+            ref_user_has_Challenges_id_user: userId,
+            ref_user_has_Challenges_id_challenge: challengeId,
+            ref_id_steps: stepId,
+          },
+          data: {
+            state: state,
+          },
+        }
+      );
+
+      // Recalcular percentagem
+      const totalSteps = await prisma.user_has_Challenges_has_Steps.count({
+        where: {
+          ref_user_has_Challenges_id_user: userId,
+          ref_user_has_Challenges_id_challenge: challengeId,
+        },
       });
-    }
 
-    // Atualizar o estado do step
-    const updatedStep = await prisma.user_has_Challenges_has_Steps.updateMany({
-      where: {
-        ref_user_has_Challenges_id_user: userId,
-        ref_user_has_Challenges_id_challenge: challengeId,
-        ref_id_steps: stepId,
-      },
-      data: {
-        state: state,
-      },
-    });
+      const completedSteps = await prisma.user_has_Challenges_has_Steps.count({
+        where: {
+          ref_user_has_Challenges_id_user: userId,
+          ref_user_has_Challenges_id_challenge: challengeId,
+          state: 1,
+        },
+      });
 
-    // Recalcular percentagem
-    const totalSteps = await prisma.user_has_Challenges_has_Steps.count({
-      where: {
-        ref_user_has_Challenges_id_user: userId,
-        ref_user_has_Challenges_id_challenge: challengeId,
-      },
-    });
+      const stepPercentage =
+        totalSteps > 0 ? Math.round((completedSteps / totalSteps) * 100) : 0;
 
-    const completedSteps = await prisma.user_has_Challenges_has_Steps.count({
-      where: {
-        ref_user_has_Challenges_id_user: userId,
-        ref_user_has_Challenges_id_challenge: challengeId,
-        state: 1,
-      },
-    });
+      // Atualizar a tabela user_has_Challenges com a percentagem
+      const progressUpdate = await prisma.user_has_Challenges.updateMany({
+        where: {
+          ref_id_user: userId,
+          ref_id_challenge: challengeId,
+        },
+        data: {
+          progress_percentage: stepPercentage,
+        },
+      });
 
-    const stepPercentage = totalSteps > 0 ? Math.round((completedSteps / totalSteps) * 100) : 0;
-
-
-    // Atualizar a tabela user_has_Challenges com a percentagem
-    const progressUpdate = await prisma.user_has_Challenges.updateMany({
-      where: {
-        ref_id_user: userId,
-        ref_id_challenge: challengeId,
-      },
-      data: {
-        progress_percentage: stepPercentage,
-      },
-    });
-
-    // Se completou o desafio (progress_percentage == 100)
+      // Se completou o desafio (progress_percentage == 100)
       if (stepPercentage === 100) {
         // Atualizar como completado
         await prisma.user_has_Challenges.update({
@@ -697,201 +712,213 @@ async getAllChallenges(req: Request, res: Response) {
         }
       }
 
-    debugLogs.push(`Updated user_has_Challenges: ${progressUpdate.count} record(s)`);
+      debugLogs.push(
+        `Updated user_has_Challenges: ${progressUpdate.count} record(s)`
+      );
 
-    res.status(200).json({
-      message: "Step updated and progress recalculated",
-      progress_percentage: stepPercentage,
-      updatedStep,
-      total_steps: totalSteps,
-      debug_logs: debugLogs,
-    });
+      res.status(200).json({
+        message: "Step updated and progress recalculated",
+        progress_percentage: stepPercentage,
+        updatedStep,
+        total_steps: totalSteps,
+        debug_logs: debugLogs,
+      });
+    } catch (error) {
+      debugLogs.push(
+        `Main error: ${error instanceof Error ? error.message : String(error)}`
+      );
+      console.error("Error:", error);
 
-  } catch (error) {
-    debugLogs.push(`Main error: ${error instanceof Error ? error.message : String(error)}`);
-    console.error("Error:", error);
-
-    res.status(500).json({
-      error: "Internal server error",
-      details: error instanceof Error ? error.message : "Unknown error",
-      debug_logs: debugLogs,
-    });
-  }
-}
-
-
-//Função para ir buscar o desafio em progresso
-async getChallengeInProgress(req: Request, res: Response) {
-  try {
-    const userId = parseInt(req.params.id);
-    
-    // Verifica se o ID do utilizador é válido
-    if (isNaN(userId)) {
-      return res.status(400).json({ error: "Invalid user ID" });
-    }
-    
-    // Vai buscar um desafio que tenha progress_percentage >= 0 e < 100 (em progresso)
-    // e que não esteja completado (completed = false)
-    const challengeInProgress = await prisma.user_has_Challenges.findFirst({
-      where: {
-        ref_id_user: userId,
-        completed: false,
-        blocked: false,
-        progress_percentage: {
-          gte: 0,
-          lt: 100
-        }
-      },
-      include: {
-        challenge: true 
-      },
-    });
-    
-    if (!challengeInProgress) {
-      return res.status(404).json({ 
-        message: "No challenge in progress found for this user"
+      res.status(500).json({
+        error: "Internal server error",
+        details: error instanceof Error ? error.message : "Unknown error",
+        debug_logs: debugLogs,
       });
     }
-    
-    // Vai buscar os steps do desafio em progresso
-    const steps = await prisma.user_has_Challenges_has_Steps.findMany({
-      where: {
-        ref_user_has_Challenges_id_user: userId,
-        ref_user_has_Challenges_id_challenge: challengeInProgress.ref_id_challenge
-      },
-      include: {
-        step: {
-          include: {
-            Step_Video: true,
-            Step_Bet: true,
-            Step_View: true,
-            Step_Questionnaire: true
-          }
-        }
-      },
-      orderBy: {
-        ref_id_steps: 'asc'
-      }
-    });
-    
-    // Retorna o desafio com sua informação de progresso e steps
-    res.json({
-      challenge: challengeInProgress.challenge,
-      progress: {
-        progress_percentage: challengeInProgress.progress_percentage,
-        detail_seen: challengeInProgress.detail_seen,
-      },
-      steps: steps
-    });
-    
-  } catch (error) {
-    console.error("Error fetching challenge in progress:", error);
-    res.status(500).json({ 
-      error: "Failed to fetch challenge in progress",
-      details: error instanceof Error ? error.message : "Unknown error"
-    });
   }
-}
 
-async createFullChallenge(req: Request, res: Response) {
-  const data = req.body as CreateChallengeRequest;
-  
-  try {
-    // Usar transação para garantir que todas as operações sejam bem-sucedidas
-    const result = await prisma.$transaction(async (tx) => {
-      // 1. Criar o challenge
-      const challenge = await tx.challenges.create({
-        data: {
-          number: data.challenge.number,
-          name: data.challenge.name,
-          short_description: data.challenge.short_description,
-          long_description: data.challenge.long_description,
-          image: data.challenge.image,
+  //Função para ir buscar o desafio em progresso
+  async getChallengeInProgress(req: Request, res: Response) {
+    try {
+      const userId = parseInt(req.params.id);
+
+      // Verifica se o ID do utilizador é válido
+      if (isNaN(userId)) {
+        return res.status(400).json({ error: "Invalid user ID" });
+      }
+
+      // Vai buscar um desafio que tenha progress_percentage >= 0 e < 100 (em progresso)
+      // e que não esteja completado (completed = false)
+      const challengeInProgress = await prisma.user_has_Challenges.findFirst({
+        where: {
+          ref_id_user: userId,
+          completed: false,
+          blocked: false,
+          progress_percentage: {
+            gte: 0,
+            lt: 100,
+          },
+        },
+        include: {
+          challenge: true,
         },
       });
-      
-      // 2. Criar cada step do challenge
-      const createdSteps = [];
-      
-      for (const stepData of data.steps) {
-        let stepVideoId = null;
-        let stepBetId = null;
-        let stepViewId = null;
-        let stepQuestionnaireId = null;
-        
-        // Criar o tipo específico de step
-        if (stepData.type === 'video' && stepData.data.video_url && stepData.data.video_description) {
-          const video = await tx.step_Video.create({
-            data: {
-              video_url: stepData.data.video_url,
-              video_description: stepData.data.video_description,
+
+      if (!challengeInProgress) {
+        return res.status(404).json({
+          message: "No challenge in progress found for this user",
+        });
+      }
+
+      // Vai buscar os steps do desafio em progresso
+      const steps = await prisma.user_has_Challenges_has_Steps.findMany({
+        where: {
+          ref_user_has_Challenges_id_user: userId,
+          ref_user_has_Challenges_id_challenge:
+            challengeInProgress.ref_id_challenge,
+        },
+        include: {
+          step: {
+            include: {
+              Step_Video: true,
+              Step_Bet: true,
+              Step_View: true,
+              Step_Questionnaire: true,
             },
-          });
-          stepVideoId = video.id_step_video;
-        } 
-        else if (stepData.type === 'bet' && stepData.data.bet_description && stepData.data.bet_json) {
-          const bet = await tx.step_Bet.create({
-            data: {
-              bet_description: stepData.data.bet_description,
-              bet_json: stepData.data.bet_json,
-            },
-          });
-          stepBetId = bet.id_step_bet;
-        }
-        else if (stepData.type === 'view' && stepData.data.view_description && stepData.data.view_page) {
-          const view = await tx.step_View.create({
-            data: {
-              view_description: stepData.data.view_description,
-              view_page: stepData.data.view_page,
-            },
-          });
-          stepViewId = view.id_step_view;
-        }
-        else if (stepData.type === 'questionnaire' && stepData.data.questionnaire_description && stepData.data.questionnaire_json) {
-          const questionnaire = await tx.step_Questionnaire.create({
-            data: {
-              questionnaire_description: stepData.data.questionnaire_description,
-              questionnaire_json: stepData.data.questionnaire_json,
-            },
-          });
-          stepQuestionnaireId = questionnaire.id_step_questionnaire;
-        }
-        
-        // Criar o registro na tabela Steps
-        const step = await tx.steps.create({
+          },
+        },
+        orderBy: {
+          ref_id_steps: "asc",
+        },
+      });
+
+      // Retorna o desafio com sua informação de progresso e steps
+      res.json({
+        challenge: challengeInProgress.challenge,
+        progress: {
+          progress_percentage: challengeInProgress.progress_percentage,
+          detail_seen: challengeInProgress.detail_seen,
+        },
+        steps: steps,
+      });
+    } catch (error) {
+      console.error("Error fetching challenge in progress:", error);
+      res.status(500).json({
+        error: "Failed to fetch challenge in progress",
+        details: error instanceof Error ? error.message : "Unknown error",
+      });
+    }
+  }
+
+  async createFullChallenge(req: Request, res: Response) {
+    const data = req.body as CreateChallengeRequest;
+
+    try {
+      // Usar transação para garantir que todas as operações sejam bem-sucedidas
+      const result = await prisma.$transaction(async (tx) => {
+        // 1. Criar o challenge
+        const challenge = await tx.challenges.create({
           data: {
-            ref_id_step_video: stepVideoId,
-            ref_id_step_bet: stepBetId,
-            ref_id_step_view: stepViewId,
-            ref_id_step_questionnaire: stepQuestionnaireId,
-            ref_id_challenges: challenge.id_challenge,
+            number: data.challenge.number,
+            name: data.challenge.name,
+            short_description: data.challenge.short_description,
+            long_description: data.challenge.long_description,
+            image: data.challenge.image,
           },
         });
-        
-        createdSteps.push(step);
-      }
-      
-      // Retornar todos os dados criados
-      return {
-        challenge,
-        steps: createdSteps
-      };
-    });
-    
-    res.status(201).json({
-      message: "Challenge created successfully with all steps",
-      data: result
-    });
-    
-  } catch (error) {
-    console.error("Error creating challenge:", error);
-    res.status(500).json({ 
-      error: "Failed to create challenge with steps",
-      details: error instanceof Error ? error.message : "Unknown error"
-    });
+
+        // 2. Criar cada step do challenge
+        const createdSteps = [];
+
+        for (const stepData of data.steps) {
+          let stepVideoId = null;
+          let stepBetId = null;
+          let stepViewId = null;
+          let stepQuestionnaireId = null;
+
+          // Criar o tipo específico de step
+          if (
+            stepData.type === "video" &&
+            stepData.data.video_url &&
+            stepData.data.video_description
+          ) {
+            const video = await tx.step_Video.create({
+              data: {
+                video_url: stepData.data.video_url,
+                video_description: stepData.data.video_description,
+              },
+            });
+            stepVideoId = video.id_step_video;
+          } else if (
+            stepData.type === "bet" &&
+            stepData.data.bet_description &&
+            stepData.data.bet_json
+          ) {
+            const bet = await tx.step_Bet.create({
+              data: {
+                bet_description: stepData.data.bet_description,
+                bet_json: stepData.data.bet_json,
+              },
+            });
+            stepBetId = bet.id_step_bet;
+          } else if (
+            stepData.type === "view" &&
+            stepData.data.view_description &&
+            stepData.data.view_page
+          ) {
+            const view = await tx.step_View.create({
+              data: {
+                view_description: stepData.data.view_description,
+                view_page: stepData.data.view_page,
+              },
+            });
+            stepViewId = view.id_step_view;
+          } else if (
+            stepData.type === "questionnaire" &&
+            stepData.data.questionnaire_description &&
+            stepData.data.questionnaire_json
+          ) {
+            const questionnaire = await tx.step_Questionnaire.create({
+              data: {
+                questionnaire_description:
+                  stepData.data.questionnaire_description,
+                questionnaire_json: stepData.data.questionnaire_json,
+              },
+            });
+            stepQuestionnaireId = questionnaire.id_step_questionnaire;
+          }
+
+          // Criar o registro na tabela Steps
+          const step = await tx.steps.create({
+            data: {
+              ref_id_step_video: stepVideoId,
+              ref_id_step_bet: stepBetId,
+              ref_id_step_view: stepViewId,
+              ref_id_step_questionnaire: stepQuestionnaireId,
+              ref_id_challenges: challenge.id_challenge,
+            },
+          });
+
+          createdSteps.push(step);
+        }
+
+        // Retornar todos os dados criados
+        return {
+          challenge,
+          steps: createdSteps,
+        };
+      });
+
+      res.status(201).json({
+        message: "Challenge created successfully with all steps",
+        data: result,
+      });
+    } catch (error) {
+      console.error("Error creating challenge:", error);
+      res.status(500).json({
+        error: "Failed to create challenge with steps",
+        details: error instanceof Error ? error.message : "Unknown error",
+      });
+    }
   }
-}
-
-
-
 }
