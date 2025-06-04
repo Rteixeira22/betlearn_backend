@@ -571,13 +571,8 @@ export class ChallengesController {
         });
 
            try {
-        // Detectar se estamos em produção ou desenvolvimento
-        const baseUrl = process.env.NODE_ENV === 'production' 
-          ? 'https://api-betlearn-wine.vercel.app' 
-          : 'http://localhost:3000';
-        
         await axios.post(
-          `${baseUrl}/api/challenges/${userId}/${challengeId}/unblock-next`
+          `https://api-betlearn-wine.vercel.app/api/challenges/${userId}/${challengeId}/unblock-next`
         );
       } catch (axiosError) {
         console.error("Failed to unblock next challenge:", axiosError);
