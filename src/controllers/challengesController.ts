@@ -703,9 +703,6 @@ export class ChallengesController {
           await axios.post(
             `http://localhost:3000/api/challenges/${userId}/${challengeId}/unblock-next`
           );
-          await axios.post(
-            `https://api-betlearn-wine.vercel.app/api/challenges/${userId}/${challengeId}/unblock-next`
-          );
         } catch (axiosError) {
           console.error("Failed to unblock next challenge:", axiosError);
         }
