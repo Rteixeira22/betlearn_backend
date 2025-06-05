@@ -4,6 +4,15 @@ import { PrismaClient } from '@prisma/client'
 import { Request, Response } from 'express'
 import bcrypt from 'bcrypt';
 
+// Extend Express Request interface to include userId
+declare global {
+  namespace Express {
+    interface Request {
+      userId?: string;
+    }
+  }
+}
+
 const prisma = new PrismaClient()
 
 export class UserController {
@@ -25,15 +34,28 @@ export class UserController {
   }
 
   // Get user by ID
-  async getUserById(req: Request, res: Response) {
+  async getUserById(req: Request, res: Response): Promise<void> {
     try {
-      const userId = parseInt(req.params.id)
+      const requestedId = parseInt(req.params.id);
+      const tokenUserId = parseInt(req.userId!); 
+
+      if (requestedId !== tokenUserId) {
+        res.status(403).json({ error: 'Acesso restrito' });
+        return;
+      }
+
       const user = await prisma.users.findUnique({
-        where: { id_user: userId }
-      })
-      res.json(user)
+        where: { id_user: requestedId },
+      });
+
+      if (!user) {
+        res.status(404).json({ error: 'Utilizador não encontrado' });
+        return;
+      }
+
+      res.json(user);
     } catch (error) {
-      res.status(500).json({ error: 'Failed to fetch user' })
+      res.status(500).json({ error: 'Erro ao obter dados do utilizador' });
     }
   }
 
@@ -42,6 +64,12 @@ export class UserController {
   async getUserChallenges(req: Request, res: Response) {
     try {
       const userId = parseInt(req.params.id)
+      const tokenUserId = parseInt(req.userId!); 
+
+      if (userId !== tokenUserId) {
+        res.status(403).json({ error: 'Acesso restrito' });
+        return;
+      }
       const challenges = await prisma.user_has_Challenges.findMany({
         where: { ref_id_user: userId },
         include: {
@@ -57,7 +85,14 @@ export class UserController {
   // Get user bet history
   async getUserBetHistory(req: Request, res: Response) {
     try {
-      const userId = parseInt(req.params.id)
+      const userId = parseInt(req.params.id);
+      const tokenUserId = parseInt(req.userId!); 
+
+      if (userId !== tokenUserId) {
+        res.status(403).json({ error: 'Acesso restrito' });
+        return;
+      }      
+      
       const bets = await prisma.bets.findMany({
         where: { ref_id_user: userId }
       })
@@ -71,6 +106,12 @@ export class UserController {
   async getActiveBets(req: Request, res: Response) {
     try {
       const userId = parseInt(req.params.id)
+      const tokenUserId = parseInt(req.userId!); 
+
+      if (userId !== tokenUserId) {
+        res.status(403).json({ error: 'Acesso restrito' });
+        return;
+      }
       const activeBets = await prisma.bets.findMany({
         where: { 
           ref_id_user: userId,
@@ -87,6 +128,12 @@ export class UserController {
   async getClosedBets(req: Request, res: Response) {
     try {
       const userId = parseInt(req.params.id)
+      const tokenUserId = parseInt(req.userId!); 
+
+      if (userId !== tokenUserId) {
+        res.status(403).json({ error: 'Acesso restrito' });
+        return;
+      }
       const closedBets = await prisma.bets.findMany({
         where: { 
           ref_id_user: userId,
@@ -103,6 +150,12 @@ export class UserController {
   async getWonBets(req: Request, res: Response) {
     try {
       const userId = parseInt(req.params.id)
+      const tokenUserId = parseInt(req.userId!); 
+
+      if (userId !== tokenUserId) {
+        res.status(403).json({ error: 'Acesso restrito' });
+        return;
+      }
       const wonBets = await prisma.bets.findMany({
         where: { 
           ref_id_user: userId,
@@ -120,6 +173,12 @@ export class UserController {
   async getLostBets(req: Request, res: Response) {
     try {
       const userId = parseInt(req.params.id)
+      const tokenUserId = parseInt(req.userId!); 
+
+      if (userId !== tokenUserId) {
+        res.status(403).json({ error: 'Acesso restrito' });
+        return;
+      }
       const lostBets = await prisma.bets.findMany({
         where: { 
           ref_id_user: userId,
@@ -136,7 +195,9 @@ export class UserController {
   //Get user by username
   async getUserByUsername(req: Request, res: Response) {
     try {
-      const username = req.params.username
+        const username = req.params.username
+
+
       const user = await prisma.users.findUnique({
         where: { username: username }
       })
@@ -195,6 +256,14 @@ export class UserController {
   async deleteUser(req: Request, res: Response) {
     try {
       const userId = parseInt(req.params.id)
+
+      const tokenUserId = parseInt(req.userId!); 
+
+      if (userId !== tokenUserId) {
+        res.status(403).json({ error: 'Acesso restrito' });
+        return;
+      }
+
       await prisma.users.delete({
         where: { id_user: userId }
       })
@@ -206,8 +275,13 @@ export class UserController {
   // Update user password
   async updateUserPassword(req: Request, res: Response) {
     try {
-      console.log("Received ID:", req.params.id);
-      console.log("Received Body:", req.body);
+      const requestedId = parseInt(req.params.id);
+      const tokenUserId = parseInt(req.userId!); 
+
+      if (requestedId !== tokenUserId) {
+        res.status(403).json({ error: 'Acesso restrito' });
+        return;
+      }
   
       const userId = Number(req.params.id);
       if (isNaN(userId)) {
@@ -249,7 +323,15 @@ export class UserController {
   // Update user profile
   async updateUserProfile(req: Request, res: Response) {
     try {
-      const userId = parseInt(req.params.id)
+
+      const userId = parseInt(req.params.id);
+      const tokenUserId = parseInt(req.userId!); 
+
+      if (userId !== tokenUserId) {
+        res.status(403).json({ error: 'Acesso restrito' });
+        return;
+      }
+
       const { name, email, username, image } = req.body
       
       const updatedUser = await prisma.users.update({
@@ -273,6 +355,13 @@ export class UserController {
     try {
       const userId = parseInt(req.params.id)
       const { money } = req.body
+
+      const tokenUserId = parseInt(req.userId!); 
+
+      if (userId !== tokenUserId) {
+        res.status(403).json({ error: 'Acesso restrito' });
+        return;
+      }
       
       const updatedUser = await prisma.users.update({
         where: { id_user: userId },
@@ -290,6 +379,13 @@ export class UserController {
     try {
       const userId = parseInt(req.params.id)
       const { points } = req.body
+
+      const tokenUserId = parseInt(req.userId!); 
+
+      if (userId !== tokenUserId) {
+        res.status(403).json({ error: 'Acesso restrito' });
+        return;
+      }
       
       const updatedUser = await prisma.users.update({
         where: { id_user: userId },
@@ -308,6 +404,13 @@ async updateUserBetsVisibility(req: Request, res: Response) {
   try {
     const userId = parseInt(req.params.id)
     const { bets_visibility } = req.body
+
+      const tokenUserId = parseInt(req.userId!); 
+
+      if (userId !== tokenUserId) {
+        res.status(403).json({ error: 'Acesso restrito' });
+        return;
+      }
     
     const updatedUser = await prisma.users.update({
       where: { id_user: userId },
@@ -326,6 +429,14 @@ async updateUserTutorialVerification(req: Request, res: Response) {
   try {
     const userId = parseInt(req.params.id)
     const { tutorial_verification } = req.body
+
+      const tokenUserId = parseInt(req.userId!); 
+
+      if (userId !== tokenUserId) {
+        res.status(403).json({ error: 'Acesso restrito' });
+        return;
+      }
+
     const updatedUser = await prisma.users.update({
       where: { id_user: userId },
       data: { tutorial_verification }
@@ -359,6 +470,12 @@ async updateUserTutorialVerification(req: Request, res: Response) {
   async getUserPositionInLeaderboard(req: Request, res: Response) {
     try {
       const userId = parseInt(req.params.id)
+      const tokenUserId = parseInt(req.userId!); 
+
+      if (userId !== tokenUserId) {
+        res.status(403).json({ error: 'Acesso restrito' });
+        return;
+      }
       const leaderboard = await prisma.users.findMany({
         orderBy: { points: 'desc' }
       });

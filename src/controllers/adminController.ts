@@ -3,6 +3,13 @@ import { PrismaClient } from '@prisma/client'
 import { Request, Response } from 'express'
 import bcrypt from 'bcrypt';
 
+declare global {
+  namespace Express {
+    interface Request {
+      adminId?: string;
+    }
+  }
+}
 
 const prisma = new PrismaClient()
 
@@ -22,9 +29,18 @@ export class AdminController {
     async getAdminById(req: Request, res: Response) {
         try {
             const adminId = parseInt(req.params.id)
+
+            const tokenUserId = parseInt(req.adminId!);
+            
+            if (adminId !== tokenUserId) {
+                res.status(403).json({ error: 'Não está autorizado a aceder ao perfil de outro utilizador' });
+                return;
+            }
+
             const admin = await prisma.admin.findUnique({
                 where: { id: adminId }
             })
+            
             res.json(admin)
         } catch (error) {
             res.status(500).json({ error: 'Failed to fetch admin' })
@@ -51,29 +67,59 @@ export class AdminController {
     }
 
     // Update admin
-    async updateAdmin(req: Request, res: Response) {
-        try {
-            const adminId = parseInt(req.params.id)
-            const { name, email, username, password } = req.body
-            const updatedAdmin = await prisma.admin.update({
-                where: { id: adminId },
-                data: {
-                    name,
-                    email,
-                    username,
-                    password,
-                }
-            })
-            res.json(updatedAdmin)
-        } catch (error) {
-            res.status(500).json({ error: 'Failed to update admin' })
+   async updateAdmin(req: Request, res: Response) {
+    try {
+      const adminId = parseInt(req.params.id);
+      const tokenUserId = parseInt(req.adminId!);
+
+      if (adminId !== tokenUserId) {
+        res.status(403).json({ 
+          error: 'Acesso restrito' 
+        });
+        return;
+      }
+
+      const { name, email, username, password } = req.body;
+      
+      const updateData: any = {};
+      
+      if (name) updateData.name = name;
+      if (email) updateData.email = email;
+      if (username) updateData.username = username;
+      
+      if (password) {
+        updateData.password = await bcrypt.hash(password, 10);
+      }
+
+      const updatedAdmin = await prisma.admin.update({
+        where: { id: adminId },
+        data: updateData,
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          username: true,
         }
+      });
+      
+      res.json(updatedAdmin);
+    } catch (error) {
+      console.error('Error updating admin:', error);
+      res.status(500).json({ error: 'Failed to update admin' });
     }
+  }
 
     // Delete admin
     async deleteAdmin(req: Request, res: Response) {
         try {
             const adminId = parseInt(req.params.id)
+
+            const tokenUserId = parseInt(req.adminId!);
+            
+            if (adminId !== tokenUserId) {
+                res.status(403).json({ error: 'Acesso restrito' });
+                return;
+            }
             await prisma.admin.delete({
                 where: { id: adminId }
             })

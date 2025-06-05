@@ -10,7 +10,7 @@ export class AuthController {
     try {
       const { username, password } = req.body;
 
-      // Verificar se o usuário existe
+      // Verificar se o utilizador existe
       const user = await prisma.users.findUnique({
         where: { username },
       });
@@ -30,12 +30,13 @@ export class AuthController {
             userId: user.id_user,
             email: user.email,
             username: user.username,
+            role: "user",
           },
           process.env.JWT_SECRET || "seu_secret_key",
           { expiresIn: "12h" }
         );
 
-        // Retornar usuário e token
+        // Retornar utilizador e token
         const { password: _, ...userWithoutPassword } = user;
         res.status(200).json({
           user: userWithoutPassword,
@@ -75,6 +76,7 @@ export class AuthController {
             adminId: admin.id,
             email: admin.email,
             username: admin.username,
+            role: "admin",
           },
           process.env.JWT_SECRET || "seu_secret_key",
           { expiresIn: "12h" }
