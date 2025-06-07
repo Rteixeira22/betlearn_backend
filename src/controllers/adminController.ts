@@ -17,6 +17,7 @@ export class AdminController {
 
     // Get all admins
     async getAdmins(req: Request, res: Response) {
+
         try {
             const admins = await prisma.admin.findMany()
             res.json(admins)

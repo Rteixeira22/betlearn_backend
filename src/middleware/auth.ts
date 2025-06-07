@@ -23,6 +23,7 @@ const requireAPIKey = (req: AuthenticatedRequest, res: Response, next: NextFunct
 
   let role: 'user' | 'admin' | null = null;
 
+
   if (providedKey === userKey) {
     role = 'user';
   } else if (providedKey === adminKey) {
@@ -36,6 +37,7 @@ const requireAPIKey = (req: AuthenticatedRequest, res: Response, next: NextFunct
 
   req.apiKey = providedKey;
   req.userRole = role;
+
 
   next();
 };

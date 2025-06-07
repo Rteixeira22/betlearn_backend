@@ -4,11 +4,12 @@ import { PrismaClient } from '@prisma/client'
 import { Request, Response } from 'express'
 import bcrypt from 'bcrypt';
 
-// Extend Express Request interface to include userId
+// Extend Express Request interface to include userId and userRole
 declare global {
   namespace Express {
     interface Request {
       userId?: string;
+      userRole?: 'user' | 'admin';
     }
   }
 }
@@ -34,30 +35,32 @@ export class UserController {
   }
 
   // Get user by ID
-  async getUserById(req: Request, res: Response): Promise<void> {
-    try {
-      const requestedId = parseInt(req.params.id);
-      const tokenUserId = parseInt(req.userId!); 
+    async getUserById(req: Request, res: Response): Promise<void> {
+      try {
+        const role = req.userRole;
+        const requestedId = parseInt(req.params.id);
+        const tokenUserId = parseInt(req.userId!);
 
-      if (requestedId !== tokenUserId) {
-        res.status(403).json({ error: 'Acesso restrito' });
-        return;
-      }
+        if (role !== 'admin' && requestedId !== tokenUserId) {
+          res.status(403).json({ error: 'Acesso restrito' });
+          return;
+        }
 
-      const user = await prisma.users.findUnique({
-        where: { id_user: requestedId },
-      });
+        const user = await prisma.users.findUnique({
+          where: { id_user: requestedId },
+        });
 
-      if (!user) {
-        res.status(404).json({ error: 'Utilizador não encontrado' });
-        return;
-      }
+        if (!user) {
+          res.status(404).json({ error: 'Utilizador não encontrado' });
+          return;
+        }
 
       res.json(user);
     } catch (error) {
       res.status(500).json({ error: 'Erro ao obter dados do utilizador' });
     }
   }
+
 
 
   // Get user challenges
@@ -355,13 +358,6 @@ export class UserController {
     try {
       const userId = parseInt(req.params.id)
       const { money } = req.body
-
-      const tokenUserId = parseInt(req.userId!); 
-
-      if (userId !== tokenUserId) {
-        res.status(403).json({ error: 'Acesso restrito' });
-        return;
-      }
       
       const updatedUser = await prisma.users.update({
         where: { id_user: userId },

@@ -3,7 +3,8 @@ import jwt, { JwtPayload } from 'jsonwebtoken';
 
 export interface AuthenticatedRequest extends Request {
   userId?: string;
-  userRole?: string;
+  userRole?: 'user' | 'admin';
+  adminId?: string;
 }
 
 export function verifyJWT(req: AuthenticatedRequest, res: Response, next: NextFunction): void {

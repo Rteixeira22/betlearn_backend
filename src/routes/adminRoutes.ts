@@ -188,16 +188,16 @@ import authorize from '../middleware/authorize';
 import { verifyJWT } from '../middleware/verifyJWT';
 
 // GET Admin Routes
-router.get("/",  authorize('admin'), requireAPIKey, adminController.getAdmins); // Get all admins
+router.get("/",  requireAPIKey, authorize('admin'), adminController.getAdmins); // Get all admins
 router.get("/:id", requireAPIKey, verifyJWT, adminController.getAdminById); // Get admin by ID
 
 // POST Admin Routes
-router.post("/", authorize('admin'), requireAPIKey, adminController.createAdmin); // Create admin
+router.post("/", requireAPIKey, authorize('admin'), adminController.createAdmin); // Create admin
 
 // PUT Admin Routes
-router.put("/:id", authorize('admin'), requireAPIKey, verifyJWT, adminController.updateAdmin); // Update admin
+router.put("/:id", requireAPIKey, authorize('admin'), verifyJWT, adminController.updateAdmin); // Update admin
 
 // DELETE Admin Routes
-router.delete("/:id", authorize('admin'), requireAPIKey, verifyJWT, adminController.deleteAdmin); // Delete admin
+router.delete("/:id", requireAPIKey, authorize('admin'), verifyJWT, adminController.deleteAdmin); // Delete admin
 
 export default router; // Export router

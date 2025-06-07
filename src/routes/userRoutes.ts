@@ -659,7 +659,7 @@ router.get("/email/:email",  requireAPIKey, userController.getUserByEmail);
 router.patch("/:id/password", requireAPIKey, verifyJWT, userController.updateUserPassword);
 router.patch("/:id/profile", requireAPIKey, verifyJWT, userController.updateUserProfile);
 //esta como string
-router.patch("/:id/money", requireAPIKey, verifyJWT, userController.updateUserMoney);
+router.patch("/:id/money", userController.updateUserMoney);
 router.patch("/:id/points", requireAPIKey, verifyJWT, userController.updateUserPoints);
 router.patch("/:id/bets-visibility", requireAPIKey, verifyJWT, userController.updateUserBetsVisibility);
 router.patch(
