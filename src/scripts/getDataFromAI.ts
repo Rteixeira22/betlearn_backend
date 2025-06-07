@@ -1,14 +1,15 @@
-import axios from 'axios';
-import * as dotenv from 'dotenv';
-import Ajv from 'ajv';
-import addFormats from 'ajv-formats';
+import axios from "axios";
+import * as dotenv from "dotenv";
+import Ajv from "ajv";
+import addFormats from "ajv-formats";
 import axiosInstance from "../configs/axiosConfig";
-
+import { console } from "inspector";
 
 dotenv.config();
 
 const apiKey = process.env.GEMINI_API_KEY;
-const API_BASE_URL = process.env.API_BASE_URL || 'https://api-betlearn-wine.vercel.app/api/';
+const API_BASE_URL =
+  process.env.API_BASE_URL || "https://api-betlearn-wine.vercel.app/api/";
 
 // Configuração do Ajv para validação
 const ajv = new Ajv({ allErrors: true });
@@ -43,8 +44,8 @@ const schema = {
             type: "array",
             minItems: 5,
             maxItems: 5,
-            items: { type: "string", enum: ["V", "D", "E"] }
-          }
+            items: { type: "string", enum: ["V", "D", "E"] },
+          },
         },
         required: [
           "position",
@@ -57,9 +58,9 @@ const schema = {
           "goals_against",
           "goals_difference",
           "total_matches",
-          "form"
-        ]
-      }
+          "form",
+        ],
+      },
     },
     games: {
       type: "array",
@@ -75,14 +76,14 @@ const schema = {
             type: "object",
             properties: {
               "1": { type: "number", minimum: 1 },
-              "x": { type: "number", minimum: 1 },
-              "2": { type: "number", minimum: 1 }
+              x: { type: "number", minimum: 1 },
+              "2": { type: "number", minimum: 1 },
             },
-            required: ["1", "x", "2"]
+            required: ["1", "x", "2"],
           },
           goals_local_team: { type: "integer", minimum: 0 },
           goals_visitor_team: { type: "integer", minimum: 0 },
-          schedule: { type: "string", pattern: "^(\\d{2}):(\\d{2})$" }
+          schedule: { type: "string", pattern: "^(\\d{2}):(\\d{2})$" },
         },
         required: [
           "id",
@@ -91,10 +92,10 @@ const schema = {
           "odds",
           "goals_local_team",
           "goals_visitor_team",
-          "schedule"
-        ]
-      }
-    }
+          "schedule",
+        ],
+      },
+    },
   },
   required: [
     "championship_id",
@@ -102,20 +103,33 @@ const schema = {
     "round",
     "generated_at",
     "classification",
-    "games"
-  ]
+    "games",
+  ],
 };
-
+console.log("AH");
 // Função para validar JSON usando o esquema definido
 function validateJSON(data: any): { valid: boolean; errors: any | null } {
   const validate = ajv.compile(schema);
   const valid = validate(data);
-  
+
   return {
     valid,
-    errors: valid ? null : validate.errors
+    errors: valid ? null : validate.errors,
   };
 }
+
+// Vai buscar os campeonatos que já existem na base de dados
+async function fetchExistingChampionships() {
+  try {
+    const response = await axiosInstance.get("/championships/");
+    return response.data;
+  } catch (error: any) {
+    console.error("Erro ao buscar campeonatos existentes:", error.message);
+  }
+}
+
+// Mandar ao AI
+const campeonatos = fetchExistingChampionships();
 
 // Função principal para gerar dados via Gemini e validá-los antes de enviar para a API
 async function generateChampionshipData() {
@@ -152,50 +166,52 @@ async function generateChampionshipData() {
   Sê criativo com os nomes das equipas. As odds devem ser realistas com base nas posições das equipas na tabela. Os resultados devem refletir probabilidades realistas considerando a força das equipas.
   Gere apenas o JSON sem explicações adicionais.
   
-  É MUITO IMPORTANTE que o JSON gerado siga exatamente o esquema descrito acima, com todos os campos obrigatórios e no formato correto. Garante que a data 'generated_at' esteja no formato "YYYY-MM-DD".`;
+  É MUITO IMPORTANTE que o JSON gerado siga exatamente o esquema descrito acima, com todos os campos obrigatórios e no formato correto. Garante que a data 'generated_at' esteja no formato "YYYY-MM-DD".
+  
+  Estes são todos os campeonatos que já existem. Não te esqueças que é crucial que o campeonato novo que vais gerar tenha informações diferentes de qualquer um destes: ${campeonatos}`;
 
   try {
-    console.log('A enviar pedido à API do Gemini...');
-    
+    console.log("A enviar pedido à API do Gemini...");
+
     const response = await axios.post(
-      'https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro-002:generateContent',
+      "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro-002:generateContent",
       {
         contents: [{ parts: [{ text: prompt }] }],
         generationConfig: {
           temperature: 0.7,
           topP: 0.95,
           topK: 40,
-          maxOutputTokens: 4000  
-        }
+          maxOutputTokens: 4000,
+        },
       },
       {
         headers: {
-          'Content-Type': 'application/json',
-          'x-goog-api-key': apiKey
+          "Content-Type": "application/json",
+          "x-goog-api-key": apiKey,
         },
-        timeout: 60000 
+        timeout: 60000,
       }
     );
 
     const resultado = response.data.candidates[0].content.parts[0].text;
-    
+
     try {
       // Remove qualquer texto antes e depois do JSON (caso haja)
       const jsonMatch = resultado.match(/\{[\s\S]*\}/);
       const jsonString = jsonMatch ? jsonMatch[0] : resultado;
-      
+
       const dadosJSON = JSON.parse(jsonString);
-      
+
       // Validar o JSON com o esquema
-      console.log('A validar o JSON gerado...');
+      console.log("A validar o JSON gerado...");
       const validationResult = validateJSON(dadosJSON);
-      
+
       if (!validationResult.valid) {
-        throw new Error('O JSON gerado não passou na validação de esquema');
+        throw new Error("O JSON gerado não passou na validação de esquema");
       }
-      
-      console.log('JSON validado com sucesso. A enviar para a API...');
-      
+
+      console.log("JSON validado com sucesso. A enviar para a API...");
+
       // Enviar para a API apenas se o JSON for válido
       /* const apiResponse = await axios.post(
         `${API_BASE_URL}/championships/`,
@@ -207,34 +223,35 @@ async function generateChampionshipData() {
         }
       ); */
 
-      const apiResponse = await axiosInstance.post(
-        "/championships/",
-        { json: JSON.stringify(dadosJSON) },
-        
+      const apiResponse = await axiosInstance.post("/championships/", {
+        json: JSON.stringify(dadosJSON),
+      });
+
+      const notification = await axiosInstance.post("/admin-notifications/", {
+        title: "Novo campeonato criado",
+        message: `Um novo campeonato foi criado com sucesso.`,
+        source: "getDataFromAI",
+        type: "success",
+      });
+
+      console.log(
+        "Dados do campeonato adicionados à base de dados com sucesso!"
       );
 
-      const notification = await axiosInstance.post(
-        "/admin-notifications/",
-        {
-          title: "Novo campeonato criado",
-          message: `Um novo campeonato foi criado com sucesso.`,
-          source: "getDataFromAI",
-          type: "success",
-        }
-      );
-
-      
-      console.log('Dados do campeonato adicionados à base de dados com sucesso!');
-      
       return dadosJSON;
     } catch (parseError: any) {
-      console.error('Erro ao processar ou validar o JSON recebido:', parseError.message);
-      throw new Error('O formato da resposta não é um JSON válido ou não passou na validação');
+      console.error(
+        "Erro ao processar ou validar o JSON recebido:",
+        parseError.message
+      );
+      throw new Error(
+        "O formato da resposta não é um JSON válido ou não passou na validação"
+      );
     }
   } catch (err: any) {
-    console.error('Erro ao gerar ou guardar dados do campeonato:', err.message);
+    console.error("Erro ao gerar ou guardar dados do campeonato:", err.message);
     if (err.response) {
-      console.error('Detalhes do erro:', err.response.data);
+      console.error("Detalhes do erro:", err.response.data);
     }
     throw err;
   }
@@ -243,7 +260,7 @@ async function generateChampionshipData() {
 // Tenta corrigir problemas comuns com a resposta do AI
 async function retryWithFixes(maxAttempts = 3): Promise<any> {
   let attempts = 0;
-  
+
   while (attempts < maxAttempts) {
     try {
       attempts++;
@@ -251,25 +268,24 @@ async function retryWithFixes(maxAttempts = 3): Promise<any> {
       return await generateChampionshipData();
     } catch (error: any) {
       console.error(`Falha na tentativa ${attempts}:`, error.message);
-      
-      if (attempts >= maxAttempts) {
-        console.error('Número máximo de tentativas atingido.');
 
-      const notification = await axiosInstance.post(
-        "/admin-notifications/",
-        {
+      if (attempts >= maxAttempts) {
+        console.error("Número máximo de tentativas atingido.");
+
+        const notification = await axiosInstance.post("/admin-notifications/", {
           title: "Erro ao gerar campeonato",
           message: `Não foi possível gerar um campeonato após ${maxAttempts} tentativas.`,
           source: "getDataFromAI",
           type: "error",
-        }
-      );
+        });
 
-        throw new Error(`Não foi possível gerar um JSON válido após ${maxAttempts} tentativas.`);
+        throw new Error(
+          `Não foi possível gerar um JSON válido após ${maxAttempts} tentativas.`
+        );
       }
-      
+
       // Espera um curto período antes de tentar novamente
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      await new Promise((resolve) => setTimeout(resolve, 2000));
     }
   }
 }
@@ -278,16 +294,16 @@ async function retryWithFixes(maxAttempts = 3): Promise<any> {
 if (require.main === module) {
   // Verifica se a API key está definida
   if (!apiKey) {
-    console.error('ERRO: GEMINI_API_KEY não está definida no ambiente.');
+    console.error("ERRO: GEMINI_API_KEY não está definida no ambiente.");
     process.exit(1);
   }
-  
+
   retryWithFixes()
     .then(() => {
-      console.log('Processo concluído com sucesso.');
+      console.log("Processo concluído com sucesso.");
     })
     .catch((err: Error) => {
-      console.error('O processo falhou:', err.message);
+      console.error("O processo falhou:", err.message);
       process.exit(1);
     });
 }
