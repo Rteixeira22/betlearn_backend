@@ -39,6 +39,7 @@ async function main() {
           bets_visibility: true,
           tutorial_verification: true,
           password: userPassword_1,
+          has_accepted_terms: true,
         },
       }),
       prisma.users.create({
@@ -54,6 +55,7 @@ async function main() {
           bets_visibility: true,
           tutorial_verification: true,
           password: userPassword_2,
+          has_accepted_terms: true,
         },
       }),
       prisma.users.create({
@@ -69,6 +71,7 @@ async function main() {
           bets_visibility: false,
           tutorial_verification: false,
           password: userPassword_3,
+          has_accepted_terms: true,
         },
       }),
     ]);

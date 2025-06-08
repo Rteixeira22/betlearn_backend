@@ -216,26 +216,29 @@
  */
 import express from "express";
 import { TipsController } from "../controllers/tipsController";
+import { requireAPIKey } from "../middleware/auth";
+import { verifyJWT } from '../middleware/verifyJWT';
+import authorize from '../middleware/authorize';
 
 const router = express.Router();
 const tipsController = new TipsController();
 
-router.get("/active", tipsController.getActiveTip); // Get active tip
+router.get("/active", requireAPIKey, verifyJWT, tipsController.getActiveTip); // Get active tip
 
 // GET Tip Routes
-router.get("/", tipsController.getTips); // Get all tips
-router.get("/:id", tipsController.getTipById); // Get tip by ID
+router.get("/", requireAPIKey, verifyJWT, tipsController.getTips); // Get all tips
+router.get("/:id", requireAPIKey, verifyJWT, tipsController.getTipById); // Get tip by ID
 
 // POST Tip Routes
-router.post("/", tipsController.createTip); // Create tip
+router.post("/", requireAPIKey, verifyJWT, authorize('admin'), tipsController.createTip); // Create tip
 
 // Put Tip Routes
-router.put("/:id", tipsController.updateTip); // Update tip
+router.put("/:id", requireAPIKey, verifyJWT, authorize('admin'), tipsController.updateTip); // Update tip
 
 // Put Tip State Routes
-router.put("/:id/state", tipsController.updateTipState); // Update tip state
+router.put("/:id/state", requireAPIKey, tipsController.updateTipState); // Update tip state
 
 // DELETE Tip Routes
-router.delete("/:id", tipsController.deleteTip); // Delete tip
+router.delete("/:id", requireAPIKey, verifyJWT, authorize('admin'), tipsController.deleteTip); // Delete tip
 
-export default router; // Export router
+export default router; 

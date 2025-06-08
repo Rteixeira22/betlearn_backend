@@ -27,6 +27,7 @@ export function verifyJWT(req: AuthenticatedRequest, res: Response, next: NextFu
     req.userId = decoded.userId;
     req.adminId = decoded.adminId; 
     req.userRole = decoded.role;
+
     next();
   } catch (err) {
     res.status(403).json({ error: 'Token inválido ou expirado' });

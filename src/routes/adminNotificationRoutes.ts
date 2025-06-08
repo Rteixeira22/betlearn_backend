@@ -285,16 +285,16 @@ import { requireAPIKey } from "../middleware/auth";
 import authorize from '../middleware/authorize';
 import { verifyJWT } from '../middleware/verifyJWT';
 
-router.get("/", authorize('admin'), requireAPIKey, adminNotificationController.getNotifications); // Route to get all notifications
+router.get("/", requireAPIKey, authorize('admin'), adminNotificationController.getNotifications); // Route to get all notifications
 
-router.get("/:id", authorize('admin'), requireAPIKey, adminNotificationController.getNotificationById); // Route to get notification by ID
+router.get("/:id",  requireAPIKey, authorize('admin'), adminNotificationController.getNotificationById); // Route to get notification by ID
 
-router.post("/", authorize('admin'), requireAPIKey, adminNotificationController.createNotification); // Route to create a new notification
+router.post("/",  requireAPIKey, authorize('admin'), verifyJWT,  adminNotificationController.createNotification); // Route to create a new notification
 
-router.put("/:id", authorize('admin'), requireAPIKey, adminNotificationController.updateNotification); // Route to update a notification by ID
+router.put("/:id",  requireAPIKey, authorize('admin'), verifyJWT,  adminNotificationController.updateNotification); // Route to update a notification by ID
 
-router.put("/:id/read", authorize('admin'), requireAPIKey, adminNotificationController.markAsRead) // Route to mark a notification as read
+router.put("/:id/read",  requireAPIKey, authorize('admin'), verifyJWT,  adminNotificationController.markAsRead) // Route to mark a notification as read
 
-router.delete("/:id", authorize('admin'), requireAPIKey, adminNotificationController.deleteNotification); // Route to delete a notification by ID
+router.delete("/:id",  requireAPIKey, authorize('admin'), verifyJWT, adminNotificationController.deleteNotification); // Route to delete a notification by ID
 
 export default router; // Export router

@@ -7,8 +7,9 @@ interface AuthenticatedRequest extends Request {
 }
 
 const requireAPIKey = (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
+
   const providedKey: string | undefined =
-    req.headers['x-api-key'] as string || req.query.apikey as string;
+    req.headers['apikey'] as string || req.query.apikey as string;
 
   const userKey = process.env.API_KEY_USERS;
   const adminKey = process.env.API_KEY_ADMINS;
@@ -30,6 +31,7 @@ const requireAPIKey = (req: AuthenticatedRequest, res: Response, next: NextFunct
     role = 'admin';
   }
 
+
   if (!role) {
     res.status(403).json({ error: 'Key da API inválida' });
     return;
@@ -37,6 +39,8 @@ const requireAPIKey = (req: AuthenticatedRequest, res: Response, next: NextFunct
 
   req.apiKey = providedKey;
   req.userRole = role;
+
+
 
 
   next();
