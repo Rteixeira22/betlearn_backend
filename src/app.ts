@@ -24,6 +24,7 @@ import path from "path";
 const allowedOrigins = [
   "http://localhost:8081", 
   "http://localhost:3000",
+  "http://localhost:3001",
   "https://api-betlearn-wine.vercel.app", 
   "https://betlearn-admin.vercel.app",
   "https://betlearnapp.vercel.app",
