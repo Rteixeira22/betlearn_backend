@@ -3,11 +3,11 @@ name: Get_Championships_Daily
 
 # Ocasioes em que o workflow comeca a trabalhar
 on:
-  push: # Em qualquer commit para ca feito na Pipeline
-    branches:
-      - Pipeline so para a construcao #
-  #schedule:
-  # - cron: "0 23 * * *" # Todos os dias.
+  # push: # Em qualquer commit para ca feito na Pipeline
+  #   branches:
+  #     - Pipeline so para a construcao #
+  schedule:
+    - cron: "0 23 * * *" # Todos os dias.
 
 # Jobs a ser executados
 jobs:
