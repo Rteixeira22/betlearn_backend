@@ -254,10 +254,10 @@ export class QuestionnaireController {
     }
   }
 
-  // Update a specific questionnaire response
+  // Update a specific questionnaire by user ID
   async updateQuestionnaireResponse(req: Request<{ id: string }, {}, UpdateQuestionnaireRequest>, res: Response): Promise<void> {
     try {
-      const userId: number = parseInt(req.params.id);
+      const userId = parseInt(req.params.id);
       const {
         budget,
         verification,
@@ -275,14 +275,18 @@ export class QuestionnaireController {
       }
 
       // Verificar se o questionário existe
-      const existingResponse = await prisma.questionnaire_Response.findUnique({
+      const existingResponse = await prisma.questionnaire_Response.findMany({
         where: { ref_id_user: userId },
       });
+
 
       if (!existingResponse) {
         ResponseHelper.notFound(res, `Questionário com ID ${userId} não encontrado`);
         return;
       }
+
+      const questionnare_Id = existingResponse[0].id_questionnaire_response ;
+
 
       // Validações para campos que estão sendo atualizados
       if (verification !== undefined && typeof verification !== 'boolean') {
@@ -292,7 +296,7 @@ export class QuestionnaireController {
 
     
       const updatedResponseRaw = await prisma.questionnaire_Response.update({
-        where: { ref_id_user: userId },
+        where: { id_questionnaire_response: questionnare_Id },
         data: {
           budget,
           verification,
