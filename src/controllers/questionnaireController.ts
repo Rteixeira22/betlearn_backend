@@ -321,11 +321,6 @@ export class QuestionnaireController {
         return;
       }
 
-      if (budget !== undefined && (typeof budget !== 'number' || budget < 0)) {
-        ResponseHelper.badRequest(res, "Orçamento deve ser um número positivo");
-        return;
-      }
-
       if (salary !== undefined && (typeof salary !== 'number' || salary < 0)) {
         ResponseHelper.badRequest(res, "Salário deve ser um número positivo");
         return;

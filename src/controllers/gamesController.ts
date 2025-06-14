@@ -33,10 +33,10 @@ export class GamesController {
         game_state: game.game_state!
       }));
 
-      ResponseHelper.success(res, games, "Games retrieved successfully");
+      ResponseHelper.success(res, games, "Jogos obtidos com sucesso");
     } catch (error) {
       console.error("Error fetching games:", error);
-      ResponseHelper.serverError(res, "Failed to fetch games");
+      ResponseHelper.serverError(res, "Falha ao obter jogos");
     }
   }
 
@@ -46,7 +46,7 @@ export class GamesController {
       const gameId: number = parseInt(req.params.id);
 
       if (isNaN(gameId) || gameId <= 0) {
-        ResponseHelper.badRequest(res, "Invalid game ID format");
+        ResponseHelper.badRequest(res, "Formato de ID de jogo inválido");
         return;
       }
 
@@ -55,7 +55,7 @@ export class GamesController {
       });
 
       if (!gameRaw) {
-        ResponseHelper.notFound(res, `Game with ID ${gameId} not found`);
+        ResponseHelper.notFound(res, `Jogo com ID ${gameId} não encontrado`);
         return;
       }
 
@@ -72,10 +72,10 @@ export class GamesController {
         game_state: gameRaw.game_state!
       };
 
-      ResponseHelper.success(res, game, "Game retrieved successfully");
+      ResponseHelper.success(res, game, "Jogo obtido com sucesso");
     } catch (error) {
       console.error("Error fetching game:", error);
-      ResponseHelper.serverError(res, "Failed to fetch game");
+      ResponseHelper.serverError(res, "Falha ao obter jogo");
     }
   }
 
@@ -96,45 +96,45 @@ export class GamesController {
 
       // Validate required fields
       if (!local_team || typeof local_team !== 'string' || local_team.trim().length === 0) {
-        ResponseHelper.badRequest(res, "Local team is required and must be a non-empty string");
+        ResponseHelper.badRequest(res, "Equipa local é obrigatória e deve ser uma string não vazia");
         return;
       }
 
       if (!visitor_team || typeof visitor_team !== 'string' || visitor_team.trim().length === 0) {
-        ResponseHelper.badRequest(res, "Visitor team is required and must be a non-empty string");
+        ResponseHelper.badRequest(res, "Equipa visitante é obrigatória e deve ser uma string não vazia");
         return;
       }
 
       if (!schedule) {
-        ResponseHelper.badRequest(res, "Schedule is required");
+        ResponseHelper.badRequest(res, "Horário é obrigatório");
         return;
       }
 
       // Validate schedule format
       const scheduleDate = new Date(schedule);
       if (isNaN(scheduleDate.getTime())) {
-        ResponseHelper.badRequest(res, "Invalid schedule date format");
+        ResponseHelper.badRequest(res, "Formato de data de horário inválido");
         return;
       }
 
       // Validate optional numeric fields
       if (odd !== undefined && (typeof odd !== 'number' || odd < 0)) {
-        ResponseHelper.badRequest(res, "Odd must be a positive number");
+        ResponseHelper.badRequest(res, "Odd deve ser um número positivo");
         return;
       }
 
       if (goals_local_team !== undefined && (typeof goals_local_team !== 'number' || goals_local_team < 0)) {
-        ResponseHelper.badRequest(res, "Goals local team must be a non-negative number");
+        ResponseHelper.badRequest(res, "Golos da equipa local devem ser um número não negativo");
         return;
       }
 
       if (goals_visitor_team !== undefined && (typeof goals_visitor_team !== 'number' || goals_visitor_team < 0)) {
-        ResponseHelper.badRequest(res, "Goals visitor team must be a non-negative number");
+        ResponseHelper.badRequest(res, "Golos da equipa visitante devem ser um número não negativo");
         return;
       }
 
       if (game_state !== undefined && (typeof game_state !== 'number' || (game_state !== 0 && game_state !== 1))) {
-        ResponseHelper.badRequest(res, "Game state must be 0 (active) or 1 (finished)");
+        ResponseHelper.badRequest(res, "Estado do jogo deve ser 0 (ativo) ou 1 (terminado)");
         return;
       }
 
@@ -165,10 +165,10 @@ export class GamesController {
         game_state: newGameRaw.game_state!
       };
 
-      ResponseHelper.created(res, newGame, "Game created successfully");
+      ResponseHelper.created(res, newGame, "Jogo criado com sucesso");
     } catch (error) {
       console.error("Error creating game:", error);
-      ResponseHelper.serverError(res, "Failed to create game");
+      ResponseHelper.serverError(res, "Falha ao criar jogo");
     }
   }
 
@@ -179,12 +179,12 @@ export class GamesController {
       const betId: number = parseInt(req.params.betId);
 
       if (isNaN(gameId) || gameId <= 0) {
-        ResponseHelper.badRequest(res, "Invalid game ID format");
+        ResponseHelper.badRequest(res, "Formato de ID de jogo inválido");
         return;
       }
 
       if (isNaN(betId) || betId <= 0) {
-        ResponseHelper.badRequest(res, "Invalid bet ID format");
+        ResponseHelper.badRequest(res, "Formato de ID de aposta inválido");
         return;
       }
 
@@ -194,7 +194,7 @@ export class GamesController {
       });
 
       if (!existingGame) {
-        ResponseHelper.notFound(res, `Game with ID ${gameId} not found`);
+        ResponseHelper.notFound(res, `Jogo com ID ${gameId} não encontrado`);
         return;
       }
 
@@ -204,7 +204,7 @@ export class GamesController {
       });
 
       if (!existingBet) {
-        ResponseHelper.notFound(res, `Bet with ID ${betId} not found`);
+        ResponseHelper.notFound(res, `Aposta com ID ${betId} não encontrada`);
         return;
       }
 
@@ -244,7 +244,7 @@ export class GamesController {
           unfinished_games_count: 0
         };
 
-        ResponseHelper.success(res, response, "Game and bet state updated successfully");
+        ResponseHelper.success(res, response, "Estado do jogo e aposta atualizados com sucesso");
         return;
       }
 
@@ -290,7 +290,7 @@ export class GamesController {
             unfinished_games_count: 0
           };
 
-          ResponseHelper.success(res, response, "Game and bet state updated successfully");
+          ResponseHelper.success(res, response, "Estado do jogo e aposta atualizados com sucesso");
         } else {
           // Multiple unfinished games remain
           const updatedExactGame = await prisma.games.update({
@@ -315,12 +315,12 @@ export class GamesController {
             unfinished_games_count: betsWithUnfinishedGames - 1
           };
 
-          ResponseHelper.success(res, response, "Game state updated successfully");
+          ResponseHelper.success(res, response, "Estado do jogo atualizado com sucesso");
         }
       }
     } catch (error) {
       console.error("Error updating game state:", error);
-      ResponseHelper.serverError(res, "Failed to update game state");
+      ResponseHelper.serverError(res, "Falha ao atualizar estado do jogo");
     }
   }
 
@@ -330,7 +330,7 @@ export class GamesController {
       const gameId: number = parseInt(req.params.id);
 
       if (isNaN(gameId) || gameId <= 0) {
-        ResponseHelper.badRequest(res, "Invalid game ID format");
+        ResponseHelper.badRequest(res, "Formato de ID de jogo inválido");
         return;
       }
 
@@ -339,7 +339,7 @@ export class GamesController {
       });
 
       if (!existingGame) {
-        ResponseHelper.notFound(res, `Game with ID ${gameId} not found`);
+        ResponseHelper.notFound(res, `Jogo com ID ${gameId} não encontrado`);
         return;
       }
 
@@ -347,10 +347,10 @@ export class GamesController {
         where: { id_game: gameId },
       });
 
-      ResponseHelper.success(res, null, "Game deleted successfully");
+      ResponseHelper.success(res, null, "Jogo eliminado com sucesso");
     } catch (error) {
       console.error("Error deleting game:", error);
-      ResponseHelper.serverError(res, "Failed to delete game");
+      ResponseHelper.serverError(res, "Falha ao eliminar jogo");
     }
   }
 
@@ -397,7 +397,7 @@ export class GamesController {
       });
       
       if (bettedGames.length === 0) {
-        ResponseHelper.notFound(res, "No bets found for today");
+        ResponseHelper.notFound(res, "Nenhuma aposta encontrada para hoje");
         return;
       }
 
@@ -419,7 +419,7 @@ export class GamesController {
       const mostBettedGame = gamesWithCounts[0];
 
       if (!mostBettedGame) {
-        ResponseHelper.notFound(res, "No bets found for today");
+        ResponseHelper.notFound(res, "Nenhuma aposta encontrada para hoje");
         return;
       }
 
@@ -440,10 +440,10 @@ export class GamesController {
         championship_json: mostBettedGame.championship_json
       };
 
-      ResponseHelper.success(res, response, "Most betted game of the day retrieved successfully");
+      ResponseHelper.success(res, response, "Jogo mais apostado do dia obtido com sucesso");
     } catch (error) {
       console.error("Error fetching most betted game:", error);
-      ResponseHelper.serverError(res, "Failed to fetch most betted game of the day");
+      ResponseHelper.serverError(res, "Falha ao obter jogo mais apostado do dia");
     }
   }
 }
