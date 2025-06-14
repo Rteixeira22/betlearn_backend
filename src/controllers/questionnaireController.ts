@@ -249,11 +249,6 @@ export class QuestionnaireController {
         return;
       }
 
-      if (debt_monthly !== undefined && (typeof debt_monthly !== 'number' || debt_monthly < 0)) {
-        ResponseHelper.badRequest(res, "Dívida mensal deve ser um número positivo");
-        return;
-      }
-
       if (income_source !== undefined && typeof income_source !== 'string') {
         ResponseHelper.badRequest(res, "Fonte de rendimento deve ser uma string");
         return;
@@ -338,11 +333,6 @@ export class QuestionnaireController {
 
       if (debt !== undefined && (typeof debt !== 'number' || debt < 0)) {
         ResponseHelper.badRequest(res, "Dívida deve ser um número positivo");
-        return;
-      }
-
-      if (debt_monthly !== undefined && (typeof debt_monthly !== 'number' || debt_monthly < 0)) {
-        ResponseHelper.badRequest(res, "Dívida mensal deve ser um número positivo");
         return;
       }
 
