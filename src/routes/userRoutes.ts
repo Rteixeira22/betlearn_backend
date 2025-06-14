@@ -656,7 +656,7 @@ router.get("/email/:email",  requireAPIKey, userController.getUserByEmail);
 
 // User Profile Update Routes
 
-router.patch("/:id/password", requireAPIKey, verifyJWT, userController.updateUserPassword);
+router.patch("/:id/password", requireAPIKey, userController.updateUserPassword);
 router.patch("/:id/profile", requireAPIKey, verifyJWT, userController.updateUserProfile);
 //esta como string
 router.patch("/:id/money", userController.updateUserMoney);

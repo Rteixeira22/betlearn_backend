@@ -997,7 +997,7 @@ router.post("/full",  requireAPIKey, verifyJWT, authorize('admin'), challengeCon
 
 //create user has challenge
 router.post(
-  "/:id_user/:id_challenge",  requireAPIKey, verifyJWT,
+  "/:id_user/:id_challenge",  requireAPIKey,
   challengeController.createUserHasChallenges
 );
 

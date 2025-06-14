@@ -11,6 +11,8 @@ const requireAPIKey = (req: AuthenticatedRequest, res: Response, next: NextFunct
   const providedKey: string | undefined =
     req.headers['apikey'] as string || req.query.apikey as string;
 
+
+
   const userKey = process.env.API_KEY_USERS;
   const adminKey = process.env.API_KEY_ADMINS;
 

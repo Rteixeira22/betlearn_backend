@@ -12,7 +12,7 @@ const UpdateMoney = async () => {
     }
 
     console.log("Users fetched successfully.");
-    const users = usersResponse.data;
+    const users = usersResponse.data.data;
     
     console.log("Updating users money...");
     const updatePromises = users.map(async (user: any) => {

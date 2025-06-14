@@ -80,10 +80,10 @@ export class ChallengesController {
         },
       };
 
-      ResponseHelper.success(res, response, "Challenges retrieved successfully");
+      ResponseHelper.success(res, response, "Desafios obtidos com sucesso");
     } catch (error) {
       console.error("Error fetching challenges:", error);
-      ResponseHelper.serverError(res, "Failed to fetch challenges");
+      ResponseHelper.serverError(res, "Falha ao obter desafios");
     }
   }
 
@@ -93,7 +93,7 @@ export class ChallengesController {
       const challengeId = parseInt(req.params.id);
       
       if (isNaN(challengeId) || challengeId <= 0) {
-        ResponseHelper.badRequest(res, "Invalid challenge ID format");
+        ResponseHelper.badRequest(res, "Formato de ID do desafio inválido");
         return;
       }
 
@@ -112,14 +112,14 @@ export class ChallengesController {
       });
 
       if (!challenge) {
-        ResponseHelper.notFound(res, `Challenge with ID ${challengeId} not found`);
+        ResponseHelper.notFound(res, `Desafio com ID ${challengeId} não encontrado`);
         return;
       }
 
-      ResponseHelper.success(res, challenge, "Challenge retrieved successfully");
+      ResponseHelper.success(res, challenge, "Desafio obtido com sucesso");
     } catch (error) {
       console.error("Error fetching challenge:", error);
-      ResponseHelper.serverError(res, "Failed to fetch challenge");
+      ResponseHelper.serverError(res, "Falha ao obter desafio");
     }
   }
 
@@ -129,10 +129,10 @@ export class ChallengesController {
       const count = await prisma.challenges.count();
       const response: ChallengeCountResponse = { count };
       
-      ResponseHelper.success(res, response, "Challenge count retrieved successfully");
+      ResponseHelper.success(res, response, "Contagem de desafios obtida com sucesso");
     } catch (error) {
       console.error("Error counting challenges:", error);
-      ResponseHelper.serverError(res, "Failed to count challenges");
+      ResponseHelper.serverError(res, "Falha ao contar desafios");
     }
   }
 
@@ -143,12 +143,12 @@ export class ChallengesController {
 
       // Validation
       if (!number || !name || !short_description || !long_description || !image) {
-        ResponseHelper.badRequest(res, "All fields are required: number, name, short_description, long_description, image");
+        ResponseHelper.badRequest(res, "Todos os campos são obrigatórios: number, name, short_description, long_description, image");
         return;
       }
 
       if (typeof number !== 'number' || number <= 0) {
-        ResponseHelper.badRequest(res, "Number must be a positive integer");
+        ResponseHelper.badRequest(res, "O número deve ser um número inteiro positivo");
         return;
       }
 
@@ -158,9 +158,11 @@ export class ChallengesController {
       });
 
       if (existingChallenge) {
-        ResponseHelper.conflict(res, `Challenge with number ${number} already exists`);
+        ResponseHelper.conflict(res, `Desafio com número ${number} já existe`);
         return;
       }
+
+      console.log("Creating challenge:")
 
       const newChallenge = await prisma.challenges.create({
         data: {
@@ -172,10 +174,10 @@ export class ChallengesController {
         },
       });
 
-      ResponseHelper.created(res, newChallenge, "Challenge created successfully");
+      ResponseHelper.created(res, newChallenge, "Desafio criado com sucesso");
     } catch (error) {
       console.error("Error creating challenge:", error);
-      ResponseHelper.serverError(res, "Failed to create challenge");
+      ResponseHelper.serverError(res, "Falha ao criar desafio");
     }
   }
 
@@ -185,7 +187,7 @@ export class ChallengesController {
       const challengeId = parseInt(req.params.id);
       
       if (isNaN(challengeId) || challengeId <= 0) {
-        ResponseHelper.badRequest(res, "Invalid challenge ID format");
+        ResponseHelper.badRequest(res, "Formato de ID do desafio inválido");
         return;
       }
 
@@ -199,10 +201,10 @@ export class ChallengesController {
         },
       });
 
-      ResponseHelper.success(res, steps, "Challenge steps retrieved successfully");
+      ResponseHelper.success(res, steps, "Passos do desafio obtidos com sucesso");
     } catch (error) {
       console.error("Error fetching steps:", error);
-      ResponseHelper.serverError(res, "Failed to fetch steps");
+      ResponseHelper.serverError(res, "Falha ao obter passos");
     }
   }
 
@@ -211,10 +213,8 @@ export class ChallengesController {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
 
-
       const tomorrow = new Date(today);
       tomorrow.setDate(tomorrow.getDate() + 1);
-
 
       const count = await prisma.user_has_Challenges.count({
         where: {
@@ -226,10 +226,10 @@ export class ChallengesController {
       });
 
       const response: ChallengeCountResponse = { count };
-      ResponseHelper.success(res, response, "Today's challenges count retrieved successfully");
+      ResponseHelper.success(res, response, "Contagem de desafios de hoje obtida com sucesso");
     } catch (error) {
       console.error("Error fetching today's challenges:", error);
-      ResponseHelper.serverError(res, "Failed to fetch today's challenges");
+      ResponseHelper.serverError(res, "Falha ao obter desafios de hoje");
     }
   }
 
@@ -265,10 +265,10 @@ export class ChallengesController {
 
       if (completedChallenges.length === 0) {
         const response: MostCompletedChallengeResponse = {
-          message: "No challenges were completed today",
+          message: "Nenhum desafio foi completado hoje",
           mostCompleted: null,
         };
-        ResponseHelper.success(res, response, "No completed challenges found for today");
+        ResponseHelper.success(res, response, "Nenhum desafio completado encontrado para hoje");
         return;
       }
 
@@ -287,10 +287,10 @@ export class ChallengesController {
         date: today.toISOString().split("T")[0],
       };
 
-      ResponseHelper.success(res, response, "Most completed challenge retrieved successfully");
+      ResponseHelper.success(res, response, "Desafio mais completado obtido com sucesso");
     } catch (error) {
       console.error("Error fetching most completed challenge:", error);
-      ResponseHelper.serverError(res, "Failed to fetch most completed challenge today");
+      ResponseHelper.serverError(res, "Falha ao obter o desafio mais completado hoje");
     }
   }
 
@@ -302,12 +302,12 @@ export class ChallengesController {
       const tokenUserId = parseInt(req.userId!);
 
       if (isNaN(requestedId) || requestedId <= 0) {
-        ResponseHelper.badRequest(res, "Invalid user ID format");
+        ResponseHelper.badRequest(res, "Formato de ID do utilizador inválido");
         return;
       }
 
       if (role !== 'admin' && requestedId !== tokenUserId) {
-        ResponseHelper.forbidden(res, "Access denied");
+        ResponseHelper.forbidden(res, "Acesso negado");
         return;
       }
 
@@ -321,10 +321,10 @@ export class ChallengesController {
         },
       });
 
-      ResponseHelper.success(res, challenges, "User challenges retrieved successfully");
+      ResponseHelper.success(res, challenges, "Desafios do utilizador obtidos com sucesso");
     } catch (error) {
       console.error("Error fetching user challenges:", error);
-      ResponseHelper.serverError(res, "Failed to fetch challenges");
+      ResponseHelper.serverError(res, "Falha ao obter desafios");
     }
   }
 
@@ -336,12 +336,12 @@ export class ChallengesController {
       const tokenUserId = parseInt(req.userId!);
 
       if (isNaN(requestedId) || requestedId <= 0) {
-        ResponseHelper.badRequest(res, "Invalid user ID format");
+        ResponseHelper.badRequest(res, "Formato de ID do utilizador inválido");
         return;
       }
 
       if (role !== 'admin' && requestedId !== tokenUserId) {
-        ResponseHelper.forbidden(res, "Access denied");
+        ResponseHelper.forbidden(res, "Acesso negado");
         return;
       }
 
@@ -355,10 +355,10 @@ export class ChallengesController {
         },
       });
 
-      ResponseHelper.success(res, challenges, "Completed challenges retrieved successfully");
+      ResponseHelper.success(res, challenges, "Desafios completados obtidos com sucesso");
     } catch (error) {
       console.error("Error fetching completed challenges:", error);
-      ResponseHelper.serverError(res, "Failed to fetch challenges");
+      ResponseHelper.serverError(res, "Falha ao obter desafios");
     }
   }
 
@@ -369,7 +369,7 @@ export class ChallengesController {
       const { name, short_description, long_description, image }: UpdateChallengeRequest = req.body;
 
       if (isNaN(challengeId) || challengeId <= 0) {
-        ResponseHelper.badRequest(res, "Invalid challenge ID format");
+        ResponseHelper.badRequest(res, "Formato de ID do desafio inválido");
         return;
       }
 
@@ -379,7 +379,7 @@ export class ChallengesController {
       });
 
       if (!existingChallenge) {
-        ResponseHelper.notFound(res, `Challenge with ID ${challengeId} not found`);
+        ResponseHelper.notFound(res, `Desafio com ID ${challengeId} não encontrado`);
         return;
       }
 
@@ -393,10 +393,10 @@ export class ChallengesController {
         },
       });
 
-      ResponseHelper.success(res, updatedChallenge, "Challenge updated successfully");
+      ResponseHelper.success(res, updatedChallenge, "Desafio atualizado com sucesso");
     } catch (error) {
       console.error("Error updating challenge:", error);
-      ResponseHelper.serverError(res, "Failed to update challenge");
+      ResponseHelper.serverError(res, "Falha ao atualizar desafio");
     }
   }
 
@@ -406,7 +406,7 @@ export class ChallengesController {
       const challengeId = parseInt(req.params.id);
 
       if (isNaN(challengeId) || challengeId <= 0) {
-        ResponseHelper.badRequest(res, "Invalid challenge ID format");
+        ResponseHelper.badRequest(res, "Formato de ID do desafio inválido");
         return;
       }
 
@@ -416,7 +416,7 @@ export class ChallengesController {
       });
 
       if (!existingChallenge) {
-        ResponseHelper.notFound(res, `Challenge with ID ${challengeId} not found`);
+        ResponseHelper.notFound(res, `Desafio com ID ${challengeId} não encontrado`);
         return;
       }
 
@@ -424,10 +424,10 @@ export class ChallengesController {
         where: { id_challenge: challengeId },
       });
 
-      ResponseHelper.noContent(res, "Challenge deleted successfully");
+      ResponseHelper.noContent(res, "Desafio eliminado com sucesso");
     } catch (error) {
       console.error("Error deleting challenge:", error);
-      ResponseHelper.serverError(res, "Failed to delete challenge");
+      ResponseHelper.serverError(res, "Falha ao eliminar desafio");
     }
   }
 
@@ -438,7 +438,7 @@ export class ChallengesController {
 
       // Ensure all required fields are provided
       if (completed === undefined || blocked === undefined || detail_seen === undefined) {
-        ResponseHelper.badRequest(res, "Missing required fields: completed, blocked, and detail_seen are required");
+        ResponseHelper.badRequest(res, "Campos obrigatórios em falta: completed, blocked, e detail_seen são obrigatórios");
         return;
       }
 
@@ -447,7 +447,7 @@ export class ChallengesController {
       const challengeId = parseInt(req.params.id_challenge);
 
       if (isNaN(userId) || isNaN(challengeId)) {
-        ResponseHelper.badRequest(res, "Invalid user ID or challenge ID");
+        ResponseHelper.badRequest(res, "ID do utilizador ou ID do desafio inválido");
         return;
       }
 
@@ -461,12 +461,12 @@ export class ChallengesController {
       });
 
       if (!userExists) {
-        ResponseHelper.notFound(res, "User not found");
+        ResponseHelper.notFound(res, "Utilizador não encontrado");
         return;
       }
 
       if (!challengeExists) {
-        ResponseHelper.notFound(res, "Challenge not found");
+        ResponseHelper.notFound(res, "Desafio não encontrado");
         return;
       }
 
@@ -500,17 +500,17 @@ export class ChallengesController {
 
       await Promise.all(stepsToCreate);
 
-      ResponseHelper.created(res, newUserHasChallenge, "User challenge relationship created successfully");
+      ResponseHelper.created(res, newUserHasChallenge, "Relação utilizador-desafio criada com sucesso");
     } catch (error) {
       console.error("Error details:", error);
 
       // Check for specific error types
       if ((error as any).code === "P2002") {
-        ResponseHelper.conflict(res, "This user already has this challenge assigned");
+        ResponseHelper.conflict(res, "Este utilizador já tem este desafio atribuído");
         return;
       }
 
-      ResponseHelper.serverError(res, "Failed to create user has challenge");
+      ResponseHelper.serverError(res, "Falha ao criar relação utilizador-desafio");
     }
   }
 
@@ -522,19 +522,19 @@ export class ChallengesController {
       const tokenUserId = parseInt(req.userId!);
 
       if (isNaN(requestedId) || requestedId <= 0) {
-        ResponseHelper.badRequest(res, "Invalid user ID format");
+        ResponseHelper.badRequest(res, "Formato de ID do utilizador inválido");
         return;
       }
 
       if (role !== 'admin' && requestedId !== tokenUserId) {
-        ResponseHelper.forbidden(res, "Access denied");
+        ResponseHelper.forbidden(res, "Acesso negado");
         return;
       }
 
       const currentChallengeId = parseInt(req.params.id_challenge);
 
       if (isNaN(currentChallengeId) || currentChallengeId <= 0) {
-        ResponseHelper.badRequest(res, "Invalid challenge ID format");
+        ResponseHelper.badRequest(res, "Formato de ID do desafio inválido");
         return;
       }
 
@@ -543,7 +543,7 @@ export class ChallengesController {
       });
 
       if (!currentChallenge) {
-        ResponseHelper.notFound(res, "Current challenge not found");
+        ResponseHelper.notFound(res, "Desafio atual não encontrado");
         return;
       }
 
@@ -559,7 +559,7 @@ export class ChallengesController {
       });
 
       if (!nextChallenge) {
-        ResponseHelper.notFound(res, "No next challenge found");
+        ResponseHelper.notFound(res, "Próximo desafio não encontrado");
         return;
       }
 
@@ -586,7 +586,7 @@ export class ChallengesController {
           },
         });
 
-        ResponseHelper.success(res, updatedUserHasChallenge, "Next challenge unblocked successfully");
+        ResponseHelper.success(res, updatedUserHasChallenge, "Próximo desafio desbloqueado com sucesso");
         return;
       } else {
         // Create new relation
@@ -616,12 +616,12 @@ export class ChallengesController {
           skipDuplicates: true,
         });
 
-        ResponseHelper.created(res, newUserHasChallenge, "Next challenge created and unblocked successfully");
+        ResponseHelper.created(res, newUserHasChallenge, "Próximo desafio criado e desbloqueado com sucesso");
         return;
       }
     } catch (error) {
       console.error("Error details:", error);
-      ResponseHelper.serverError(res, "Failed to unblock next challenge");
+      ResponseHelper.serverError(res, "Falha ao desbloquear próximo desafio");
     }
   }
 
@@ -633,12 +633,12 @@ export class ChallengesController {
       const tokenUserId = parseInt(req.userId!);
 
       if (isNaN(requestedId) || requestedId <= 0) {
-        ResponseHelper.badRequest(res, "Invalid user ID format");
+        ResponseHelper.badRequest(res, "Formato de ID do utilizador inválido");
         return;
       }
 
       if (role !== 'admin' && requestedId !== tokenUserId) {
-        ResponseHelper.forbidden(res, "Access denied");
+        ResponseHelper.forbidden(res, "Acesso negado");
         return;
       }
       
@@ -646,12 +646,12 @@ export class ChallengesController {
       const { detail_seen } = req.body;
 
       if (isNaN(challengeId) || challengeId <= 0) {
-        ResponseHelper.badRequest(res, "Invalid challenge ID format");
+        ResponseHelper.badRequest(res, "Formato de ID do desafio inválido");
         return;
       }
 
       if (typeof detail_seen !== 'boolean') {
-        ResponseHelper.badRequest(res, "detail_seen must be a boolean value");
+        ResponseHelper.badRequest(res, "detail_seen deve ser um valor booleano");
         return;
       }
 
@@ -667,10 +667,10 @@ export class ChallengesController {
         },
       });
 
-      ResponseHelper.success(res, updatedUserHasChallenge, "Challenge detail seen status updated successfully");
+      ResponseHelper.success(res, updatedUserHasChallenge, "Estado de visualização de detalhes do desafio atualizado com sucesso");
     } catch (error) {
       console.error("Error updating challenge detail seen:", error);
-      ResponseHelper.serverError(res, "Failed to update user has challenge");
+      ResponseHelper.serverError(res, "Falha ao atualizar relação utilizador-desafio");
     }
   }
 
@@ -682,12 +682,12 @@ export class ChallengesController {
       const tokenUserId = parseInt(req.userId!);
 
       if (isNaN(requestedId) || requestedId <= 0) {
-        ResponseHelper.badRequest(res, "Invalid user ID format");
+        ResponseHelper.badRequest(res, "Formato de ID do utilizador inválido");
         return;
       }
 
       if (role !== 'admin' && requestedId !== tokenUserId) {
-        ResponseHelper.forbidden(res, "Access denied");
+        ResponseHelper.forbidden(res, "Acesso negado");
         return;
       }
       
@@ -696,7 +696,7 @@ export class ChallengesController {
 
       // Verificação básica de IDs
       if (isNaN(requestedId) || isNaN(challengeId)) {
-        ResponseHelper.badRequest(res, "Invalid user or challenge ID");
+        ResponseHelper.badRequest(res, "ID do utilizador ou ID do desafio inválido");
         return;
       }
 
@@ -706,7 +706,7 @@ export class ChallengesController {
         progress_percentage < 0 ||
         progress_percentage > 100
       ) {
-        ResponseHelper.badRequest(res, "Invalid progress percentage - must be a number between 0 and 100");
+        ResponseHelper.badRequest(res, "Percentagem de progresso inválida - deve ser um número entre 0 e 100");
         return;
       }
 
@@ -747,10 +747,10 @@ export class ChallengesController {
         }
       }
 
-      ResponseHelper.success(res, updatedUserHasChallenge, "Challenge progress updated successfully");
+      ResponseHelper.success(res, updatedUserHasChallenge, "Progresso do desafio atualizado com sucesso");
     } catch (error) {
       console.error("Error updating challenge progress:", error);
-      ResponseHelper.serverError(res, "Failed to update user challenge progress");
+      ResponseHelper.serverError(res, "Falha ao atualizar progresso do desafio do utilizador");
     }
   }
 
@@ -762,12 +762,12 @@ export class ChallengesController {
       const userId = parseInt(id_user);
 
       if (isNaN(userId) || userId <= 0) {
-        ResponseHelper.badRequest(res, "Invalid user ID format");
+        ResponseHelper.badRequest(res, "Formato de ID de utilizador inválido");
         return;
       }
 
       if (role !== 'admin' && userId !== tokenUserId) {
-        ResponseHelper.forbidden(res, "Access denied");
+        ResponseHelper.forbidden(res, "Acesso negado");
         return;
       }
       
@@ -776,12 +776,12 @@ export class ChallengesController {
       const stepId = parseInt(id_step);
 
       if (isNaN(challengeId) || isNaN(stepId)) {
-        ResponseHelper.badRequest(res, "Invalid challenge ID or step ID");
+        ResponseHelper.badRequest(res, "ID de desafio ou ID de passo inválido");
         return;
       }
 
       if (typeof state !== 'number' || (state !== 0 && state !== 1)) {
-        ResponseHelper.badRequest(res, "State must be 0 or 1");
+        ResponseHelper.badRequest(res, "O estado deve ser 0 ou 1");
         return;
       }
 
@@ -802,7 +802,7 @@ export class ChallengesController {
 
       if (!existingRecord) {
         debugLogs.push("Step record not found");
-        ResponseHelper.notFound(res, "Step not found");
+        ResponseHelper.notFound(res, "Passo não encontrado");
         return;
       }
 
@@ -813,13 +813,13 @@ export class ChallengesController {
       if (existingRecord.state === state) {
         debugLogs.push("State is already up to date");
         const response: StepUpdateResponse = {
-          message: "Step already updated",
+          message: "Passo já atualizado",
           progress_percentage: 0,
           updatedStep: existingRecord,
           total_steps: 0,
           debug_logs: debugLogs,
         };
-        ResponseHelper.success(res, response, "Step already updated");
+        ResponseHelper.success(res, response, "Passo já atualizado");
         return;
       }
 
@@ -897,17 +897,17 @@ export class ChallengesController {
       );
 
       const response: StepUpdateResponse = {
-        message: "Step updated and progress recalculated",
+        message: "Passo atualizado e progresso recalculado",
         progress_percentage: stepPercentage,
         updatedStep,
         total_steps: totalSteps,
         debug_logs: debugLogs,
       };
 
-      ResponseHelper.success(res, response, "Step updated and progress recalculated successfully");
+      ResponseHelper.success(res, response, "Passo atualizado e progresso recalculado com sucesso");
     } catch (error) {
       console.error("Error:", error);
-      ResponseHelper.serverError(res, `Internal server error: ${error instanceof Error ? error.message : "Unknown error"}`);
+      ResponseHelper.serverError(res, `Erro interno do servidor: ${error instanceof Error ? error.message : "Erro desconhecido"}`);
     }
   }
 
@@ -920,12 +920,12 @@ export class ChallengesController {
       const tokenUserId = parseInt(req.userId!);
 
       if (isNaN(requestedId) || requestedId <= 0) {
-        ResponseHelper.badRequest(res, "Invalid user ID format");
+        ResponseHelper.badRequest(res, "Formato de ID de utilizador inválido");
         return;
       }
 
       if (role !== 'admin' && requestedId !== tokenUserId) {
-        ResponseHelper.forbidden(res, "Access denied");
+        ResponseHelper.forbidden(res, "Acesso negado");
         return;
       }
 
@@ -947,7 +947,7 @@ export class ChallengesController {
       });
 
       if (!challengeInProgress) {
-        ResponseHelper.notFound(res, "No challenge in progress found for this user");
+        ResponseHelper.notFound(res, "Nenhum desafio em progresso encontrado para este utilizador");
         return;
       }
 
@@ -982,35 +982,41 @@ export class ChallengesController {
         steps: steps,
       };
 
-      ResponseHelper.success(res, response, "Challenge in progress retrieved successfully");
+      ResponseHelper.success(res, response, "Desafio em progresso obtido com sucesso");
     } catch (error) {
       console.error("Error fetching challenge in progress:", error);
-      ResponseHelper.serverError(res, "Failed to fetch challenge in progress");
+      ResponseHelper.serverError(res, "Falha ao obter desafio em progresso");
     }
   }
 
    async createFullChallenge(req: Request<{}, {}, CreateFullChallengeRequest>, res: Response): Promise<void> {
     try {
+
+
       const { challenge, steps }: CreateFullChallengeRequest = req.body;
 
       // Validation
       if (!challenge || !steps || !Array.isArray(steps)) {
-        ResponseHelper.badRequest(res, "Invalid request: challenge and steps are required");
+        ResponseHelper.badRequest(res, "Pedido inválido: desafio e passos são obrigatórios");
         return;
       }
 
+      if( !challenge.image){
+        challenge.image = 'https://cdn-icons-png.flaticon.com/512/2583/2583319.png';
+      }
+
       if (!challenge.number || !challenge.name || !challenge.short_description || !challenge.long_description || !challenge.image) {
-        ResponseHelper.badRequest(res, "All challenge fields are required: number, name, short_description, long_description, image");
+        ResponseHelper.badRequest(res, "Todos os campos do desafio são obrigatórios: número, nome, descrição curta, descrição longa, imagem");
         return;
       }
 
       if (typeof challenge.number !== 'number' || challenge.number <= 0) {
-        ResponseHelper.badRequest(res, "Challenge number must be a positive integer");
+        ResponseHelper.badRequest(res, "O número do desafio deve ser um número inteiro positivo");
         return;
       }
 
       if (steps.length === 0) {
-        ResponseHelper.badRequest(res, "At least one step is required");
+        ResponseHelper.badRequest(res, "Pelo menos um passo é obrigatório");
         return;
       }
 
@@ -1020,9 +1026,11 @@ export class ChallengesController {
       });
 
       if (existingChallenge) {
-        ResponseHelper.conflict(res, `Challenge with number ${challenge.number} already exists`);
+        ResponseHelper.conflict(res, `Desafio com número ${challenge.number} já existe`);
         return;
       }
+
+      console.log("Creating challenge with steps:", challenge, steps);
 
       // Usar transação para garantir que todas as operações sejam bem-sucedidas
       const result = await prisma.$transaction(async (tx) => {
@@ -1048,7 +1056,7 @@ export class ChallengesController {
 
           // Validar tipo de step
           if (!['video', 'bet', 'view', 'questionnaire'].includes(stepData.type)) {
-            throw new Error(`Invalid step type: ${stepData.type}`);
+            throw new Error(`Tipo de passo inválido: ${stepData.type}`);
           }
 
           // Criar o tipo específico de step
@@ -1099,7 +1107,7 @@ export class ChallengesController {
             });
             stepQuestionnaireId = questionnaire.id_step_questionnaire;
           } else {
-            throw new Error(`Missing required data for step type: ${stepData.type}`);
+            throw new Error(`Dados obrigatórios em falta para o tipo de passo: ${stepData.type}`);
           }
 
           // Criar o registro na tabela Steps
@@ -1123,10 +1131,10 @@ export class ChallengesController {
         };
       });
 
-      ResponseHelper.created(res, result, "Challenge created successfully with all steps");
+      ResponseHelper.created(res, result, "Desafio criado com sucesso com todos os passos");
     } catch (error) {
       console.error("Error creating challenge:", error);
-      ResponseHelper.serverError(res, "Failed to create challenge with steps");
+      ResponseHelper.serverError(res, "Falha ao criar desafio com passos");
     }
   }
 }

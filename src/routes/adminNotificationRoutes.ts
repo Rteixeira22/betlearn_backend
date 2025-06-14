@@ -289,7 +289,7 @@ router.get("/", requireAPIKey, authorize('admin'), adminNotificationController.g
 
 router.get("/:id",  requireAPIKey, authorize('admin'), adminNotificationController.getNotificationById); // Route to get notification by ID
 
-router.post("/",  requireAPIKey, authorize('admin'), verifyJWT,  adminNotificationController.createNotification); // Route to create a new notification
+router.post("/",  requireAPIKey, authorize('admin'),  adminNotificationController.createNotification); // Route to create a new notification
 
 router.put("/:id",  requireAPIKey, authorize('admin'), verifyJWT,  adminNotificationController.updateNotification); // Route to update a notification by ID
 

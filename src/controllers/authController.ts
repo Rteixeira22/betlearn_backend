@@ -62,12 +62,14 @@ export class AuthController {
         { expiresIn: "12h" }
       );
 
+    
       // Retornar utilizador e token
       const { password: _, ...userWithoutPassword } = user;
       const loginResponse: LoginResponse = {
         user: userWithoutPassword,
         token,
       };
+
 
        ResponseHelper.success(res, loginResponse, "Login realizado com sucesso");
     } catch (error) {

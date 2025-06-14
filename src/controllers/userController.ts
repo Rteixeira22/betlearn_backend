@@ -461,15 +461,9 @@ export class UserController {
   async updateUserPassword(req: Request<{ id: string }, {}, UpdateUserPasswordRequest>, res: Response): Promise<void> {
     try {
       const requestedId = parseInt(req.params.id);
-      const tokenUserId = parseInt(req.userId!); 
 
       if (isNaN(requestedId) || requestedId <= 0) {
         ResponseHelper.badRequest(res, "Invalid user ID format");
-        return;
-      }
-
-      if (requestedId !== tokenUserId) {
-        ResponseHelper.forbidden(res, "Access denied");
         return;
       }
 
@@ -795,7 +789,7 @@ export class UserController {
         orderBy: { points: 'desc' }
       });
       const userPosition = leaderboard.findIndex(user => user.id_user === userId) + 1;
-      ResponseHelper.success(res, leaderboard, "Leaderboard retrieved successfully");
+      ResponseHelper.success(res, userPosition, "Leaderboard retrieved successfully");
 
     } catch (error) {
       ResponseHelper.serverError(res, "Failed to fetch user position in leaderboard");

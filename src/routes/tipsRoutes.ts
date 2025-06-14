@@ -223,10 +223,10 @@ import authorize from '../middleware/authorize';
 const router = express.Router();
 const tipsController = new TipsController();
 
-router.get("/active", requireAPIKey, verifyJWT, tipsController.getActiveTip); // Get active tip
+router.get("/active", requireAPIKey, tipsController.getActiveTip); // Get active tip
 
 // GET Tip Routes
-router.get("/", requireAPIKey, verifyJWT, tipsController.getTips); // Get all tips
+router.get("/", requireAPIKey, tipsController.getTips); // Get all tips
 router.get("/:id", requireAPIKey, verifyJWT, tipsController.getTipById); // Get tip by ID
 
 // POST Tip Routes

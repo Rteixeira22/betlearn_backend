@@ -16,13 +16,18 @@ export function verifyJWT(req: AuthenticatedRequest, res: Response, next: NextFu
   }
 
   const token = authHeader.split(' ')[1];
+
+  
   if (!token) {
     res.status(401).json({ error: 'Token mal formado' });
     return;
   }
 
+
   try {
+
     const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as JwtPayload;
+
 
     req.userId = decoded.userId;
     req.adminId = decoded.adminId; 
