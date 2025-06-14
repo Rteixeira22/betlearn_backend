@@ -960,7 +960,7 @@ const challengeController = new ChallengesController();
 router.get("/count", requireAPIKey, verifyJWT, challengeController.countChallenges);
 
 // Get all challenges
-router.get("/", requireAPIKey, verifyJWT, challengeController.getAllChallenges);
+router.get("/", requireAPIKey, challengeController.getAllChallenges);
 
 // Get Count of challenges today
 router.get("/count-today", requireAPIKey, verifyJWT, authorize('admin'), challengeController.getCountChallengesByDate);
