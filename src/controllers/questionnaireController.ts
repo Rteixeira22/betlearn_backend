@@ -228,32 +228,6 @@ export class QuestionnaireController {
         return;
       }
 
-
-      if (salary !== undefined && (typeof salary !== 'number' || salary < 0)) {
-        ResponseHelper.badRequest(res, "Salário deve ser um número positivo");
-        return;
-      }
-
-      if (expenses !== undefined && (typeof expenses !== 'number' || expenses < 0)) {
-        ResponseHelper.badRequest(res, "Despesas devem ser um número positivo");
-        return;
-      }
-
-      if (available_amount !== undefined && (typeof available_amount !== 'number' || available_amount < 0)) {
-        ResponseHelper.badRequest(res, "Montante disponível deve ser um número positivo");
-        return;
-      }
-
-      if (debt !== undefined && (typeof debt !== 'number' || debt < 0)) {
-        ResponseHelper.badRequest(res, "Dívida deve ser um número positivo");
-        return;
-      }
-
-      if (income_source !== undefined && typeof income_source !== 'string') {
-        ResponseHelper.badRequest(res, "Fonte de rendimento deve ser uma string");
-        return;
-      }
-
       const newResponseRaw = await prisma.questionnaire_Response.create({
         data: {
           budget,
@@ -316,31 +290,7 @@ export class QuestionnaireController {
         return;
       }
 
-      if (salary !== undefined && (typeof salary !== 'number' || salary < 0)) {
-        ResponseHelper.badRequest(res, "Salário deve ser um número positivo");
-        return;
-      }
-
-      if (expenses !== undefined && (typeof expenses !== 'number' || expenses < 0)) {
-        ResponseHelper.badRequest(res, "Despesas devem ser um número positivo");
-        return;
-      }
-
-      if (available_amount !== undefined && (typeof available_amount !== 'number' || available_amount < 0)) {
-        ResponseHelper.badRequest(res, "Montante disponível deve ser um número positivo");
-        return;
-      }
-
-      if (debt !== undefined && (typeof debt !== 'number' || debt < 0)) {
-        ResponseHelper.badRequest(res, "Dívida deve ser um número positivo");
-        return;
-      }
-
-      if (income_source !== undefined && typeof income_source !== 'string') {
-        ResponseHelper.badRequest(res, "Fonte de rendimento deve ser uma string");
-        return;
-      }
-
+    
       const updatedResponseRaw = await prisma.questionnaire_Response.update({
         where: { id_questionnaire_response: questionnaireId },
         data: {
