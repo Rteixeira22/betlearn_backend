@@ -257,7 +257,7 @@ export class QuestionnaireController {
   // Update a specific questionnaire response
   async updateQuestionnaireResponse(req: Request<{ id: string }, {}, UpdateQuestionnaireRequest>, res: Response): Promise<void> {
     try {
-      const questionnaireId: number = parseInt(req.params.id);
+      const userId: number = parseInt(req.params.id);
       const {
         budget,
         verification,
@@ -269,18 +269,18 @@ export class QuestionnaireController {
         income_source,
       }: UpdateQuestionnaireRequest = req.body;
 
-      if (isNaN(questionnaireId) || questionnaireId <= 0) {
+      if (isNaN(userId) || userId <= 0) {
         ResponseHelper.badRequest(res, "Formato de ID de questionário inválido");
         return;
       }
 
       // Verificar se o questionário existe
       const existingResponse = await prisma.questionnaire_Response.findUnique({
-        where: { id_questionnaire_response: questionnaireId },
+        where: { ref_id_user: userId },
       });
 
       if (!existingResponse) {
-        ResponseHelper.notFound(res, `Questionário com ID ${questionnaireId} não encontrado`);
+        ResponseHelper.notFound(res, `Questionário com ID ${userId} não encontrado`);
         return;
       }
 
@@ -292,7 +292,7 @@ export class QuestionnaireController {
 
     
       const updatedResponseRaw = await prisma.questionnaire_Response.update({
-        where: { id_questionnaire_response: questionnaireId },
+        where: { ref_id_user: userId },
         data: {
           budget,
           verification,
@@ -309,7 +309,7 @@ export class QuestionnaireController {
         verification: updatedResponseRaw.verification ?? false
       };
 
-      ResponseHelper.success(res, updatedResponse, "Resposta de questionário atualizada com sucesso");
+      ResponseHelper.success(res, updatedResponse, "Resposta ao questionário atualizada com sucesso");
     } catch (error) {
       console.error("Error updating questionnaire response:", error);
       ResponseHelper.serverError(res, "Falha ao atualizar resposta de questionário");
