@@ -28,10 +28,10 @@ export class AdminController {
         ...admin,
       }));
 
-      ResponseHelper.success(res, admins, "Admins retrieved successfully");
+      ResponseHelper.success(res, admins, "Administradores obtidos com sucesso");
     } catch (error) {
       console.error("Error fetching admins:", error);
-      ResponseHelper.serverError(res, "Failed to fetch admins");
+      ResponseHelper.serverError(res, "Falha ao obter administradores");
     }
   }
 
@@ -42,12 +42,12 @@ export class AdminController {
     const tokenUserId: number = parseInt(req.adminId!);
 
     if (isNaN(adminId) || adminId <= 0) {
-      ResponseHelper.badRequest(res, "Invalid admin ID format");
+      ResponseHelper.badRequest(res, "Formato de ID de administrador inválido");
       return;
     }
 
     if (isNaN(tokenUserId)) {
-      ResponseHelper.unauthorized(res, "Invalid token");
+      ResponseHelper.unauthorized(res, "Token inválido");
       return;
     }
 
@@ -67,7 +67,7 @@ export class AdminController {
     });
 
     if (!adminRaw) {
-      ResponseHelper.notFound(res, `Admin with ID ${adminId} not found`);
+      ResponseHelper.notFound(res, `Administrador com ID ${adminId} não encontrado`);
       return;
     }
 
@@ -75,10 +75,10 @@ export class AdminController {
       ...adminRaw
     };
 
-    ResponseHelper.success(res, admin, "Admin retrieved successfully");
+    ResponseHelper.success(res, admin, "Administrador obtido com sucesso");
   } catch (error) {
     console.error("Error fetching admin:", error);
-    ResponseHelper.serverError(res, "Failed to fetch admin");
+    ResponseHelper.serverError(res, "Falha ao obter administrador");
   }
 }
 
@@ -90,38 +90,38 @@ export class AdminController {
 
     // Validações
     if (!name || !email || !username || !password) {
-      ResponseHelper.badRequest(res, "Name, email, username and password are required");
+      ResponseHelper.badRequest(res, "Nome, email, nome de utilizador e palavra-passe são obrigatórios");
       return;
     }
 
     if (typeof name !== 'string' || typeof email !== 'string' || 
         typeof username !== 'string' || typeof password !== 'string') {
-      ResponseHelper.badRequest(res, "All fields must be strings");
+      ResponseHelper.badRequest(res, "Todos os campos devem ser texto");
       return;
     }
 
     if (name.trim().length === 0 || email.trim().length === 0 || 
         username.trim().length === 0 || password.trim().length === 0) {
-      ResponseHelper.badRequest(res, "Fields cannot be empty");
+      ResponseHelper.badRequest(res, "Os campos não podem estar vazios");
       return;
     }
 
     // Validação de email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      ResponseHelper.badRequest(res, "Invalid email format");
+      ResponseHelper.badRequest(res, "Formato de email inválido");
       return;
     }
 
     // Validação de username
     if (username.length < 3) {
-      ResponseHelper.badRequest(res, "Username must be at least 3 characters long");
+      ResponseHelper.badRequest(res, "O nome de utilizador deve ter pelo menos 3 caracteres");
       return;
     }
 
     // Validação de password
     if (password.length < 6) {
-      ResponseHelper.badRequest(res, "Password must be at least 6 characters long");
+      ResponseHelper.badRequest(res, "A palavra-passe deve ter pelo menos 6 caracteres");
       return;
     }
 
@@ -137,11 +137,11 @@ export class AdminController {
 
     if (existingAdmin) {
       if (existingAdmin.email === email.trim()) {
-        ResponseHelper.conflict(res, "Email already exists");
+        ResponseHelper.conflict(res, "Email já existe");
         return;
       }
       if (existingAdmin.username === username.trim()) {
-        ResponseHelper.conflict(res, "Username already exists");
+        ResponseHelper.conflict(res, "Nome de utilizador já existe");
         return;
       }
     }
@@ -167,10 +167,10 @@ export class AdminController {
       ...newAdminRaw
     };
 
-    ResponseHelper.created(res, newAdmin, "Admin created successfully");
+    ResponseHelper.created(res, newAdmin, "Administrador criado com sucesso");
   } catch (error) {
     console.error("Error creating admin:", error);
-    ResponseHelper.serverError(res, "Failed to create admin");
+    ResponseHelper.serverError(res, "Falha ao criar administrador");
   }
 }
 
@@ -183,12 +183,12 @@ export class AdminController {
     const { name, email, username, password }: UpdateAdminRequest = req.body;
 
     if (isNaN(adminId) || adminId <= 0) {
-      ResponseHelper.badRequest(res, "Invalid admin ID format");
+      ResponseHelper.badRequest(res, "Formato de ID de administrador inválido");
       return;
     }
 
     if (isNaN(tokenUserId)) {
-      ResponseHelper.unauthorized(res, "Invalid token");
+      ResponseHelper.unauthorized(res, "Token inválido");
       return;
     }
 
@@ -198,63 +198,63 @@ export class AdminController {
     }
 
     if (!name && !email && !username && !password) {
-      ResponseHelper.badRequest(res, "At least one field must be provided for update");
+      ResponseHelper.badRequest(res, "Pelo menos um campo deve ser fornecido para atualização");
       return;
     }
 
     if (name !== undefined) {
       if (typeof name !== 'string') {
-        ResponseHelper.badRequest(res, "Name must be a string");
+        ResponseHelper.badRequest(res, "O nome deve ser texto");
         return;
       }
       if (name.trim().length === 0) {
-        ResponseHelper.badRequest(res, "Name cannot be empty");
+        ResponseHelper.badRequest(res, "O nome não pode estar vazio");
         return;
       }
     }
 
     if (email !== undefined) {
       if (typeof email !== 'string') {
-        ResponseHelper.badRequest(res, "Email must be a string");
+        ResponseHelper.badRequest(res, "O email deve ser texto");
         return;
       }
       if (email.trim().length === 0) {
-        ResponseHelper.badRequest(res, "Email cannot be empty");
+        ResponseHelper.badRequest(res, "O email não pode estar vazio");
         return;
       }
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(email)) {
-        ResponseHelper.badRequest(res, "Invalid email format");
+        ResponseHelper.badRequest(res, "Formato de email inválido");
         return;
       }
     }
 
     if (username !== undefined) {
       if (typeof username !== 'string') {
-        ResponseHelper.badRequest(res, "Username must be a string");
+        ResponseHelper.badRequest(res, "O nome de utilizador deve ser texto");
         return;
       }
       if (username.trim().length === 0) {
-        ResponseHelper.badRequest(res, "Username cannot be empty");
+        ResponseHelper.badRequest(res, "O nome de utilizador não pode estar vazio");
         return;
       }
       if (username.length < 3) {
-        ResponseHelper.badRequest(res, "Username must be at least 3 characters long");
+        ResponseHelper.badRequest(res, "O nome de utilizador deve ter pelo menos 3 caracteres");
         return;
       }
     }
 
     if (password !== undefined) {
       if (typeof password !== 'string') {
-        ResponseHelper.badRequest(res, "Password must be a string");
+        ResponseHelper.badRequest(res, "A palavra-passe deve ser texto");
         return;
       }
       if (password.trim().length === 0) {
-        ResponseHelper.badRequest(res, "Password cannot be empty");
+        ResponseHelper.badRequest(res, "A palavra-passe não pode estar vazia");
         return;
       }
       if (password.length < 6) {
-        ResponseHelper.badRequest(res, "Password must be at least 6 characters long");
+        ResponseHelper.badRequest(res, "A palavra-passe deve ter pelo menos 6 caracteres");
         return;
       }
     }
@@ -264,7 +264,7 @@ export class AdminController {
     });
 
     if (!existingAdmin) {
-      ResponseHelper.notFound(res, `Admin with ID ${adminId} not found`);
+      ResponseHelper.notFound(res, `Administrador com ID ${adminId} não encontrado`);
       return;
     }
 
@@ -285,11 +285,11 @@ export class AdminController {
 
       if (conflictAdmin) {
         if (email && conflictAdmin.email === email.trim()) {
-          ResponseHelper.conflict(res, "Email already exists");
+          ResponseHelper.conflict(res, "Email já existe");
           return;
         }
         if (username && conflictAdmin.username === username.trim()) {
-          ResponseHelper.conflict(res, "Username already exists");
+          ResponseHelper.conflict(res, "Nome de utilizador já existe");
           return;
         }
       }
@@ -318,10 +318,10 @@ export class AdminController {
       ...updatedAdminRaw
     };
 
-    ResponseHelper.success(res, updatedAdmin, "Admin updated successfully");
+    ResponseHelper.success(res, updatedAdmin, "Administrador atualizado com sucesso");
   } catch (error) {
     console.error("Error updating admin:", error);
-    ResponseHelper.serverError(res, "Failed to update admin");
+    ResponseHelper.serverError(res, "Falha ao atualizar administrador");
   }
 }
 
@@ -333,12 +333,12 @@ export class AdminController {
     const tokenUserId: number = parseInt(req.adminId!);
 
     if (isNaN(adminId) || adminId <= 0) {
-      ResponseHelper.badRequest(res, "Invalid admin ID format");
+      ResponseHelper.badRequest(res, "Formato de ID de administrador inválido");
       return;
     }
 
     if (isNaN(tokenUserId)) {
-      ResponseHelper.unauthorized(res, "Invalid token");
+      ResponseHelper.unauthorized(res, "Token inválido");
       return;
     }
 
@@ -352,7 +352,7 @@ export class AdminController {
     });
 
     if (!existingAdmin) {
-      ResponseHelper.notFound(res, `Admin with ID ${adminId} not found`);
+      ResponseHelper.notFound(res, `Administrador com ID ${adminId} não encontrado`);
       return;
     }
 
@@ -360,10 +360,10 @@ export class AdminController {
       where: { id: adminId }
     });
 
-    ResponseHelper.success(res, null, "Admin deleted successfully");
+    ResponseHelper.success(res, null, "Administrador eliminado com sucesso");
   } catch (error) {
     console.error("Error deleting admin:", error);
-    ResponseHelper.serverError(res, "Failed to delete admin");
+    ResponseHelper.serverError(res, "Falha ao eliminar administrador");
   }
 }
 

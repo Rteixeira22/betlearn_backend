@@ -23,15 +23,15 @@ export class AuthController {
 
       // Validação dos campos obrigatórios
       if (!username || !password) {
-         ResponseHelper.badRequest(res, "Username e password são obrigatórios");
+         ResponseHelper.badRequest(res, "Nome de utilizador e palavra-passe são obrigatórios");
       }
 
       if (typeof username !== 'string' || typeof password !== 'string') {
-         ResponseHelper.badRequest(res, "Username e password devem ser strings");
+         ResponseHelper.badRequest(res, "Nome de utilizador e palavra-passe devem ser texto");
       }
 
       if (username.trim().length === 0 || password.trim().length === 0) {
-         ResponseHelper.badRequest(res, "Username e password não podem estar vazios");
+         ResponseHelper.badRequest(res, "Nome de utilizador e palavra-passe não podem estar vazios");
       }
 
       // Verificar se o utilizador existe
@@ -71,7 +71,7 @@ export class AuthController {
       };
 
 
-       ResponseHelper.success(res, loginResponse, "Login realizado com sucesso");
+       ResponseHelper.success(res, loginResponse, "Sessão iniciada com sucesso");
     } catch (error) {
        ResponseHelper.serverError(res, "Falha na autenticação");
     }
@@ -84,15 +84,15 @@ export class AuthController {
 
       // Validação dos campos obrigatórios
       if (!username || !password) {
-         ResponseHelper.badRequest(res, "Username e password são obrigatórios");
+         ResponseHelper.badRequest(res, "Nome de utilizador e palavra-passe são obrigatórios");
       }
 
       if (typeof username !== 'string' || typeof password !== 'string') {
-         ResponseHelper.badRequest(res, "Username e password devem ser strings");
+         ResponseHelper.badRequest(res, "Nome de utilizador e palavra-passe devem ser texto");
       }
 
       if (username.trim().length === 0 || password.trim().length === 0) {
-         ResponseHelper.badRequest(res, "Username e password não podem estar vazios");
+         ResponseHelper.badRequest(res, "Nome de utilizador e palavra-passe não podem estar vazios");
       }
 
       // Verificar se o administrador existe
@@ -130,7 +130,7 @@ export class AuthController {
         admin: adminWithoutPassword,
         token,
       };
-       ResponseHelper.success(res, adminLoginResponse, "Login de administrador realizado com sucesso");
+       ResponseHelper.success(res, adminLoginResponse, "Sessão de administrador iniciada com sucesso");
     } catch (error) {
        ResponseHelper.serverError(res, "Falha na autenticação");
     }

@@ -23,12 +23,12 @@ export class BetsController {
       const tokenUserId = parseInt(req.userId!);
       
       if (isNaN(requestedId) || requestedId <= 0) {
-        ResponseHelper.badRequest(res, "Invalid user ID format");
+        ResponseHelper.badRequest(res, "Formato de ID de utilizador inválido");
         return;
       }
 
       if (role !== 'admin' && requestedId !== tokenUserId) {
-        ResponseHelper.forbidden(res, "Access denied");
+        ResponseHelper.forbidden(res, "Acesso negado");
         return;
       }
 
@@ -59,12 +59,12 @@ export class BetsController {
 
       // Validate parsed values
       if (parsedLimit && (isNaN(parsedLimit) || parsedLimit <= 0)) {
-        ResponseHelper.badRequest(res, "Invalid limit value");
+        ResponseHelper.badRequest(res, "Valor de limite inválido");
         return;
       }
 
       if (isNaN(parsedOffset) || parsedOffset < 0) {
-        ResponseHelper.badRequest(res, "Invalid offset value");
+        ResponseHelper.badRequest(res, "Valor de offset inválido");
         return;
       }
 
@@ -114,10 +114,10 @@ export class BetsController {
         }
       };
 
-      ResponseHelper.success(res, response, "Bets retrieved successfully");
+      ResponseHelper.success(res, response, "Apostas obtidas com sucesso");
     } catch (error) {
       console.error("Error fetching bets:", error);
-      ResponseHelper.serverError(res, "Failed to fetch bet history");
+      ResponseHelper.serverError(res, "Falha ao obter histórico de apostas");
     }
   }
 
@@ -127,7 +127,7 @@ export class BetsController {
       const userId = parseInt(req.params.id);
       
       if (isNaN(userId) || userId <= 0) {
-        ResponseHelper.badRequest(res, "Invalid user ID format");
+        ResponseHelper.badRequest(res, "Formato de ID de utilizador inválido");
         return;
       }
 
@@ -136,10 +136,10 @@ export class BetsController {
       });
 
       const response: BetCountResponse = { count };
-      ResponseHelper.success(res, response, "Bet count retrieved successfully");
+      ResponseHelper.success(res, response, "Número de apostas obtido com sucesso");
     } catch (error) {
       console.error("Error counting bets:", error);
-      ResponseHelper.serverError(res, "Failed to count bets");
+      ResponseHelper.serverError(res, "Falha ao contar apostas");
     }
   }
 
@@ -162,10 +162,10 @@ export class BetsController {
       });
 
       const response: BetCountResponse = { count };
-      ResponseHelper.success(res, response, "Today's bets count retrieved successfully");
+      ResponseHelper.success(res, response, "Número de apostas de hoje obtido com sucesso");
     } catch (error) {
       console.error("Error fetching today's bets:", error);
-      ResponseHelper.serverError(res, "Failed to fetch today's bets");
+      ResponseHelper.serverError(res, "Falha ao obter apostas de hoje");
     }
   }
 
@@ -175,7 +175,7 @@ export class BetsController {
       const userId = parseInt(req.params.id);
       
       if (isNaN(userId) || userId <= 0) {
-        ResponseHelper.badRequest(res, "Invalid user ID format");
+        ResponseHelper.badRequest(res, "Formato de ID de utilizador inválido");
         return;
       }
       
@@ -193,14 +193,14 @@ export class BetsController {
       });
 
       if (!bet) {
-        ResponseHelper.notFound(res, `No bets found for user ${userId}`);
+        ResponseHelper.notFound(res, `Nenhuma aposta encontrada para o utilizador ${userId}`);
         return;
       }
 
-      ResponseHelper.success(res, bet as BetWithGames, "Last bet retrieved successfully");
+      ResponseHelper.success(res, bet as BetWithGames, "Última aposta obtida com sucesso");
     } catch (error) {
       console.error("Error fetching last bet:", error);
-      ResponseHelper.serverError(res, "Failed to fetch last bet with game data");
+      ResponseHelper.serverError(res, "Falha ao obter a última aposta com dados do jogo");
     }
   }
 
@@ -211,12 +211,12 @@ export class BetsController {
       const ref_id_championship = parseInt(req.params.id_championship);
 
       if (isNaN(ref_id_user) || ref_id_user <= 0) {
-        ResponseHelper.badRequest(res, "Invalid user ID format");
+        ResponseHelper.badRequest(res, "Formato de ID de utilizador inválido");
         return;
       }
 
       if (isNaN(ref_id_championship) || ref_id_championship <= 0) {
-        ResponseHelper.badRequest(res, "Invalid championship ID format");
+        ResponseHelper.badRequest(res, "Formato de ID de campeonato inválido");
         return;
       }
 
@@ -242,12 +242,12 @@ export class BetsController {
 
       // Validate required fields
       if (!type || !amount || !potential_earning || !odd_bet || state === undefined) {
-        ResponseHelper.badRequest(res, "Missing required bet fields");
+        ResponseHelper.badRequest(res, "Campos obrigatórios da aposta em falta");
         return;
       }
 
       if (!local_team || !visitor_team || !schedule || !betted_team || !odd_game) {
-        ResponseHelper.badRequest(res, "Missing required game fields");
+        ResponseHelper.badRequest(res, "Campos obrigatórios do jogo em falta");
         return;
       }
 
@@ -301,10 +301,10 @@ export class BetsController {
       });
 
       const response: CreateBetTransactionResponse = transaction;
-      ResponseHelper.created(res, response, "Bet created successfully");
+      ResponseHelper.created(res, response, "Aposta criada com sucesso");
     } catch (error) {
       console.error("Error creating bet:", error);
-      ResponseHelper.serverError(res, "Failed to create bet and game relation");
+      ResponseHelper.serverError(res, "Falha ao criar aposta e relação com jogo");
     }
   }
 
@@ -314,7 +314,7 @@ export class BetsController {
       const id_bets = parseInt(req.params.id);
 
       if (isNaN(id_bets) || id_bets <= 0) {
-        ResponseHelper.badRequest(res, "Invalid bet ID format");
+        ResponseHelper.badRequest(res, "Formato de ID de aposta inválido");
         return;
       }
 
@@ -322,18 +322,18 @@ export class BetsController {
 
       // Validate that at least one field is provided
       if (state === undefined && result === undefined) {
-        ResponseHelper.badRequest(res, "At least one field (state or result) must be provided");
+        ResponseHelper.badRequest(res, "Pelo menos um campo (estado ou resultado) deve ser fornecido");
         return;
       }
 
       // Validate state and result values
       if (state !== undefined && (typeof state !== 'number' || (state !== 0 && state !== 1))) {
-        ResponseHelper.badRequest(res, "State must be 0 or 1");
+        ResponseHelper.badRequest(res, "Estado deve ser 0 ou 1");
         return;
       }
 
       if (result !== undefined && (typeof result !== 'number' || (result !== 0 && result !== 1))) {
-        ResponseHelper.badRequest(res, "Result must be 0 or 1");
+        ResponseHelper.badRequest(res, "Resultado deve ser 0 ou 1");
         return;
       }
 
@@ -343,7 +343,7 @@ export class BetsController {
       });
 
       if (!existingBet) {
-        ResponseHelper.notFound(res, `Bet with ID ${id_bets} not found`);
+        ResponseHelper.notFound(res, `Aposta com ID ${id_bets} não encontrada`);
         return;
       }
 
@@ -355,10 +355,10 @@ export class BetsController {
         },
       });
 
-      ResponseHelper.success(res, bet, "Bet updated successfully");
+      ResponseHelper.success(res, bet, "Aposta atualizada com sucesso");
     } catch (error) {
       console.error("Error updating bet:", error);
-      ResponseHelper.serverError(res, "Failed to update bet");
+      ResponseHelper.serverError(res, "Falha ao atualizar aposta");
     }
   }
 
@@ -368,7 +368,7 @@ export class BetsController {
       const id_bets = parseInt(req.params.id);
 
       if (isNaN(id_bets) || id_bets <= 0) {
-        ResponseHelper.badRequest(res, "Invalid bet ID format");
+        ResponseHelper.badRequest(res, "Formato de ID de aposta inválido");
         return;
       }
 
@@ -378,7 +378,7 @@ export class BetsController {
       });
 
       if (!existingBet) {
-        ResponseHelper.notFound(res, `Bet with ID ${id_bets} not found`);
+        ResponseHelper.notFound(res, `Aposta com ID ${id_bets} não encontrada`);
         return;
       }
 
@@ -386,10 +386,10 @@ export class BetsController {
         where: { id_bets: id_bets },
       });
 
-      ResponseHelper.success(res, null, "Bet deleted successfully");
+      ResponseHelper.success(res, null, "Aposta eliminada com sucesso");
     } catch (error) {
       console.error("Error deleting bet:", error);
-      ResponseHelper.serverError(res, "Failed to delete bet");
+      ResponseHelper.serverError(res, "Falha ao eliminar aposta");
     }
   }
 }

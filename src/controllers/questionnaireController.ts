@@ -24,10 +24,10 @@ export class QuestionnaireController {
         verification: response.verification ?? false
       }));
 
-      ResponseHelper.success(res, responses, "Questionnaires retrieved successfully");
+      ResponseHelper.success(res, responses, "Questionários obtidos com sucesso");
     } catch (error) {
       console.error("Error fetching questionnaires:", error);
-      ResponseHelper.serverError(res, "Failed to fetch questionnaires");
+      ResponseHelper.serverError(res, "Falha ao obter questionários");
     }
   }
 
@@ -37,7 +37,7 @@ export class QuestionnaireController {
       const questionnaireId: number = parseInt(req.params.id);
       
       if (isNaN(questionnaireId) || questionnaireId <= 0) {
-        ResponseHelper.badRequest(res, "Invalid questionnaire ID format");
+        ResponseHelper.badRequest(res, "Formato de ID de questionário inválido");
         return;
       }
 
@@ -46,7 +46,7 @@ export class QuestionnaireController {
       });
 
       if (!responseRaw) {
-        ResponseHelper.notFound(res, `Questionnaire with ID ${questionnaireId} not found`);
+        ResponseHelper.notFound(res, `Questionário com ID ${questionnaireId} não encontrado`);
         return;
       }
 
@@ -55,10 +55,10 @@ export class QuestionnaireController {
         verification: responseRaw.verification ?? false
       };
 
-      ResponseHelper.success(res, response, "Questionnaire retrieved successfully");
+      ResponseHelper.success(res, response, "Questionário obtido com sucesso");
     } catch (error) {
       console.error("Error fetching questionnaire by ID:", error);
-      ResponseHelper.serverError(res, "Failed to fetch questionnaire");
+      ResponseHelper.serverError(res, "Falha ao obter questionário");
     }
   }
 
@@ -70,12 +70,12 @@ export class QuestionnaireController {
       const tokenUserId = parseInt(req.userId!);
 
       if (isNaN(requestedId) || requestedId <= 0) {
-        ResponseHelper.badRequest(res, "Invalid user ID format");
+        ResponseHelper.badRequest(res, "Formato de ID de utilizador inválido");
         return;
       }
 
       if (role !== 'admin' && requestedId !== tokenUserId) {
-        ResponseHelper.forbidden(res, "Access denied");
+        ResponseHelper.forbidden(res, "Acesso não autorizado");
         return;
       }
       
@@ -89,10 +89,10 @@ export class QuestionnaireController {
         verification: response.verification ?? false
       }));
 
-      ResponseHelper.success(res, responses, "User questionnaire responses retrieved successfully");
+      ResponseHelper.success(res, responses, "Respostas de questionário do utilizador obtidas com sucesso");
     } catch (error) {
       console.error("Error fetching questionnaire responses by user ID:", error);
-      ResponseHelper.serverError(res, "Failed to fetch questionnaire responses");
+      ResponseHelper.serverError(res, "Falha ao obter respostas de questionário");
     }
   }
 
@@ -104,12 +104,12 @@ export class QuestionnaireController {
       const tokenUserId = parseInt(req.userId!);
 
       if (isNaN(requestedId) || requestedId <= 0) {
-        ResponseHelper.badRequest(res, "Invalid user ID format");
+        ResponseHelper.badRequest(res, "Formato de ID de utilizador inválido");
         return;
       }
 
       if (role !== 'admin' && requestedId !== tokenUserId) {
-        ResponseHelper.forbidden(res, "Access denied");
+        ResponseHelper.forbidden(res, "Acesso não autorizado");
         return;
       }
 
@@ -123,10 +123,10 @@ export class QuestionnaireController {
         verification: response.verification ?? false
       }));
 
-      ResponseHelper.success(res, responses, "Verified questionnaire responses retrieved successfully");
+      ResponseHelper.success(res, responses, "Respostas de questionário verificadas obtidas com sucesso");
     } catch (error) {
       console.error("Error fetching verified questionnaire responses:", error);
-      ResponseHelper.serverError(res, "Failed to fetch verified questionnaire responses");
+      ResponseHelper.serverError(res, "Falha ao obter respostas de questionário verificadas");
     }
   }
 
@@ -138,12 +138,12 @@ export class QuestionnaireController {
       const tokenUserId = parseInt(req.userId!);
 
       if (isNaN(requestedId) || requestedId <= 0) {
-        ResponseHelper.badRequest(res, "Invalid user ID format");
+        ResponseHelper.badRequest(res, "Formato de ID de utilizador inválido");
         return;
       }
 
       if (role !== 'admin' && requestedId !== tokenUserId) {
-        ResponseHelper.forbidden(res, "Access denied");
+        ResponseHelper.forbidden(res, "Acesso não autorizado");
         return;
       }
       
@@ -157,10 +157,10 @@ export class QuestionnaireController {
         verification: response.verification ?? false
       }));
 
-      ResponseHelper.success(res, responses, "Unverified questionnaire responses retrieved successfully");
+      ResponseHelper.success(res, responses, "Respostas de questionário não verificadas obtidas com sucesso");
     } catch (error) {
       console.error("Error fetching unverified questionnaire responses:", error);
-      ResponseHelper.serverError(res, "Failed to fetch unverified questionnaire responses");
+      ResponseHelper.serverError(res, "Falha ao obter respostas de questionário não verificadas");
     }
   }
 
@@ -172,12 +172,12 @@ export class QuestionnaireController {
       const tokenUserId = parseInt(req.userId!);
 
       if (isNaN(requestedId) || requestedId <= 0) {
-        ResponseHelper.badRequest(res, "Invalid user ID format");
+        ResponseHelper.badRequest(res, "Formato de ID de utilizador inválido");
         return;
       }
 
       if (role !== 'admin' && requestedId !== tokenUserId) {
-        ResponseHelper.forbidden(res, "Access denied");
+        ResponseHelper.forbidden(res, "Acesso não autorizado");
         return;
       }
 
@@ -187,7 +187,7 @@ export class QuestionnaireController {
       });
 
       if (!responseRaw) {
-        ResponseHelper.notFound(res, "No questionnaire response found for this user");
+        ResponseHelper.notFound(res, "Nenhuma resposta de questionário encontrada para este utilizador");
         return;
       }
 
@@ -196,10 +196,10 @@ export class QuestionnaireController {
         verification: responseRaw.verification ?? false
       };
 
-      ResponseHelper.success(res, response, "Last questionnaire response retrieved successfully");
+      ResponseHelper.success(res, response, "Última resposta de questionário obtida com sucesso");
     } catch (error) {
       console.error("Error fetching last questionnaire response:", error);
-      ResponseHelper.serverError(res, "Failed to fetch the last questionnaire response");
+      ResponseHelper.serverError(res, "Falha ao obter a última resposta de questionário");
     }
   }
 
@@ -218,50 +218,44 @@ export class QuestionnaireController {
         ref_id_user,
       }: CreateQuestionnaireRequest = req.body;
 
-      // Validações básicas
       if (typeof verification !== 'boolean') {
-        ResponseHelper.badRequest(res, "Verification field is required and must be a boolean");
+        ResponseHelper.badRequest(res, "Campo de verificação é obrigatório e deve ser booleano");
         return;
       }
 
       if (!ref_id_user || ref_id_user <= 0) {
-        ResponseHelper.badRequest(res, "Valid user ID is required");
+        ResponseHelper.badRequest(res, "ID de utilizador válido é obrigatório");
         return;
       }
 
-      // Validações opcionais para campos numéricos
-      if (budget !== undefined && (typeof budget !== 'number' || budget < 0)) {
-        ResponseHelper.badRequest(res, "Budget must be a positive number");
-        return;
-      }
 
       if (salary !== undefined && (typeof salary !== 'number' || salary < 0)) {
-        ResponseHelper.badRequest(res, "Salary must be a positive number");
+        ResponseHelper.badRequest(res, "Salário deve ser um número positivo");
         return;
       }
 
       if (expenses !== undefined && (typeof expenses !== 'number' || expenses < 0)) {
-        ResponseHelper.badRequest(res, "Expenses must be a positive number");
+        ResponseHelper.badRequest(res, "Despesas devem ser um número positivo");
         return;
       }
 
       if (available_amount !== undefined && (typeof available_amount !== 'number' || available_amount < 0)) {
-        ResponseHelper.badRequest(res, "Available amount must be a positive number");
+        ResponseHelper.badRequest(res, "Montante disponível deve ser um número positivo");
         return;
       }
 
       if (debt !== undefined && (typeof debt !== 'number' || debt < 0)) {
-        ResponseHelper.badRequest(res, "Debt must be a positive number");
+        ResponseHelper.badRequest(res, "Dívida deve ser um número positivo");
         return;
       }
 
       if (debt_monthly !== undefined && (typeof debt_monthly !== 'number' || debt_monthly < 0)) {
-        ResponseHelper.badRequest(res, "Monthly debt must be a positive number");
+        ResponseHelper.badRequest(res, "Dívida mensal deve ser um número positivo");
         return;
       }
 
       if (income_source !== undefined && typeof income_source !== 'string') {
-        ResponseHelper.badRequest(res, "Income source must be a string");
+        ResponseHelper.badRequest(res, "Fonte de rendimento deve ser uma string");
         return;
       }
 
@@ -284,10 +278,10 @@ export class QuestionnaireController {
         verification: newResponseRaw.verification ?? false
       };
 
-      ResponseHelper.created(res, newResponse, "Questionnaire response created successfully");
+      ResponseHelper.created(res, newResponse, "Resposta de questionário criada com sucesso");
     } catch (error) {
       console.error("Error creating questionnaire response:", error);
-      ResponseHelper.serverError(res, "Failed to create questionnaire response");
+      ResponseHelper.serverError(res, "Falha ao criar resposta de questionário");
     }
   }
 
@@ -307,7 +301,7 @@ export class QuestionnaireController {
       }: UpdateQuestionnaireRequest = req.body;
 
       if (isNaN(questionnaireId) || questionnaireId <= 0) {
-        ResponseHelper.badRequest(res, "Invalid questionnaire ID format");
+        ResponseHelper.badRequest(res, "Formato de ID de questionário inválido");
         return;
       }
 
@@ -317,48 +311,48 @@ export class QuestionnaireController {
       });
 
       if (!existingResponse) {
-        ResponseHelper.notFound(res, `Questionnaire with ID ${questionnaireId} not found`);
+        ResponseHelper.notFound(res, `Questionário com ID ${questionnaireId} não encontrado`);
         return;
       }
 
       // Validações para campos que estão sendo atualizados
       if (verification !== undefined && typeof verification !== 'boolean') {
-        ResponseHelper.badRequest(res, "Verification must be a boolean");
+        ResponseHelper.badRequest(res, "Verificação deve ser booleana");
         return;
       }
 
       if (budget !== undefined && (typeof budget !== 'number' || budget < 0)) {
-        ResponseHelper.badRequest(res, "Budget must be a positive number");
+        ResponseHelper.badRequest(res, "Orçamento deve ser um número positivo");
         return;
       }
 
       if (salary !== undefined && (typeof salary !== 'number' || salary < 0)) {
-        ResponseHelper.badRequest(res, "Salary must be a positive number");
+        ResponseHelper.badRequest(res, "Salário deve ser um número positivo");
         return;
       }
 
       if (expenses !== undefined && (typeof expenses !== 'number' || expenses < 0)) {
-        ResponseHelper.badRequest(res, "Expenses must be a positive number");
+        ResponseHelper.badRequest(res, "Despesas devem ser um número positivo");
         return;
       }
 
       if (available_amount !== undefined && (typeof available_amount !== 'number' || available_amount < 0)) {
-        ResponseHelper.badRequest(res, "Available amount must be a positive number");
+        ResponseHelper.badRequest(res, "Montante disponível deve ser um número positivo");
         return;
       }
 
       if (debt !== undefined && (typeof debt !== 'number' || debt < 0)) {
-        ResponseHelper.badRequest(res, "Debt must be a positive number");
+        ResponseHelper.badRequest(res, "Dívida deve ser um número positivo");
         return;
       }
 
       if (debt_monthly !== undefined && (typeof debt_monthly !== 'number' || debt_monthly < 0)) {
-        ResponseHelper.badRequest(res, "Monthly debt must be a positive number");
+        ResponseHelper.badRequest(res, "Dívida mensal deve ser um número positivo");
         return;
       }
 
       if (income_source !== undefined && typeof income_source !== 'string') {
-        ResponseHelper.badRequest(res, "Income source must be a string");
+        ResponseHelper.badRequest(res, "Fonte de rendimento deve ser uma string");
         return;
       }
 
@@ -380,10 +374,10 @@ export class QuestionnaireController {
         verification: updatedResponseRaw.verification ?? false
       };
 
-      ResponseHelper.success(res, updatedResponse, "Questionnaire response updated successfully");
+      ResponseHelper.success(res, updatedResponse, "Resposta de questionário atualizada com sucesso");
     } catch (error) {
       console.error("Error updating questionnaire response:", error);
-      ResponseHelper.serverError(res, "Failed to update questionnaire response");
+      ResponseHelper.serverError(res, "Falha ao atualizar resposta de questionário");
     }
   }
 
@@ -393,7 +387,7 @@ export class QuestionnaireController {
       const questionnaireId: number = parseInt(req.params.id);
 
       if (isNaN(questionnaireId) || questionnaireId <= 0) {
-        ResponseHelper.badRequest(res, "Invalid questionnaire ID format");
+        ResponseHelper.badRequest(res, "Formato de ID de questionário inválido");
         return;
       }
 
@@ -402,7 +396,7 @@ export class QuestionnaireController {
       });
 
       if (!existingResponse) {
-        ResponseHelper.notFound(res, `Questionnaire with ID ${questionnaireId} not found`);
+        ResponseHelper.notFound(res, `Questionário com ID ${questionnaireId} não encontrado`);
         return;
       }
 
@@ -410,10 +404,10 @@ export class QuestionnaireController {
         where: { id_questionnaire_response: questionnaireId },
       });
 
-      ResponseHelper.success(res, null, "Questionnaire response deleted successfully");
+      ResponseHelper.success(res, null, "Resposta de questionário eliminada com sucesso");
     } catch (error) {
       console.error("Error deleting questionnaire response:", error);
-      ResponseHelper.serverError(res, "Failed to delete questionnaire response");
+      ResponseHelper.serverError(res, "Falha ao eliminar resposta de questionário");
     }
   }
 }

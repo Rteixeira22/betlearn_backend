@@ -27,10 +27,10 @@ export class ChampionsController {
         creation_date: championship.creation_date!
       }));
   
-      ResponseHelper.success(res, championships, "Championships retrieved successfully");
+      ResponseHelper.success(res, championships, "Campeonatos obtidos com sucesso");
     } catch (error) {
       console.error("Error fetching championships:", error);
-      ResponseHelper.serverError(res, "Failed to fetch championships");
+      ResponseHelper.serverError(res, "Falha ao obter campeonatos");
     }
   }
 
@@ -50,10 +50,10 @@ export class ChampionsController {
         creation_date: championship.creation_date!
       }));
 
-      ResponseHelper.success(res, championships, "Last two championships retrieved successfully");
+      ResponseHelper.success(res, championships, "Últimos dois campeonatos obtidos com sucesso");
     } catch (error) {
       console.error("Error fetching last two championships:", error);
-      ResponseHelper.serverError(res, "Failed to fetch last two championships");
+      ResponseHelper.serverError(res, "Falha ao obter os últimos dois campeonatos");
     }
   }
 
@@ -83,7 +83,7 @@ export class ChampionsController {
       });
       
       if (!championshipRaw) {
-        ResponseHelper.notFound(res, "No championship found for yesterday");
+        ResponseHelper.notFound(res, "Nenhum campeonato encontrado para ontem");
         return;
       }
 
@@ -93,10 +93,10 @@ export class ChampionsController {
         creation_date: championshipRaw.creation_date!
       };
       
-      ResponseHelper.success(res, championship, "Yesterday's championship retrieved successfully");
+      ResponseHelper.success(res, championship, "Campeonato de ontem obtido com sucesso");
     } catch (error) {
       console.error("Error fetching yesterday's championship:", error);
-      ResponseHelper.serverError(res, "Failed to fetch yesterday's championship");
+      ResponseHelper.serverError(res, "Falha ao obter o campeonato de ontem");
     }
   }
 
@@ -106,7 +106,7 @@ export class ChampionsController {
       const championshipId: number = parseInt(req.params.id);
 
       if (isNaN(championshipId) || championshipId <= 0) {
-        ResponseHelper.badRequest(res, "Invalid championship ID format");
+        ResponseHelper.badRequest(res, "Formato de ID de campeonato inválido");
         return;
       }
 
@@ -115,7 +115,7 @@ export class ChampionsController {
       });
 
       if (!championshipRaw) {
-        ResponseHelper.notFound(res, `Championship with ID ${championshipId} not found`);
+        ResponseHelper.notFound(res, `Campeonato com ID ${championshipId} não encontrado`);
         return;
       }
 
@@ -125,10 +125,10 @@ export class ChampionsController {
         creation_date: championshipRaw.creation_date!
       };
 
-      ResponseHelper.success(res, championship, "Championship retrieved successfully");
+      ResponseHelper.success(res, championship, "Campeonato obtido com sucesso");
     } catch (error) {
       console.error("Error fetching championship:", error);
-      ResponseHelper.serverError(res, "Failed to fetch championship");
+      ResponseHelper.serverError(res, "Falha ao obter campeonato");
     }
   }
 
@@ -138,12 +138,12 @@ export class ChampionsController {
       const { json }: CreateChampionshipRequest = req.body;
 
       if (!json) {
-        ResponseHelper.badRequest(res, "Championship JSON data is required");
+        ResponseHelper.badRequest(res, "Dados JSON do campeonato são obrigatórios");
         return;
       }
 
       if (typeof json !== 'string') {
-        ResponseHelper.badRequest(res, "Championship JSON must be a string");
+        ResponseHelper.badRequest(res, "JSON do campeonato deve ser uma string");
         return;
       }
 
@@ -151,7 +151,7 @@ export class ChampionsController {
       try {
         JSON.parse(json);
       } catch (jsonError) {
-        ResponseHelper.badRequest(res, "Invalid JSON format");
+        ResponseHelper.badRequest(res, "Formato JSON inválido");
         return;
       }
 
@@ -167,10 +167,10 @@ export class ChampionsController {
         creation_date: championshipRaw.creation_date!
       };
 
-      ResponseHelper.created(res, championship, "Championship created successfully");
+      ResponseHelper.created(res, championship, "Campeonato criado com sucesso");
     } catch (error) {
       console.error("Error creating championship:", error);
-      ResponseHelper.serverError(res, "Failed to create championship");
+      ResponseHelper.serverError(res, "Falha ao criar campeonato");
     }
   }
 
@@ -181,17 +181,17 @@ export class ChampionsController {
       const { json }: UpdateChampionshipRequest = req.body;
 
       if (isNaN(championshipId) || championshipId <= 0) {
-        ResponseHelper.badRequest(res, "Invalid championship ID format");
+        ResponseHelper.badRequest(res, "Formato de ID de campeonato inválido");
         return;
       }
 
       if (!json) {
-        ResponseHelper.badRequest(res, "Championship JSON data is required");
+        ResponseHelper.badRequest(res, "Dados JSON do campeonato são obrigatórios");
         return;
       }
 
       if (typeof json !== 'string') {
-        ResponseHelper.badRequest(res, "Championship JSON must be a string");
+        ResponseHelper.badRequest(res, "JSON do campeonato deve ser uma string");
         return;
       }
 
@@ -199,7 +199,7 @@ export class ChampionsController {
       try {
         JSON.parse(json);
       } catch (jsonError) {
-        ResponseHelper.badRequest(res, "Invalid JSON format");
+        ResponseHelper.badRequest(res, "Formato JSON inválido");
         return;
       }
 
@@ -209,7 +209,7 @@ export class ChampionsController {
       });
 
       if (!existingChampionship) {
-        ResponseHelper.notFound(res, `Championship with ID ${championshipId} not found`);
+        ResponseHelper.notFound(res, `Campeonato com ID ${championshipId} não encontrado`);
         return;
       }
 
@@ -224,10 +224,10 @@ export class ChampionsController {
         creation_date: updatedChampionshipRaw.creation_date!
       };
 
-      ResponseHelper.success(res, updatedChampionship, "Championship updated successfully");
+      ResponseHelper.success(res, updatedChampionship, "Campeonato atualizado com sucesso");
     } catch (error) {
       console.error("Error updating championship:", error);
-      ResponseHelper.serverError(res, "Failed to update championship");
+      ResponseHelper.serverError(res, "Falha ao atualizar campeonato");
     }
   }
 
@@ -237,7 +237,7 @@ export class ChampionsController {
       const championshipId: number = parseInt(req.params.id);
 
       if (isNaN(championshipId) || championshipId <= 0) {
-        ResponseHelper.badRequest(res, "Invalid championship ID format");
+        ResponseHelper.badRequest(res, "Formato de ID de campeonato inválido");
         return;
       }
 
@@ -246,7 +246,7 @@ export class ChampionsController {
       });
 
       if (!existingChampionship) {
-        ResponseHelper.notFound(res, `Championship with ID ${championshipId} not found`);
+        ResponseHelper.notFound(res, `Campeonato com ID ${championshipId} não encontrado`);
         return;
       }
 
@@ -254,10 +254,10 @@ export class ChampionsController {
         where: { id_championship: championshipId },
       });
 
-      ResponseHelper.success(res, null, "Championship deleted successfully");
+      ResponseHelper.success(res, null, "Campeonato eliminado com sucesso");
     } catch (error) {
       console.error("Error deleting championship:", error);
-      ResponseHelper.serverError(res, "Failed to delete championship");
+      ResponseHelper.serverError(res, "Falha ao eliminar campeonato");
     }
   }
 
@@ -267,14 +267,14 @@ export class ChampionsController {
       const championshipData = await retryWithFixes();
 
       if (!championshipData) {
-        ResponseHelper.serverError(res, "Failed to generate championship data");
+        ResponseHelper.serverError(res, "Falha ao gerar dados do campeonato");
         return;
       }
 
-      ResponseHelper.success(res, championshipData, "Championship generated successfully");
+      ResponseHelper.success(res, championshipData, "Campeonato gerado com sucesso");
     } catch (error) {
       console.error("Error generating championship:", error);
-      ResponseHelper.serverError(res, "Failed to generate championship");
+      ResponseHelper.serverError(res, "Falha ao gerar campeonato");
     }
   }
 }

@@ -38,10 +38,10 @@ export class AdminNotificationController {
         source: notification.source ?? ""
       }));
 
-      ResponseHelper.success(res, notifications, "Notifications retrieved successfully");
+      ResponseHelper.success(res, notifications, "Notificações obtidas com sucesso");
     } catch (error) {
       console.error("Error fetching notifications:", error);
-       ResponseHelper.serverError(res, "Failed to fetch notifications");
+       ResponseHelper.serverError(res, "Falha ao obter notificações");
     }
   }
 
@@ -51,7 +51,7 @@ export class AdminNotificationController {
       const notificationId: number = parseInt(req.params.id);
       
       if (isNaN(notificationId) || notificationId <= 0) {
-         ResponseHelper.badRequest(res, "Invalid notification ID format");
+         ResponseHelper.badRequest(res, "Formato de ID de notificação inválido");
       }
 
       const notificationRaw = await prisma.adminNotification.findUnique({
@@ -59,7 +59,7 @@ export class AdminNotificationController {
       });
 
       if (!notificationRaw) {
-         ResponseHelper.notFound(res, `Notification with ID ${notificationId} not found`);
+         ResponseHelper.notFound(res, `Notificação com ID ${notificationId} não encontrada`);
       }
 
       if (
@@ -69,7 +69,7 @@ export class AdminNotificationController {
         notificationRaw.type === undefined ||
         notificationRaw.created_at === undefined
       ) {
-        ResponseHelper.serverError(res, "Notification data is incomplete");
+        ResponseHelper.serverError(res, "Os dados da notificação estão incompletos");
         return;
       }
 
@@ -83,10 +83,10 @@ export class AdminNotificationController {
         source: notificationRaw.source ?? ""
       };
 
-       ResponseHelper.success(res, notification, "Notification retrieved successfully");
+       ResponseHelper.success(res, notification, "Notificação obtida com sucesso");
     } catch (error) {
       console.error("Error fetching notification:", error);
-       ResponseHelper.serverError(res, "Failed to fetch notification");
+       ResponseHelper.serverError(res, "Falha ao obter notificação");
     }
   }
 
@@ -97,25 +97,25 @@ export class AdminNotificationController {
 
       // Validações
       if (!title || !message || !source || !type) {
-         ResponseHelper.badRequest(res, "Title, message, source and type are required");
+         ResponseHelper.badRequest(res, "Título, mensagem, origem e tipo são obrigatórios");
       }
 
       if (typeof title !== 'string' || typeof message !== 'string' || 
           typeof source !== 'string' || typeof type !== 'string') {
-         ResponseHelper.badRequest(res, "All fields must be strings");
+         ResponseHelper.badRequest(res, "Todos os campos devem ser texto");
       }
 
       if (title.trim().length === 0 || message.trim().length === 0 || 
           source.trim().length === 0 || type.trim().length === 0) {
-         ResponseHelper.badRequest(res, "Fields cannot be empty");
+         ResponseHelper.badRequest(res, "Os campos não podem estar vazios");
       }
 
       if (title.length > 255) {
-         ResponseHelper.badRequest(res, "Title is too long (max 255 characters)");
+         ResponseHelper.badRequest(res, "Título demasiado longo (máximo 255 caracteres)");
       }
 
       if (message.length > 1000) {
-         ResponseHelper.badRequest(res, "Message is too long (max 1000 characters)");
+         ResponseHelper.badRequest(res, "Mensagem demasiado longa (máximo 1000 caracteres)");
       }
 
       const newNotificationRaw = await prisma.adminNotification.create({
@@ -133,9 +133,9 @@ export class AdminNotificationController {
         source: newNotificationRaw.source ?? ""
       };
 
-       ResponseHelper.created(res, newNotification, "Notification created successfully");
+       ResponseHelper.created(res, newNotification, "Notificação criada com sucesso");
     } catch (error) {
-       ResponseHelper.serverError(res, "Failed to create notification");
+       ResponseHelper.serverError(res, "Falha ao criar notificação");
     }
   }
 
@@ -146,41 +146,41 @@ export class AdminNotificationController {
       const { title, message, is_read }: UpdateNotificationRequest = req.body;
 
       if (isNaN(notificationId) || notificationId <= 0) {
-         ResponseHelper.badRequest(res, "Invalid notification ID format");
+         ResponseHelper.badRequest(res, "Formato de ID de notificação inválido");
       }
 
       // Verificar se pelo menos um campo foi fornecido
       if (title === undefined && message === undefined && is_read === undefined) {
-         ResponseHelper.badRequest(res, "At least one field (title, message, or is_read) must be provided");
+         ResponseHelper.badRequest(res, "Pelo menos um campo (título, mensagem ou lida) deve ser fornecido");
       }
 
       // Validações dos campos
       if (title !== undefined) {
         if (typeof title !== 'string') {
-           ResponseHelper.badRequest(res, "Title must be a string");
+           ResponseHelper.badRequest(res, "O título deve ser texto");
         }
         if (title.trim().length === 0) {
-           ResponseHelper.badRequest(res, "Title cannot be empty");
+           ResponseHelper.badRequest(res, "O título não pode estar vazio");
         }
         if (title.length > 255) {
-           ResponseHelper.badRequest(res, "Title is too long (max 255 characters)");
+           ResponseHelper.badRequest(res, "Título demasiado longo (máximo 255 caracteres)");
         }
       }
 
       if (message !== undefined) {
         if (typeof message !== 'string') {
-           ResponseHelper.badRequest(res, "Message must be a string");
+           ResponseHelper.badRequest(res, "A mensagem deve ser texto");
         }
         if (message.trim().length === 0) {
-           ResponseHelper.badRequest(res, "Message cannot be empty");
+           ResponseHelper.badRequest(res, "A mensagem não pode estar vazia");
         }
         if (message.length > 1000) {
-           ResponseHelper.badRequest(res, "Message is too long (max 1000 characters)");
+           ResponseHelper.badRequest(res, "Mensagem demasiado longa (máximo 1000 caracteres)");
         }
       }
 
       if (is_read !== undefined && typeof is_read !== 'boolean') {
-         ResponseHelper.badRequest(res, "is_read must be a boolean");
+         ResponseHelper.badRequest(res, "O campo 'lida' deve ser verdadeiro ou falso");
       }
 
       // Verificar se a notificação existe
@@ -189,7 +189,7 @@ export class AdminNotificationController {
       });
 
       if (!existingNotification) {
-         ResponseHelper.notFound(res, `Notification with ID ${notificationId} not found`);
+         ResponseHelper.notFound(res, `Notificação com ID ${notificationId} não encontrada`);
       }
 
       // Preparar dados para atualização
@@ -209,9 +209,9 @@ export class AdminNotificationController {
         source: updatedNotificationRaw.source ?? ""
       };
 
-       ResponseHelper.success(res, updatedNotification, "Notification updated successfully");
+       ResponseHelper.success(res, updatedNotification, "Notificação atualizada com sucesso");
     } catch (error) {
-       ResponseHelper.serverError(res, "Failed to update notification");
+       ResponseHelper.serverError(res, "Falha ao atualizar notificação");
     }
   }
 
@@ -221,7 +221,7 @@ export class AdminNotificationController {
       const notificationId: number = parseInt(req.params.id);
 
       if (isNaN(notificationId) || notificationId <= 0) {
-         ResponseHelper.badRequest(res, "Invalid notification ID format");
+         ResponseHelper.badRequest(res, "Formato de ID de notificação inválido");
       }
 
       // Verificar se a notificação existe
@@ -230,7 +230,7 @@ export class AdminNotificationController {
       });
 
       if (!existingNotification) {
-         ResponseHelper.notFound(res, `Notification with ID ${notificationId} not found`);
+         ResponseHelper.notFound(res, `Notificação com ID ${notificationId} não encontrada`);
          return;
       }
 
@@ -241,7 +241,7 @@ export class AdminNotificationController {
           is_read: existingNotification.is_read ?? false,
           source: existingNotification.source ?? ""
         };
-         ResponseHelper.success(res, notification, "Notification is already marked as read");
+         ResponseHelper.success(res, notification, "A notificação já está marcada como lida");
          return;
       }
 
@@ -258,9 +258,9 @@ export class AdminNotificationController {
         source: updatedNotificationRaw.source ?? ""
       };
 
-       ResponseHelper.success(res, updatedNotification, "Notification marked as read successfully");
+       ResponseHelper.success(res, updatedNotification, "Notificação marcada como lida com sucesso");
     } catch (error) {
-       ResponseHelper.serverError(res, "Failed to mark notification as read");
+       ResponseHelper.serverError(res, "Falha ao marcar notificação como lida");
     }
   }
 
@@ -270,7 +270,7 @@ export class AdminNotificationController {
       const notificationId: number = parseInt(req.params.id);
 
       if (isNaN(notificationId) || notificationId <= 0) {
-         ResponseHelper.badRequest(res, "Invalid notification ID format");
+         ResponseHelper.badRequest(res, "Formato de ID de notificação inválido");
       }
 
       const existingNotification = await prisma.adminNotification.findUnique({
@@ -278,16 +278,16 @@ export class AdminNotificationController {
       });
 
       if (!existingNotification) {
-         ResponseHelper.notFound(res, `Notification with ID ${notificationId} not found`);
+         ResponseHelper.notFound(res, `Notificação com ID ${notificationId} não encontrada`);
       }
 
       await prisma.adminNotification.delete({
         where: { id_notification: notificationId }
       });
 
-       ResponseHelper.success(res, null, "Notification deleted successfully");
+       ResponseHelper.success(res, null, "Notificação eliminada com sucesso");
     } catch (error) {
-       ResponseHelper.serverError(res, "Failed to delete notification");
+       ResponseHelper.serverError(res, "Falha ao eliminar notificação");
     }
   }
 }
