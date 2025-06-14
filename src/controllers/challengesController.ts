@@ -301,11 +301,6 @@ export class ChallengesController {
       const requestedId = parseInt(req.params.id);
       const tokenUserId = parseInt(req.userId!);
 
-      if (isNaN(requestedId) || requestedId <= 0) {
-        ResponseHelper.badRequest(res, "Formato de ID do utilizador inválido");
-        return;
-      }
-
       if (role !== 'admin' && requestedId !== tokenUserId) {
         ResponseHelper.forbidden(res, "Acesso negado");
         return;

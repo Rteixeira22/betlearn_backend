@@ -205,54 +205,57 @@ export class QuestionnaireController {
 
   // Create a new questionnaire response
   async createQuestionnaireResponse(req: Request<{}, {}, CreateQuestionnaireRequest>, res: Response): Promise<void> {
-    try {
-      const {
-        budget,
-        verification,
-        salary,
-        expenses,
-        available_amount,
-        debt,
-        debt_monthly,
-        income_source,
-        ref_id_user,
-      }: CreateQuestionnaireRequest = req.body;
+  try {
+    const {
+      budget,
+      verification,
+      salary,
+      expenses,
+      available_amount,
+      debt,
+      debt_monthly,
+      income_source,
+      ref_id_user,
+    }: CreateQuestionnaireRequest = req.body;
 
-      if (typeof verification !== 'boolean') {
-        ResponseHelper.badRequest(res, "Campo de verificação é obrigatório e deve ser booleano");
-        return;
-      }
-
-      if (!ref_id_user || ref_id_user <= 0) {
-        ResponseHelper.badRequest(res, "ID de utilizador válido é obrigatório");
-        return;
-      }
-
-      const newResponseRaw = await prisma.questionnaire_Response.create({
-        data: {
-          budget,
-          verification,
-          salary,
-          expenses,
-          available_amount,
-          debt,
-          debt_monthly,
-          income_source,
-          ref_id_user,
-        },
-      });
-
-      const newResponse: QuestionnaireResponse = {
-        ...newResponseRaw,
-        verification: newResponseRaw.verification ?? false
-      };
-
-      ResponseHelper.created(res, newResponse, "Resposta de questionário criada com sucesso");
-    } catch (error) {
-      console.error("Error creating questionnaire response:", error);
-      ResponseHelper.serverError(res, "Falha ao criar resposta de questionário");
+    if (typeof verification !== 'boolean') {
+      ResponseHelper.badRequest(res, "Campo de verificação é obrigatório e deve ser booleano");
+      return;
     }
+
+    if (!ref_id_user || ref_id_user <= 0) {
+      ResponseHelper.badRequest(res, "ID de utilizador válido é obrigatório");
+      return;
+    }
+
+    // Garantir que os valores numéricos são do tipo correto
+    const questionnaireData = {
+      budget: budget ? Number(budget) : null,
+      verification: Boolean(verification),
+      salary: salary ? Number(salary) : null,
+      expenses: expenses ? Number(expenses) : null,
+      available_amount: available_amount ? Number(available_amount) : null,
+      debt: debt ? Number(debt) : null,
+      debt_monthly: debt_monthly ? Number(debt_monthly) : null,
+      income_source: income_source ? String(income_source) : null,
+      ref_id_user: Number(ref_id_user),
+    };
+
+    const newResponseRaw = await prisma.questionnaire_Response.create({
+      data: questionnaireData,
+    });
+
+    const newResponse: QuestionnaireResponse = {
+      ...newResponseRaw,
+      verification: newResponseRaw.verification ?? false
+    };
+
+    ResponseHelper.created(res, newResponse, "Resposta de questionário criada com sucesso");
+  } catch (error) {
+    console.error("Error creating questionnaire response:", error);
+    ResponseHelper.serverError(res, "Falha ao criar resposta de questionário");
   }
+}
 
   // Update a specific questionnaire by user ID
   async updateQuestionnaireResponse(req: Request<{ id: string }, {}, UpdateQuestionnaireRequest>, res: Response): Promise<void> {

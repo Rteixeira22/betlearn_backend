@@ -138,18 +138,22 @@ export class GamesController {
         return;
       }
 
+      const newGameData: any = {
+        local_team: local_team.trim(),
+        visitor_team: visitor_team.trim(),
+        schedule: scheduleDate,
+        betted_team,
+        goals_local_team,
+        goals_visitor_team,
+        image,
+        game_state: game_state ?? 0,
+      };
+      if (odd !== undefined) {
+        newGameData.odd = odd;
+      }
+
       const newGameRaw = await prisma.games.create({
-        data: {
-          local_team: local_team.trim(),
-          visitor_team: visitor_team.trim(),
-          schedule: scheduleDate,
-          betted_team,
-          odd,
-          goals_local_team,
-          goals_visitor_team,
-          image,
-          game_state: game_state ?? 0,
-        },
+        data: newGameData,
       });
 
       const newGame: Game = {
