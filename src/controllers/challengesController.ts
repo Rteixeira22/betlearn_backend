@@ -332,7 +332,7 @@ export class ChallengesController {
   async getAllChallengesCompletedByUserId(req: Request, res: Response): Promise<void> {
     try {
       const role = req.userRole;
-      const requestedId = parseInt(req.params.id);
+      const requestedId = parseInt(req.params.id_user);
       const tokenUserId = parseInt(req.userId!);
 
       if (isNaN(requestedId) || requestedId <= 0) {
@@ -518,7 +518,7 @@ export class ChallengesController {
   async unblockNextChallenge(req: Request, res: Response): Promise<void> {
     try {
       const role = req.userRole;
-      const requestedId = parseInt(req.params.id);
+      const requestedId = parseInt(req.params.id_user);
       const tokenUserId = parseInt(req.userId!);
 
       if (isNaN(requestedId) || requestedId <= 0) {
@@ -629,7 +629,7 @@ export class ChallengesController {
   async updateUserHasChallengesDetailSeen(req: Request, res: Response): Promise<void> {
     try {
       const role = req.userRole;
-      const requestedId = parseInt(req.params.id);
+      const requestedId = parseInt(req.params.id_user);
       const tokenUserId = parseInt(req.userId!);
 
       if (isNaN(requestedId) || requestedId <= 0) {
@@ -678,7 +678,7 @@ export class ChallengesController {
   async updateUserHasChallengesProgressPercentage(req: Request, res: Response): Promise<void> {
     try {
       const role = req.userRole;
-      const requestedId = parseInt(req.params.id);
+      const requestedId = parseInt(req.params.id_user);
       const tokenUserId = parseInt(req.userId!);
 
       if (isNaN(requestedId) || requestedId <= 0) {
