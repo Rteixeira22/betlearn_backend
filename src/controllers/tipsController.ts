@@ -25,10 +25,10 @@ export class TipsController {
         active: tip.active ?? 0
       }));
       
-       ResponseHelper.success(res, tips, "Tips retrieved successfully");
+       ResponseHelper.success(res, tips, "Dicas obtidas com sucesso");
     } catch (error) {
       console.error("Error fetching tips:", error);
-       ResponseHelper.serverError(res, "Failed to fetch tips");
+       ResponseHelper.serverError(res, "Falha ao obter dicas");
     }
   }
 
@@ -38,7 +38,7 @@ export class TipsController {
       const tipId: number = parseInt(req.params.id);
       
       if (isNaN(tipId) || tipId <= 0) {
-         ResponseHelper.badRequest(res, "Invalid tip ID format");
+         ResponseHelper.badRequest(res, "Formato de ID da dica inválido");
       }
 
       const tipRaw = await prisma.tips.findUnique({
@@ -46,18 +46,18 @@ export class TipsController {
       });
 
       if (!tipRaw) {
-         ResponseHelper.notFound(res, `Tip with ID ${tipId} not found`);
+         ResponseHelper.notFound(res, `Dica com ID ${tipId} não encontrada`);
       } else {
         const tip: Tip = {
           id_tip: tipRaw.id_tip!,
           tip: tipRaw.tip!,
           active: tipRaw.active ?? 0
         };
-        ResponseHelper.success(res, tip, "Tip retrieved successfully");
+        ResponseHelper.success(res, tip, "Dica obtida com sucesso");
       }
 
     } catch (error) {
-       ResponseHelper.serverError(res, "Failed to fetch tip");
+       ResponseHelper.serverError(res, "Falha ao obter dica");
     }
   }
 
@@ -69,7 +69,7 @@ export class TipsController {
       });
 
       if (!tipRaw) {
-         ResponseHelper.notFound(res, "No active tip found");
+         ResponseHelper.notFound(res, "Nenhuma dica ativa encontrada");
       } else {
         const tip: Tip = {
           id_tip: tipRaw.id_tip!,
@@ -77,12 +77,12 @@ export class TipsController {
           active: tipRaw.active ?? 0
         };
 
-        ResponseHelper.success(res, tip, "Active tip retrieved successfully");
+        ResponseHelper.success(res, tip, "Dica ativa obtida com sucesso");
       }
 
       
     } catch (error) {
-       ResponseHelper.serverError(res, "Failed to fetch active tip");
+       ResponseHelper.serverError(res, "Falha ao obter dica ativa");
     }
   }
 
@@ -92,19 +92,19 @@ export class TipsController {
       const { tip }: CreateTipRequest = req.body;
 
       if (!tip) {
-         ResponseHelper.badRequest(res, "Tip content is required");
+         ResponseHelper.badRequest(res, "Conteúdo da dica é obrigatório");
       }
 
       if (typeof tip !== 'string') {
-         ResponseHelper.badRequest(res, "Tip content must be a string");
+         ResponseHelper.badRequest(res, "Conteúdo da dica deve ser uma string");
       }
 
       if (tip.trim().length === 0) {
-         ResponseHelper.badRequest(res, "Tip content cannot be empty");
+         ResponseHelper.badRequest(res, "Conteúdo da dica não pode estar vazio");
       }
 
       if (tip.trim().length > 1000) {
-         ResponseHelper.badRequest(res, "Tip content is too long (max 1000 characters)");
+         ResponseHelper.badRequest(res, "Conteúdo da dica é demasiado longo (máximo 1000 caracteres)");
       }
 
       const newTipRaw = await prisma.tips.create({
@@ -119,9 +119,9 @@ export class TipsController {
         active: newTipRaw.active ?? 0
       };
 
-       ResponseHelper.created(res, newTip, "Tip created successfully");
+       ResponseHelper.created(res, newTip, "Dica criada com sucesso");
     } catch (error) {
-       ResponseHelper.serverError(res, "Failed to create tip");
+       ResponseHelper.serverError(res, "Falha ao criar dica");
     }
   }
 
@@ -132,23 +132,23 @@ export class TipsController {
       const { tip }: UpdateTipRequest = req.body;
 
       if (isNaN(tipId) || tipId <= 0) {
-         ResponseHelper.badRequest(res, "Invalid tip ID format");
+         ResponseHelper.badRequest(res, "Formato de ID da dica inválido");
       }
 
       if (!tip) {
-         ResponseHelper.badRequest(res, "Tip content is required");
+         ResponseHelper.badRequest(res, "Conteúdo da dica é obrigatório");
       }
 
       if (typeof tip !== 'string') {
-         ResponseHelper.badRequest(res, "Tip content must be a string");
+         ResponseHelper.badRequest(res, "Conteúdo da dica deve ser uma string");
       }
 
       if (tip && tip.trim().length === 0) {
-         ResponseHelper.badRequest(res, "Tip content cannot be empty");
+         ResponseHelper.badRequest(res, "Conteúdo da dica não pode estar vazio");
       }
 
       if (tip && tip.trim().length > 1000) {
-         ResponseHelper.badRequest(res, "Tip content is too long (max 1000 characters)");
+         ResponseHelper.badRequest(res, "Conteúdo da dica é demasiado longo (máximo 1000 caracteres)");
       }
 
       const existingTipRaw = await prisma.tips.findUnique({
@@ -156,7 +156,7 @@ export class TipsController {
       });
 
       if (!existingTipRaw) {
-         ResponseHelper.notFound(res, `Tip with ID ${tipId} not found`);
+         ResponseHelper.notFound(res, `Dica com ID ${tipId} não encontrada`);
       }
 
       if(existingTipRaw) {
@@ -181,12 +181,12 @@ export class TipsController {
           active: updatedTipRaw.active ?? 0
         };
 
-       ResponseHelper.success(res, updatedTip, "Tip updated successfully");
+       ResponseHelper.success(res, updatedTip, "Dica atualizada com sucesso");
 
       }
 
     } catch (error) {
-       ResponseHelper.serverError(res, "Failed to update tip");
+       ResponseHelper.serverError(res, "Falha ao atualizar dica");
     }
   }
 
@@ -197,11 +197,11 @@ export class TipsController {
       const { active }: UpdateTipStateRequest = req.body;
 
       if (isNaN(tipId) || tipId <= 0) {
-         ResponseHelper.badRequest(res, "Invalid tip ID format");
+         ResponseHelper.badRequest(res, "Formato de ID da dica inválido");
       }
 
       if (typeof active !== "number" || (active !== 0 && active !== 1)) {
-         ResponseHelper.badRequest(res, "Active field must be 0 (inactive) or 1 (active)");
+         ResponseHelper.badRequest(res, "Campo ativo deve ser 0 (inativo) ou 1 (ativo)");
       }
 
       // Verificar se a tip existe
@@ -210,7 +210,7 @@ export class TipsController {
       });
 
       if (!existingTipRaw) {
-         ResponseHelper.notFound(res, `Tip with ID ${tipId} not found`);
+         ResponseHelper.notFound(res, `Dica com ID ${tipId} não encontrada`);
       } else {
 
         const existingTip: Tip = {
@@ -221,8 +221,8 @@ export class TipsController {
         
         // Se já está no estado desejado, não fazer nada
         if (existingTip.active === active) {
-          const status = active === 1 ? "already active" : "already inactive";
-          ResponseHelper.success(res, existingTip, `Tip is ${status}`);
+          const status = active === 1 ? "já ativa" : "já inativa";
+          ResponseHelper.success(res, existingTip, `Dica ${status}`);
         }
       }
 
@@ -252,12 +252,12 @@ export class TipsController {
       };
 
       const message = active === 1 
-        ? "Tip activated successfully (other tips were deactivated)" 
-        : "Tip deactivated successfully";
+        ? "Dica ativada com sucesso (outras dicas foram desativadas)" 
+        : "Dica desativada com sucesso";
       
        ResponseHelper.success(res, updatedTipState, message);
     } catch (error) {
-       ResponseHelper.serverError(res, "Failed to update tip state");
+       ResponseHelper.serverError(res, "Falha ao atualizar estado da dica");
     }
   }
 
@@ -267,7 +267,7 @@ export class TipsController {
       const tipId: number = parseInt(req.params.id);
 
       if (isNaN(tipId) || tipId <= 0) {
-         ResponseHelper.badRequest(res, "Invalid tip ID format");
+         ResponseHelper.badRequest(res, "Formato de ID da dica inválido");
       }
 
       const existingTipRaw = await prisma.tips.findUnique({
@@ -275,7 +275,7 @@ export class TipsController {
       });
 
       if (!existingTipRaw) {
-         ResponseHelper.notFound(res, `Tip with ID ${tipId} not found`);
+         ResponseHelper.notFound(res, `Dica com ID ${tipId} não encontrada`);
       } else {
         const existingTip: Tip = {
           ...existingTipRaw,
@@ -286,13 +286,13 @@ export class TipsController {
           where: { id_tip: tipId },
         });
 
-        ResponseHelper.success(res, null, "Tip deleted successfully");
+        ResponseHelper.success(res, null, "Dica eliminada com sucesso");
       }
 
       
     } catch (error) {
       console.error("Error deleting tip:", error);
-       ResponseHelper.serverError(res, "Failed to delete tip");
+       ResponseHelper.serverError(res, "Falha ao eliminar dica");
     }
   }
 }

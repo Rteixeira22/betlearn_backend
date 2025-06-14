@@ -36,10 +36,10 @@ export class StepsController {
         ...step
       }));
 
-      ResponseHelper.success(res, steps, "Steps retrieved successfully");
+      ResponseHelper.success(res, steps, "Passos obtidos com sucesso");
     } catch (error) {
       console.error("Error fetching steps:", error);
-      ResponseHelper.serverError(res, "Failed to fetch steps");
+      ResponseHelper.serverError(res, "Falha ao obter passos");
     }
   }
 
@@ -49,7 +49,7 @@ export class StepsController {
       const stepId: number = parseInt(req.params.id);
       
       if (isNaN(stepId) || stepId <= 0) {
-        ResponseHelper.badRequest(res, "Invalid step ID format");
+        ResponseHelper.badRequest(res, "Formato de ID de passo inválido");
         return;
       }
 
@@ -58,7 +58,7 @@ export class StepsController {
       });
 
       if (!stepRaw) {
-        ResponseHelper.notFound(res, `Step with ID ${stepId} not found`);
+        ResponseHelper.notFound(res, `Passo com ID ${stepId} não encontrado`);
         return;
       }
 
@@ -66,10 +66,10 @@ export class StepsController {
         ...stepRaw
       };
 
-      ResponseHelper.success(res, step, "Step retrieved successfully");
+      ResponseHelper.success(res, step, "Passo obtido com sucesso");
     } catch (error) {
       console.error("Error fetching step by ID:", error);
-      ResponseHelper.serverError(res, "Failed to fetch step");
+      ResponseHelper.serverError(res, "Falha ao obter passo");
     }
   }
 
@@ -79,7 +79,7 @@ export class StepsController {
       const refIdChallenges: number = parseInt(req.params.ref_id_challenges);
       
       if (isNaN(refIdChallenges) || refIdChallenges <= 0) {
-        ResponseHelper.badRequest(res, "Invalid challenge ID format");
+        ResponseHelper.badRequest(res, "Formato de ID de desafio inválido");
         return;
       }
 
@@ -92,10 +92,10 @@ export class StepsController {
         ...step
       }));
 
-      ResponseHelper.success(res, steps, "Steps for challenge retrieved successfully");
+      ResponseHelper.success(res, steps, "Passos do desafio obtidos com sucesso");
     } catch (error) {
       console.error("Error fetching steps by challenge ID:", error);
-      ResponseHelper.serverError(res, "Failed to fetch steps");
+      ResponseHelper.serverError(res, "Falha ao obter passos");
     }
   }
 
@@ -105,7 +105,7 @@ export class StepsController {
       const videoId: number = parseInt(req.params.id_video);
       
       if (isNaN(videoId) || videoId <= 0) {
-        ResponseHelper.badRequest(res, "Invalid video ID format");
+        ResponseHelper.badRequest(res, "Formato de ID de vídeo inválido");
         return;
       }
 
@@ -117,10 +117,10 @@ export class StepsController {
         ...stepVideo
       }));
 
-      ResponseHelper.success(res, stepVideos, "Step videos retrieved successfully");
+      ResponseHelper.success(res, stepVideos, "Vídeos de passo obtidos com sucesso");
     } catch (error) {
       console.error("Error fetching step by video ID:", error);
-      ResponseHelper.serverError(res, "Failed to fetch step videos");
+      ResponseHelper.serverError(res, "Falha ao obter vídeos de passo");
     }
   }
 
@@ -130,7 +130,7 @@ export class StepsController {
       const betId: number = parseInt(req.params.id_bet);
       
       if (isNaN(betId) || betId <= 0) {
-        ResponseHelper.badRequest(res, "Invalid bet ID format");
+        ResponseHelper.badRequest(res, "Formato de ID de aposta inválido");
         return;
       }
 
@@ -142,10 +142,10 @@ export class StepsController {
         ...stepBet
       }));
 
-      ResponseHelper.success(res, stepBets, "Step bets retrieved successfully");
+      ResponseHelper.success(res, stepBets, "Apostas de passo obtidas com sucesso");
     } catch (error) {
       console.error("Error fetching step by bet ID:", error);
-      ResponseHelper.serverError(res, "Failed to fetch step bets");
+      ResponseHelper.serverError(res, "Falha ao obter apostas de passo");
     }
   }
 
@@ -155,7 +155,7 @@ export class StepsController {
       const viewId: number = parseInt(req.params.id_view);
       
       if (isNaN(viewId) || viewId <= 0) {
-        ResponseHelper.badRequest(res, "Invalid view ID format");
+        ResponseHelper.badRequest(res, "Formato de ID de visualização inválido");
         return;
       }
 
@@ -167,10 +167,10 @@ export class StepsController {
         ...stepView
       }));
 
-      ResponseHelper.success(res, stepViews, "Step views retrieved successfully");
+      ResponseHelper.success(res, stepViews, "Visualizações de passo obtidas com sucesso");
     } catch (error) {
       console.error("Error fetching step by view ID:", error);
-      ResponseHelper.serverError(res, "Failed to fetch step views");
+      ResponseHelper.serverError(res, "Falha ao obter visualizações de passo");
     }
   }
 
@@ -180,7 +180,7 @@ export class StepsController {
       const questionnaireId: number = parseInt(req.params.id_questionnaire);
       
       if (isNaN(questionnaireId) || questionnaireId <= 0) {
-        ResponseHelper.badRequest(res, "Invalid questionnaire ID format");
+        ResponseHelper.badRequest(res, "Formato de ID de questionário inválido");
         return;
       }
 
@@ -192,10 +192,10 @@ export class StepsController {
         ...stepQuestionnaire
       }));
 
-      ResponseHelper.success(res, stepQuestionnaires, "Step questionnaires retrieved successfully");
+      ResponseHelper.success(res, stepQuestionnaires, "Questionários de passo obtidos com sucesso");
     } catch (error) {
       console.error("Error fetching step by questionnaire ID:", error);
-      ResponseHelper.serverError(res, "Failed to fetch step questionnaires");
+      ResponseHelper.serverError(res, "Falha ao obter questionários de passo");
     }
   }
 
@@ -209,22 +209,22 @@ export class StepsController {
       const tokenUserId = parseInt(req.userId!);
 
       if (isNaN(requestedUserId) || requestedUserId <= 0) {
-        ResponseHelper.badRequest(res, "Invalid user ID format");
+        ResponseHelper.badRequest(res, "Formato de ID de utilizador inválido");
         return;
       }
 
       if (isNaN(challengeId) || challengeId <= 0) {
-        ResponseHelper.badRequest(res, "Invalid challenge ID format");
+        ResponseHelper.badRequest(res, "Formato de ID de desafio inválido");
         return;
       }
 
       if (isNaN(stepId) || stepId <= 0) {
-        ResponseHelper.badRequest(res, "Invalid step ID format");
+        ResponseHelper.badRequest(res, "Formato de ID de passo inválido");
         return;
       }
 
       if (role !== 'admin' && requestedUserId !== tokenUserId) {
-        ResponseHelper.forbidden(res, "Access denied");
+        ResponseHelper.forbidden(res, "Acesso negado");
         return;
       }
 
@@ -240,10 +240,10 @@ export class StepsController {
         ...item
       }));
 
-      ResponseHelper.success(res, userHasChallengesHasSteps, "User challenge steps retrieved successfully");
+      ResponseHelper.success(res, userHasChallengesHasSteps, "Passos de desafio do utilizador obtidos com sucesso");
     } catch (error) {
       console.error("Error fetching user challenge steps:", error);
-      ResponseHelper.serverError(res, "Failed to fetch user challenge steps");
+      ResponseHelper.serverError(res, "Falha ao obter passos de desafio do utilizador");
     }
   }
 
@@ -253,17 +253,17 @@ export class StepsController {
       const { video_url, video_description }: CreateStepVideoRequest = req.body;
 
       if (!video_url || typeof video_url !== 'string') {
-        ResponseHelper.badRequest(res, "Video URL is required and must be a valid string");
+        ResponseHelper.badRequest(res, "URL do vídeo é obrigatória e deve ser uma string válida");
         return;
       }
 
       if (video_url.trim().length === 0) {
-        ResponseHelper.badRequest(res, "Video URL cannot be empty");
+        ResponseHelper.badRequest(res, "URL do vídeo não pode estar vazia");
         return;
       }
 
       if (video_description !== undefined && typeof video_description !== 'string') {
-        ResponseHelper.badRequest(res, "Video description must be a string");
+        ResponseHelper.badRequest(res, "Descrição do vídeo deve ser uma string");
         return;
       }
 
@@ -278,10 +278,10 @@ export class StepsController {
         ...newVideoRaw
       };
 
-      ResponseHelper.created(res, newVideo, "Step video created successfully");
+      ResponseHelper.created(res, newVideo, "Vídeo de passo criado com sucesso");
     } catch (error) {
       console.error("Error creating step video:", error);
-      ResponseHelper.serverError(res, "Failed to create step video");
+      ResponseHelper.serverError(res, "Falha ao criar vídeo de passo");
     }
   }
 
@@ -291,7 +291,7 @@ export class StepsController {
       const { bet_description }: CreateStepBetRequest = req.body;
 
       if (bet_description !== undefined && typeof bet_description !== 'string') {
-        ResponseHelper.badRequest(res, "Bet description must be a string");
+        ResponseHelper.badRequest(res, "Descrição da aposta deve ser uma string");
         return;
       }
 
@@ -305,10 +305,10 @@ export class StepsController {
         ...newStepBetRaw
       };
 
-      ResponseHelper.created(res, newStepBet, "Step bet created successfully");
+      ResponseHelper.created(res, newStepBet, "Aposta de passo criada com sucesso");
     } catch (error) {
       console.error("Error creating step bet:", error);
-      ResponseHelper.serverError(res, "Failed to create step bet");
+      ResponseHelper.serverError(res, "Falha ao criar aposta de passo");
     }
   }
 
@@ -318,12 +318,12 @@ export class StepsController {
       const { view_description, view_page }: CreateStepViewRequest = req.body;
 
       if (view_description !== undefined && typeof view_description !== 'string') {
-        ResponseHelper.badRequest(res, "View description must be a string");
+        ResponseHelper.badRequest(res, "Descrição da visualização deve ser uma string");
         return;
       }
 
       if (view_page !== undefined && typeof view_page !== 'string') {
-        ResponseHelper.badRequest(res, "View page must be a string");
+        ResponseHelper.badRequest(res, "Página da visualização deve ser uma string");
         return;
       }
 
@@ -338,10 +338,10 @@ export class StepsController {
         ...newStepViewRaw
       };
 
-      ResponseHelper.created(res, newStepView, "Step view created successfully");
+      ResponseHelper.created(res, newStepView, "Visualização de passo criada com sucesso");
     } catch (error) {
       console.error("Error creating step view:", error);
-      ResponseHelper.serverError(res, "Failed to create step view");
+      ResponseHelper.serverError(res, "Falha ao criar visualização de passo");
     }
   }
 
@@ -351,7 +351,7 @@ export class StepsController {
       const { questionnaire_description, questionnaire_json }: CreateStepQuestionnaireRequest = req.body;
 
       if (questionnaire_description !== undefined && typeof questionnaire_description !== 'string') {
-        ResponseHelper.badRequest(res, "Questionnaire description must be a string");
+        ResponseHelper.badRequest(res, "Descrição do questionário deve ser uma string");
         return;
       }
 
@@ -366,10 +366,10 @@ export class StepsController {
         ...newStepQuestionnaireRaw
       };
 
-      ResponseHelper.created(res, newStepQuestionnaire, "Step questionnaire created successfully");
+      ResponseHelper.created(res, newStepQuestionnaire, "Questionário de passo criado com sucesso");
     } catch (error) {
       console.error("Error creating step questionnaire:", error);
-      ResponseHelper.serverError(res, "Failed to create step questionnaire");
+      ResponseHelper.serverError(res, "Falha ao criar questionário de passo");
     }
   }
 
@@ -385,34 +385,34 @@ export class StepsController {
       }: CreateStepRequest = req.body;
 
       if (!ref_id_challenges || ref_id_challenges <= 0) {
-        ResponseHelper.badRequest(res, "Valid challenge ID is required");
+        ResponseHelper.badRequest(res, "ID de desafio válido é obrigatório");
         return;
       }
 
       // Validar que pelo menos um tipo de step foi fornecido
       if (!ref_id_step_video && !ref_id_step_bet && !ref_id_step_view && !ref_id_step_questionnaire) {
-        ResponseHelper.badRequest(res, "At least one step type reference is required");
+        ResponseHelper.badRequest(res, "Pelo menos uma referência de tipo de passo é obrigatória");
         return;
       }
 
       // Validar IDs se fornecidos
       if (ref_id_step_video !== undefined && (typeof ref_id_step_video !== 'number' || ref_id_step_video <= 0)) {
-        ResponseHelper.badRequest(res, "Step video ID must be a positive number");
+        ResponseHelper.badRequest(res, "ID do vídeo de passo deve ser um número positivo");
         return;
       }
 
       if (ref_id_step_bet !== undefined && (typeof ref_id_step_bet !== 'number' || ref_id_step_bet <= 0)) {
-        ResponseHelper.badRequest(res, "Step bet ID must be a positive number");
+        ResponseHelper.badRequest(res, "ID da aposta de passo deve ser um número positivo");
         return;
       }
 
       if (ref_id_step_view !== undefined && (typeof ref_id_step_view !== 'number' || ref_id_step_view <= 0)) {
-        ResponseHelper.badRequest(res, "Step view ID must be a positive number");
+        ResponseHelper.badRequest(res, "ID da visualização de passo deve ser um número positivo");
         return;
       }
 
       if (ref_id_step_questionnaire !== undefined && (typeof ref_id_step_questionnaire !== 'number' || ref_id_step_questionnaire <= 0)) {
-        ResponseHelper.badRequest(res, "Step questionnaire ID must be a positive number");
+        ResponseHelper.badRequest(res, "ID do questionário de passo deve ser um número positivo");
         return;
       }
 
@@ -430,10 +430,10 @@ export class StepsController {
         ...newStepRaw
       };
 
-      ResponseHelper.created(res, newStep, "Step created successfully");
+      ResponseHelper.created(res, newStep, "Passo criado com sucesso");
     } catch (error) {
       console.error("Error creating step:", error);
-      ResponseHelper.serverError(res, "Failed to create step");
+      ResponseHelper.serverError(res, "Falha ao criar passo");
     }
   }
 
@@ -444,17 +444,17 @@ export class StepsController {
       const { progress_percentage, ref_id_user }: UpdateStepProgressRequest = req.body;
 
       if (isNaN(challengeId) || challengeId <= 0) {
-        ResponseHelper.badRequest(res, "Invalid challenge ID format");
+        ResponseHelper.badRequest(res, "Formato de ID de desafio inválido");
         return;
       }
 
       if (typeof progress_percentage !== 'number' || progress_percentage < 0 || progress_percentage > 100) {
-        ResponseHelper.badRequest(res, "Progress percentage must be a number between 0 and 100");
+        ResponseHelper.badRequest(res, "Percentagem de progresso deve ser um número entre 0 e 100");
         return;
       }
 
       if (!ref_id_user || ref_id_user <= 0) {
-        ResponseHelper.badRequest(res, "Valid user ID is required");
+        ResponseHelper.badRequest(res, "ID de utilizador válido é obrigatório");
         return;
       }
 
@@ -468,10 +468,10 @@ export class StepsController {
         data: { progress_percentage },
       });
 
-      ResponseHelper.success(res, updatedStepRaw, "Step progress updated successfully");
+      ResponseHelper.success(res, updatedStepRaw, "Progresso do passo atualizado com sucesso");
     } catch (error) {
       console.error("Error updating step progress:", error);
-      ResponseHelper.serverError(res, "Failed to update step progress");
+      ResponseHelper.serverError(res, "Falha ao atualizar progresso do passo");
     }
   }
 
@@ -482,17 +482,17 @@ export class StepsController {
       const { video_url, video_description }: UpdateStepVideoRequest = req.body;
 
       if (isNaN(videoId) || videoId <= 0) {
-        ResponseHelper.badRequest(res, "Invalid video ID format");
+        ResponseHelper.badRequest(res, "Formato de ID de vídeo inválido");
         return;
       }
 
       if (video_url !== undefined && (typeof video_url !== 'string' || video_url.trim().length === 0)) {
-        ResponseHelper.badRequest(res, "Video URL must be a non-empty string");
+        ResponseHelper.badRequest(res, "URL do vídeo deve ser uma string não vazia");
         return;
       }
 
       if (video_description !== undefined && typeof video_description !== 'string') {
-        ResponseHelper.badRequest(res, "Video description must be a string");
+        ResponseHelper.badRequest(res, "Descrição do vídeo deve ser uma string");
         return;
       }
 
@@ -502,7 +502,7 @@ export class StepsController {
       });
 
       if (!existingVideo) {
-        ResponseHelper.notFound(res, `Step video with ID ${videoId} not found`);
+        ResponseHelper.notFound(res, `Vídeo de passo com ID ${videoId} não encontrado`);
         return;
       }
 
@@ -518,10 +518,10 @@ export class StepsController {
         ...updatedStepVideoRaw
       };
 
-      ResponseHelper.success(res, updatedStepVideo, "Step video updated successfully");
+      ResponseHelper.success(res, updatedStepVideo, "Vídeo de passo atualizado com sucesso");
     } catch (error) {
       console.error("Error updating step video:", error);
-      ResponseHelper.serverError(res, "Failed to update step video");
+      ResponseHelper.serverError(res, "Falha ao atualizar vídeo de passo");
     }
   }
 
@@ -532,12 +532,12 @@ export class StepsController {
       const { bet_description }: UpdateStepBetRequest = req.body;
 
       if (isNaN(betId) || betId <= 0) {
-        ResponseHelper.badRequest(res, "Invalid bet ID format");
+        ResponseHelper.badRequest(res, "Formato de ID de aposta inválido");
         return;
       }
 
       if (bet_description !== undefined && typeof bet_description !== 'string') {
-        ResponseHelper.badRequest(res, "Bet description must be a string");
+        ResponseHelper.badRequest(res, "Descrição da aposta deve ser uma string");
         return;
       }
 
@@ -547,7 +547,7 @@ export class StepsController {
       });
 
       if (!existingBet) {
-        ResponseHelper.notFound(res, `Step bet with ID ${betId} not found`);
+        ResponseHelper.notFound(res, `Aposta de passo com ID ${betId} não encontrada`);
         return;
       }
 
@@ -560,10 +560,10 @@ export class StepsController {
         ...updatedStepBetRaw
       };
 
-      ResponseHelper.success(res, updatedStepBet, "Step bet updated successfully");
+      ResponseHelper.success(res, updatedStepBet, "Aposta de passo atualizada com sucesso");
     } catch (error) {
       console.error("Error updating step bet:", error);
-      ResponseHelper.serverError(res, "Failed to update step bet");
+      ResponseHelper.serverError(res, "Falha ao atualizar aposta de passo");
     }
   }
 
@@ -574,17 +574,17 @@ export class StepsController {
       const { view_description, view_page }: UpdateStepViewRequest = req.body;
 
       if (isNaN(viewId) || viewId <= 0) {
-        ResponseHelper.badRequest(res, "Invalid view ID format");
+        ResponseHelper.badRequest(res, "Formato de ID de visualização inválido");
         return;
       }
 
       if (view_description !== undefined && typeof view_description !== 'string') {
-        ResponseHelper.badRequest(res, "View description must be a string");
+        ResponseHelper.badRequest(res, "Descrição da visualização deve ser uma string");
         return;
       }
 
       if (view_page !== undefined && typeof view_page !== 'string') {
-        ResponseHelper.badRequest(res, "View page must be a string");
+        ResponseHelper.badRequest(res, "Página da visualização deve ser uma string");
         return;
       }
 
@@ -594,7 +594,7 @@ export class StepsController {
       });
 
       if (!existingView) {
-        ResponseHelper.notFound(res, `Step view with ID ${viewId} not found`);
+        ResponseHelper.notFound(res, `Visualização de passo com ID ${viewId} não encontrada`);
         return;
       }
 
@@ -610,10 +610,10 @@ export class StepsController {
         ...updatedStepViewRaw
       };
 
-      ResponseHelper.success(res, updatedStepView, "Step view updated successfully");
+      ResponseHelper.success(res, updatedStepView, "Visualização de passo atualizada com sucesso");
     } catch (error) {
       console.error("Error updating step view:", error);
-      ResponseHelper.serverError(res, "Failed to update step view");
+      ResponseHelper.serverError(res, "Falha ao atualizar visualização de passo");
     }
   }
 
@@ -624,12 +624,12 @@ export class StepsController {
       const { questionnaire_description, questionnaire_json }: UpdateStepQuestionnaireRequest = req.body;
 
       if (isNaN(questionnaireId) || questionnaireId <= 0) {
-        ResponseHelper.badRequest(res, "Invalid questionnaire ID format");
+        ResponseHelper.badRequest(res, "Formato de ID de questionário inválido");
         return;
       }
 
       if (questionnaire_description !== undefined && typeof questionnaire_description !== 'string') {
-        ResponseHelper.badRequest(res, "Questionnaire description must be a string");
+        ResponseHelper.badRequest(res, "Descrição do questionário deve ser uma string");
         return;
       }
 
@@ -639,7 +639,7 @@ export class StepsController {
       });
 
       if (!existingQuestionnaire) {
-        ResponseHelper.notFound(res, `Step questionnaire with ID ${questionnaireId} not found`);
+        ResponseHelper.notFound(res, `Questionário de passo com ID ${questionnaireId} não encontrado`);
         return;
       }
 
@@ -655,10 +655,10 @@ export class StepsController {
         ...updatedStepQuestionnaireRaw
       };
 
-      ResponseHelper.success(res, updatedStepQuestionnaire, "Step questionnaire updated successfully");
+      ResponseHelper.success(res, updatedStepQuestionnaire, "Questionário de passo atualizado com sucesso");
     } catch (error) {
       console.error("Error updating step questionnaire:", error);
-      ResponseHelper.serverError(res, "Failed to update step questionnaire");
+      ResponseHelper.serverError(res, "Falha ao atualizar questionário de passo");
     }
   }
 
@@ -668,7 +668,7 @@ export class StepsController {
       const stepId: number = parseInt(req.params.id);
 
       if (isNaN(stepId) || stepId <= 0) {
-        ResponseHelper.badRequest(res, "Invalid step ID format");
+        ResponseHelper.badRequest(res, "Formato de ID de passo inválido");
         return;
       }
 
@@ -678,7 +678,7 @@ export class StepsController {
       });
 
       if (!existingStep) {
-        ResponseHelper.notFound(res, `Step with ID ${stepId} not found`);
+        ResponseHelper.notFound(res, `Passo com ID ${stepId} não encontrado`);
         return;
       }
 
@@ -688,7 +688,7 @@ export class StepsController {
       });
 
       if (dependentRecords.length > 0) {
-        ResponseHelper.conflict(res, "Cannot delete step: it has associated user progress records");
+        ResponseHelper.conflict(res, "Não é possível eliminar o passo: tem registos de progresso de utilizador associados");
         return;
       }
 
@@ -700,10 +700,10 @@ export class StepsController {
         ...deletedStepRaw
       };
 
-      ResponseHelper.success(res, deletedStep, "Step deleted successfully");
+      ResponseHelper.success(res, deletedStep, "Passo eliminado com sucesso");
     } catch (error) {
       console.error("Error deleting step:", error);
-      ResponseHelper.serverError(res, "Failed to delete step");
+      ResponseHelper.serverError(res, "Falha ao eliminar passo");
     }
   }
 }
