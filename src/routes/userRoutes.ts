@@ -653,6 +653,7 @@ router.get("/", requireAPIKey, userController.getAllusers);
 router.get("/:id", requireAPIKey, verifyJWT, userController.getUserById);
 router.get("/username/:username", requireAPIKey, userController.getUserByUsername);
 router.get("/email/:email",  requireAPIKey, userController.getUserByEmail);
+router.get("/other-user/:id", requireAPIKey, verifyJWT, userController.getOtherUserById);
 
 // User Profile Update Routes
 

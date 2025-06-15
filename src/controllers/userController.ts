@@ -102,6 +102,41 @@ export class UserController {
     }
   }
 
+
+  async getOtherUserById(req: Request, res: Response): Promise<void> {
+    try {
+      const requestedId = parseInt(req.params.id);
+
+      if (isNaN(requestedId) || requestedId <= 0) {
+        ResponseHelper.badRequest(res, "Invalid user ID format");
+        return;
+      }
+
+
+      const user = await prisma.users.findUnique({
+        select: {
+          id_user: true,
+          name: true,
+          username: true,
+          image: true,
+          money: true,
+          points: true,
+          bets_visibility: true,
+        },
+        where: { id_user: requestedId },
+      });
+
+      if (!user) {
+        ResponseHelper.notFound(res, `User with ID ${requestedId} not found`);
+        return;
+      }
+      ResponseHelper.success(res, user, "User retrieved successfully");
+    } catch (error) {
+      console.error("Error fetching user:", error);
+      ResponseHelper.serverError(res, "Failed to fetch user data");
+    }
+  }
+
   // Get user challenges
   async getUserChallenges(req: Request, res: Response): Promise<void> {
     try {
