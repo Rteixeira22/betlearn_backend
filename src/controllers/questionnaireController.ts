@@ -219,11 +219,6 @@ export class QuestionnaireController {
       return;
     }
 
-    if (!ref_id_user || ref_id_user <= 0) {
-      ResponseHelper.badRequest(res, "ID de utilizador válido é obrigatório");
-      return;
-    }
-
     // Garantir que os valores numéricos são do tipo correto
     const questionnaireData = {
       budget: budget ? Number(budget) : 0,
