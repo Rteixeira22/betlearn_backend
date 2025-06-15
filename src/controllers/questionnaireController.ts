@@ -230,14 +230,14 @@ export class QuestionnaireController {
 
     // Garantir que os valores numéricos são do tipo correto
     const questionnaireData = {
-      budget: budget ? Number(budget) : null,
-      verification: Boolean(verification),
-      salary: salary ? Number(salary) : null,
-      expenses: expenses ? Number(expenses) : null,
-      available_amount: available_amount ? Number(available_amount) : null,
-      debt: debt ? Number(debt) : null,
-      debt_monthly: debt_monthly ? Number(debt_monthly) : null,
-      income_source: income_source ? String(income_source) : null,
+      budget: budget ? Number(budget) : 0,
+      verification: verification ? Boolean(verification) : false,
+      salary: salary ? Number(salary) : 0,
+      expenses: expenses ? Number(expenses) : 0,
+      available_amount: available_amount ? Number(available_amount) : 0,
+      debt: debt ? Number(debt) : 0,
+      debt_monthly: debt_monthly ? Number(debt_monthly) : 0,
+      income_source: income_source ? Number(income_source) : 0,
       ref_id_user: Number(ref_id_user),
       user:{
         connect: {
