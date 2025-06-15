@@ -404,7 +404,7 @@ const questionnaireController = new QuestionnaireController();
 // GET Questionnaire Routes
 router.get("/", requireAPIKey, verifyJWT, questionnaireController.getAllQuestionnaires); // Get all questionnaires
 router.get("/:id", requireAPIKey, verifyJWT, questionnaireController.getQuestionnaireById); // Get questionnaire by ID
-router.get("/user/:id", requireAPIKey, verifyJWT, questionnaireController.getQuestionnaireByUserId); // Get questionnaires by user ID
+router.get("/user/:userId", requireAPIKey, verifyJWT, questionnaireController.getQuestionnaireByUserId); // Get questionnaires by user ID
 router.get(
   "/verified/:userId",
   requireAPIKey,
