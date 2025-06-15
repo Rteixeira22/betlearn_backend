@@ -69,10 +69,6 @@ export class QuestionnaireController {
       const requestedId = parseInt(req.params.userId);
       const tokenUserId = parseInt(req.userId!);
 
-      if (isNaN(requestedId) || requestedId <= 0) {
-        ResponseHelper.badRequest(res, "Formato de ID de utilizador inválido");
-        return;
-      }
 
       if (role !== 'admin' && requestedId !== tokenUserId) {
         ResponseHelper.forbidden(res, "Acesso não autorizado");
