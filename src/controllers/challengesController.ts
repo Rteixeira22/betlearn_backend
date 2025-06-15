@@ -915,19 +915,13 @@ export class ChallengesController {
   //Função para ir buscar o desafio em progresso
   async getChallengeInProgress(req: Request, res: Response): Promise<void> {
     try {
-      const role = req.userRole;
       const requestedId = parseInt(req.params.id);
-      const tokenUserId = parseInt(req.userId!);
 
       if (isNaN(requestedId) || requestedId <= 0) {
         ResponseHelper.badRequest(res, "Formato de ID de utilizador inválido");
         return;
       }
 
-      if (role !== 'admin' && requestedId !== tokenUserId) {
-        ResponseHelper.forbidden(res, "Acesso negado");
-        return;
-      }
 
       // Vai buscar um desafio que tenha progress_percentage >= 0 e < 100 (em progresso)
       // e que não esteja completo (completed = false)
