@@ -70,7 +70,7 @@ export class UserController {
       }
 
       if (role !== 'admin' && requestedId !== tokenUserId) {
-        ResponseHelper.forbidden(res, "Access denied");
+        ResponseHelper.forbidden(res, "Acesso não autorizado");
         return;
       }
 
@@ -150,7 +150,7 @@ export class UserController {
       }
 
       if (role !== 'admin' && requestedId !== tokenUserId) {
-        ResponseHelper.forbidden(res, "Access denied");
+        ResponseHelper.forbidden(res, "Acesso não autorizado");
         return;
       }
       
@@ -180,7 +180,7 @@ export class UserController {
       }
 
       if (userId !== tokenUserId) {
-        ResponseHelper.forbidden(res, "Access denied");
+        ResponseHelper.forbidden(res, "Acesso não autorizado");
         return;
       }      
       
@@ -208,7 +208,7 @@ export class UserController {
       }
 
       if (userId !== tokenUserId) {
-        ResponseHelper.forbidden(res, "Access denied");
+        ResponseHelper.forbidden(res, "Acesso não autorizado");
         return;
       }
 
@@ -239,7 +239,7 @@ export class UserController {
       }
 
       if (userId !== tokenUserId) {
-        ResponseHelper.forbidden(res, "Access denied");
+        ResponseHelper.forbidden(res, "Acesso não autorizado");
         return;
       }
 
@@ -270,7 +270,7 @@ export class UserController {
       }
 
       if (userId !== tokenUserId) {
-        ResponseHelper.forbidden(res, "Access denied");
+        ResponseHelper.forbidden(res, "Acesso não autorizado");
         return;
       }
 
@@ -302,7 +302,7 @@ export class UserController {
       }
 
       if (userId !== tokenUserId) {
-        ResponseHelper.forbidden(res, "Access denied");
+        ResponseHelper.forbidden(res, "Acesso não autorizado");
         return;
       }
 
@@ -465,7 +465,7 @@ export class UserController {
       }
 
       if (userId !== tokenUserId) {
-        ResponseHelper.forbidden(res, "Access denied");
+        ResponseHelper.forbidden(res, "Acesso não autorizado");
         return;
       }
 
@@ -540,7 +540,7 @@ export class UserController {
       }
 
       if (userId !== tokenUserId) {
-        ResponseHelper.forbidden(res, "Access denied");
+        ResponseHelper.forbidden(res, "Acesso não autorizado");
         return;
       }
 
@@ -658,7 +658,7 @@ export class UserController {
       }
 
       if (userId !== tokenUserId) {
-        ResponseHelper.forbidden(res, "Access denied");
+        ResponseHelper.forbidden(res, "Acesso não autorizado");
         return;
       }
 
@@ -703,7 +703,7 @@ export class UserController {
       }
 
       if (userId !== tokenUserId) {
-        ResponseHelper.forbidden(res, "Access denied");
+        ResponseHelper.forbidden(res, "Acesso não autorizado");
         return;
       }
 
@@ -748,7 +748,7 @@ export class UserController {
       }
 
       if (userId !== tokenUserId) {
-        ResponseHelper.forbidden(res, "Access denied");
+        ResponseHelper.forbidden(res, "Acesso não autorizado");
         return;
       }
 
@@ -807,7 +807,7 @@ export class UserController {
       const tokenUserId = parseInt(req.userId!); 
 
       if (!tokenUserId) {
-        res.status(403).json({ error: 'Acesso restrito' });
+        ResponseHelper.forbidden(res, "Acesso não autorizado");
         return;
       }
       const leaderboard = await prisma.users.findMany({

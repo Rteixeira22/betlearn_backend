@@ -18,19 +18,13 @@ export class BetsController {
   // Get bets by user ID, with optional filtering
   async getBetsByUserId(req: Request<{ id: string }, {}, {}, BetFiltersQuery>, res: Response): Promise<void> {
     try {
-       const role = req.userRole;
       const requestedId = parseInt(req.params.id);
-      const tokenUserId = parseInt(req.userId!);
       
       if (isNaN(requestedId) || requestedId <= 0) {
         ResponseHelper.badRequest(res, "Formato de ID de utilizador inválido");
         return;
       }
 
-      if (role !== 'admin' && requestedId !== tokenUserId) {
-        ResponseHelper.forbidden(res, "Acesso negado");
-        return;
-      }
 
       const { 
         state, 
