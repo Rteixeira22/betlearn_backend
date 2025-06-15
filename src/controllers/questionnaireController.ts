@@ -239,11 +239,6 @@ export class QuestionnaireController {
       debt_monthly: debt_monthly ? Number(debt_monthly) : 0,
       income_source: income_source ? Number(income_source) : 0,
       ref_id_user: Number(ref_id_user),
-      user:{
-        connect: {
-          id_user: Number(ref_id_user)
-        }
-      }
     };
 
     const newResponseRaw = await prisma.questionnaire_Response.create({
