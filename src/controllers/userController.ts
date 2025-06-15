@@ -44,9 +44,6 @@ export class UserController {
           money: true,
           email: true,
           birthdate: true,
-          bets_visibility: true,
-          tutorial_verification: true,
-          QuestionnaireResponse: true, 
         },
         orderBy: {
           id_user: 'asc'
