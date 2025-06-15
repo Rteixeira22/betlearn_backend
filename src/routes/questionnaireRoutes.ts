@@ -425,7 +425,7 @@ router.get(
 ); // Get last questionnaire response by user ID
 
 // POST Questionnaire Routes
-router.post("/", requireAPIKey, questionnaireController.createQuestionnaireResponse); // Create a new questionnaire response
+router.post("/", requireAPIKey, verifyJWT, questionnaireController.createQuestionnaireResponse); // Create a new questionnaire response
 
 // PUT Questionnaire Routes
 router.put("/:id", requireAPIKey, verifyJWT, questionnaireController.updateQuestionnaireResponse); // Update a specific questionnaire response by ID
