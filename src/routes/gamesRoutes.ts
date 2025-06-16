@@ -384,7 +384,7 @@ router.get("/:id", requireAPIKey, verifyJWT, gamesController.getGameById);
 
 
 //POST
-router.post("/", requireAPIKey, verifyJWT, gamesController.createGame);
+router.post("/", requireAPIKey, gamesController.createGame);
 
 //UPDATE
 router.put("/:id/:betId", requireAPIKey, verifyJWT, gamesController.updateGameState);

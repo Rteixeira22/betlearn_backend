@@ -204,6 +204,7 @@ export class BetsController {
       const ref_id_user = parseInt(req.params.id_user);
       const ref_id_championship = parseInt(req.params.id_championship);
 
+
       if (isNaN(ref_id_user) || ref_id_user <= 0) {
         ResponseHelper.badRequest(res, "Formato de ID de utilizador inválido");
         return;
@@ -259,7 +260,8 @@ export class BetsController {
           game_state: game_state || 0,
         });
 
-        const ref_id_game = gameResponse.data.id_game;
+        const ref_id_game = gameResponse.data.data.id_game;
+
 
         // Create the bet
         const bet = await prisma.bets.create({
@@ -275,6 +277,7 @@ export class BetsController {
             ref_id_user,
           },
         });
+
 
         const ref_id_bets = bet.id_bets;
 
