@@ -3,7 +3,6 @@ import * as dotenv from "dotenv";
 import Ajv from "ajv";
 import addFormats from "ajv-formats";
 import axiosInstance from "../configs/axiosConfig";
-import { console } from "inspector";
 
 dotenv.config();
 
@@ -106,7 +105,7 @@ const schema = {
     "games",
   ],
 };
-console.log("AH");
+
 // Função para validar JSON usando o esquema definido
 function validateJSON(data: any): { valid: boolean; errors: any | null } {
   const validate = ajv.compile(schema);
@@ -117,19 +116,6 @@ function validateJSON(data: any): { valid: boolean; errors: any | null } {
     errors: valid ? null : validate.errors,
   };
 }
-
-// Vai buscar os campeonatos que já existem na base de dados
-async function fetchExistingChampionships() {
-  try {
-    const response = await axiosInstance.get("/championships/");
-    return response.data;
-  } catch (error: any) {
-    console.error("Erro ao buscar campeonatos existentes:", error.message);
-  }
-}
-
-// Mandar ao AI
-const campeonatos = fetchExistingChampionships();
 
 // Função principal para gerar dados via Gemini e validá-los antes de enviar para a API
 async function generateChampionshipData() {
@@ -166,9 +152,7 @@ async function generateChampionshipData() {
   Sê criativo com os nomes das equipas. As odds devem ser realistas com base nas posições das equipas na tabela. Os resultados devem refletir probabilidades realistas considerando a força das equipas.
   Gere apenas o JSON sem explicações adicionais.
   
-  É MUITO IMPORTANTE que o JSON gerado siga exatamente o esquema descrito acima, com todos os campos obrigatórios e no formato correto. Garante que a data 'generated_at' esteja no formato "YYYY-MM-DD".
-  
-  Estes são todos os campeonatos que já existem. Não te esqueças que é crucial que o campeonato novo que vais gerar tenha informações diferentes de qualquer um destes: ${campeonatos}`;
+  É MUITO IMPORTANTE que o JSON gerado siga exatamente o esquema descrito acima, com todos os campos obrigatórios e no formato correto. Garante que a data 'generated_at' esteja no formato "YYYY-MM-DD".`;
 
   try {
     console.log("A enviar pedido à API do Gemini...");
