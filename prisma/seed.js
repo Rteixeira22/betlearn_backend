@@ -197,13 +197,7 @@ async function main() {
       },
     });
 
-    const stepView = await prisma.step_View.create({
-      data: {
-        view_description: "Veja o histórico de apostas ",
-        view_page: "/historico",
-      },
-    });
-
+   
     // Agora criar os Steps e associá-los aos desafios
     const steps = await Promise.all([
       // Steps para o primeiro desafio_ Navegação
@@ -215,7 +209,6 @@ async function main() {
       }),
       prisma.steps.create({
         data: {
-          ref_id_step_view: stepView.id_step_view,
           ref_id_challenges: challenges[0].id_challenge,
         },
       }),
