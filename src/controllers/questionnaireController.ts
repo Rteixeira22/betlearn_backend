@@ -54,7 +54,7 @@ export class QuestionnaireController {
         ...responseRaw,
         verification: responseRaw.verification ?? false
       };
-
+ 
       ResponseHelper.success(res, response, "Questionário obtido com sucesso");
     } catch (error) {
       console.error("Error fetching questionnaire by ID:", error);

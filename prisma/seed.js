@@ -113,7 +113,7 @@ async function main() {
         data: {
           number: 2,
           name: "Gestão de Banca e Emocional",
-          short_description: "Aprenda a gerir sua banca e emoções",
+          short_description: "Aprenda a gerir a sua banca e emoções",
           long_description:
             "Este desafio foca na importância da gestão de banca e emocional ao fazer apostas. Aprenda a controlar as suas emoções e a tomar decisões racionais.",
           image: "https://res.cloudinary.com/dw3aj5xgm/image/upload/v1748471606/4838640_lzve8c.png",
@@ -177,13 +177,13 @@ async function main() {
 
     const stepBet = await prisma.step_Bet.create({
       data: {
-        bet_description: "Faça sua primeira aposta controlada",
+        bet_description: "Faça a sua primeira aposta controlada",
       },
     });
 
     const stepQuestionnaire = await prisma.step_Questionnaire.create({
       data: {
-        questionnaire_description: "Avalie seu conhecimento sobre apostas",
+        questionnaire_description: "Avalie o seu conhecimento sobre apostas",
         questionnaire_json: JSON.stringify({
           question: "O que significam odds decimais de 2.00 nas apostas?",
           options: [
@@ -1291,13 +1291,13 @@ async function main() {
       }),
       prisma.tips.create({
         data: {
-          tip: "Apostas múltiplas têm risco maior, mas retorno potencial maior.",
+          tip: "Apostas múltiplas têm risco maior, mas também um retorno potencial maior.",
           active: 0,
         },
       }),
       prisma.tips.create({
         data: {
-          tip: "Mantenha um registro de todas as suas apostas.",
+          tip: "Mantenha um registo de todas as suas apostas.",
           active: 1,
         },
       }),

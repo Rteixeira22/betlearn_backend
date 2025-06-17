@@ -224,7 +224,7 @@ export class StepsController {
       }
 
       if (role !== 'admin' && requestedUserId !== tokenUserId) {
-        ResponseHelper.forbidden(res, "Acesso negado");
+        ResponseHelper.forbidden(res, "Acesso restrito");
         return;
       }
 

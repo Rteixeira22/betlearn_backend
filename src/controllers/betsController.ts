@@ -172,8 +172,8 @@ export class BetsController {
         ResponseHelper.badRequest(res, "Formato de ID de utilizador inválido");
         return;
       }
-      
 
+      
       const bet = await prisma.bets.findFirst({
         where: { ref_id_user: userId },
         orderBy: { date: "desc" },
@@ -191,7 +191,39 @@ export class BetsController {
         return;
       }
 
-      ResponseHelper.success(res, bet as BetWithGames, "Última aposta obtida com sucesso");
+      // Format the single bet properly
+      const formattedBet: BetWithGames = {
+        id_bets: bet.id_bets,
+        date: bet.date,
+        type: bet.type,
+        amount: bet.amount,
+        potential_earning: bet.potential_earning,
+        odd: bet.odd,
+        ref: bet.ref || undefined,
+        state: bet.state,
+        result: bet.result || undefined,
+        ref_id_user: bet.ref_id_user,
+
+        BetsHasGames: bet.BetsHasGames.map((bhg) => ({
+          ref_id_game: bhg.ref_id_game,
+          ref_id_bet: bhg.ref_id_bet,
+          ref_id_championship: bhg.ref_id_championship,
+          game: {
+            id_game: bhg.game.id_game,
+            local_team: bhg.game.local_team,
+            visitor_team: bhg.game.visitor_team,
+            schedule: bhg.game.schedule,
+            betted_team: bhg.game.betted_team,
+            odd: typeof bhg.game.odd === 'object' ? bhg.game.odd.toNumber() : bhg.game.odd,
+            goals_local_team: bhg.game.goals_local_team || undefined,
+            goals_visitor_team: bhg.game.goals_visitor_team || undefined,
+            image: bhg.game.image || undefined,
+            game_state: bhg.game.game_state,
+          },
+        })),
+      };
+
+      ResponseHelper.success(res, formattedBet, "Última aposta obtida com sucesso");
     } catch (error) {
       console.error("Error fetching last bet:", error);
       ResponseHelper.serverError(res, "Falha ao obter a última aposta com dados do jogo");

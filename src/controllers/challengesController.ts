@@ -307,7 +307,7 @@ export class ChallengesController {
       }
 
       if (role !== 'admin' && requestedId !== tokenUserId) {
-        ResponseHelper.forbidden(res, "Acesso negado");
+        ResponseHelper.forbidden(res, "Acesso restrito");
         return;
       }
 
@@ -341,7 +341,7 @@ export class ChallengesController {
       }
 
       if (role !== 'admin' && requestedId !== tokenUserId) {
-        ResponseHelper.forbidden(res, "Acesso negado");
+        ResponseHelper.forbidden(res, "Acesso restrito");
         return;
       }
 
@@ -527,7 +527,7 @@ export class ChallengesController {
       }
 
       if (role !== 'admin' && requestedId !== tokenUserId) {
-        ResponseHelper.forbidden(res, "Acesso negado");
+        ResponseHelper.forbidden(res, "Acesso restrito");
         return;
       }
 
@@ -638,7 +638,7 @@ export class ChallengesController {
       }
 
       if (role !== 'admin' && requestedId !== tokenUserId) {
-        ResponseHelper.forbidden(res, "Acesso negado");
+        ResponseHelper.forbidden(res, "Acesso restrito");
         return;
       }
       
@@ -687,7 +687,7 @@ export class ChallengesController {
       }
 
       if (role !== 'admin' && requestedId !== tokenUserId) {
-        ResponseHelper.forbidden(res, "Acesso negado");
+        ResponseHelper.forbidden(res, "Acesso restrito");
         return;
       }
       
@@ -767,7 +767,7 @@ export class ChallengesController {
       }
 
       if (role !== 'admin' && userId !== tokenUserId) {
-        ResponseHelper.forbidden(res, "Acesso negado");
+        ResponseHelper.forbidden(res, "Acesso restrito");
         return;
       }
       

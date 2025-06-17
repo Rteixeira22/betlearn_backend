@@ -1,4 +1,3 @@
-
 import { PrismaClient } from '@prisma/client'
 import { Request, Response } from 'express'
 import bcrypt from 'bcrypt';
@@ -50,10 +49,10 @@ export class UserController {
         }
       });
       
-      ResponseHelper.success(res, users, "Users retrieved successfully");
+      ResponseHelper.success(res, users, "Utilizadores obtidos com sucesso");
     } catch (error) {
       console.error("Error fetching users:", error);
-      ResponseHelper.serverError(res, "Failed to fetch users");
+      ResponseHelper.serverError(res, "Falha ao obter utilizadores");
     }
   }
 
@@ -65,7 +64,7 @@ export class UserController {
       const tokenUserId = parseInt(req.userId!);
 
       if (isNaN(requestedId) || requestedId <= 0) {
-        ResponseHelper.badRequest(res, "Invalid user ID format");
+        ResponseHelper.badRequest(res, "Formato de ID de utilizador inválido");
         return;
       }
 
@@ -92,13 +91,13 @@ export class UserController {
       });
 
       if (!user) {
-        ResponseHelper.notFound(res, `User with ID ${requestedId} not found`);
+        ResponseHelper.notFound(res, `Utilizador com ID ${requestedId} não encontrado`);
         return;
       }
-      ResponseHelper.success(res, user, "User retrieved successfully");
+      ResponseHelper.success(res, user, "Utilizador obtido com sucesso");
     } catch (error) {
       console.error("Error fetching user:", error);
-      ResponseHelper.serverError(res, "Failed to fetch user data");
+      ResponseHelper.serverError(res, "Falha ao obter dados do utilizador");
     }
   }
 
@@ -108,7 +107,7 @@ export class UserController {
       const requestedId = parseInt(req.params.id);
 
       if (isNaN(requestedId) || requestedId <= 0) {
-        ResponseHelper.badRequest(res, "Invalid user ID format");
+        ResponseHelper.badRequest(res, "Formato de ID de utilizador inválido");
         return;
       }
 
@@ -127,13 +126,13 @@ export class UserController {
       });
 
       if (!user) {
-        ResponseHelper.notFound(res, `User with ID ${requestedId} not found`);
+        ResponseHelper.notFound(res, `Utilizador com ID ${requestedId} não encontrado`);
         return;
       }
-      ResponseHelper.success(res, user, "User retrieved successfully");
+      ResponseHelper.success(res, user, "Utilizador obtido com sucesso");
     } catch (error) {
       console.error("Error fetching user:", error);
-      ResponseHelper.serverError(res, "Failed to fetch user data");
+      ResponseHelper.serverError(res, "Falha ao obter dados do utilizador");
     }
   }
 
@@ -145,7 +144,7 @@ export class UserController {
       const tokenUserId = parseInt(req.userId!);
 
       if (isNaN(requestedId) || requestedId <= 0) {
-        ResponseHelper.badRequest(res, "Invalid user ID format");
+        ResponseHelper.badRequest(res, "Formato de ID de utilizador inválido");
         return;
       }
 
@@ -161,10 +160,10 @@ export class UserController {
         }
       });
       
-      ResponseHelper.success(res, challenges, "User challenges retrieved successfully");
+      ResponseHelper.success(res, challenges, "Desafios do utilizador obtidos com sucesso");
     } catch (error) {
       console.error("Error fetching user challenges:", error);
-      ResponseHelper.serverError(res, "Failed to fetch user challenges");
+      ResponseHelper.serverError(res, "Falha ao obter desafios do utilizador");
     }
   }
 
@@ -175,7 +174,7 @@ export class UserController {
       const tokenUserId = parseInt(req.userId!); 
 
       if (isNaN(userId) || userId <= 0) {
-        ResponseHelper.badRequest(res, "Invalid user ID format");
+        ResponseHelper.badRequest(res, "Formato de ID de utilizador inválido");
         return;
       }
 
@@ -189,10 +188,10 @@ export class UserController {
         orderBy: { date: 'desc' }
       });
       
-      ResponseHelper.success(res, bets, "Bet history retrieved successfully");
+      ResponseHelper.success(res, bets, "Histórico de apostas obtido com sucesso");
     } catch (error) {
       console.error("Error fetching bet history:", error);
-      ResponseHelper.serverError(res, "Failed to fetch bet history");
+      ResponseHelper.serverError(res, "Falha ao obter histórico de apostas");
     }
   }
 
@@ -203,7 +202,7 @@ export class UserController {
       const tokenUserId = parseInt(req.userId!); 
 
       if (isNaN(userId) || userId <= 0) {
-        ResponseHelper.badRequest(res, "Invalid user ID format");
+        ResponseHelper.badRequest(res, "Formato de ID de utilizador inválido");
         return;
       }
 
@@ -220,10 +219,10 @@ export class UserController {
         orderBy: { date: 'desc' }
       });
       
-      ResponseHelper.success(res, activeBets, "Active bets retrieved successfully");
+      ResponseHelper.success(res, activeBets, "Apostas ativas obtidas com sucesso");
     } catch (error) {
       console.error("Error fetching active bets:", error);
-      ResponseHelper.serverError(res, "Failed to fetch active bets");
+      ResponseHelper.serverError(res, "Falha ao obter apostas ativas");
     }
   }
 
@@ -234,7 +233,7 @@ export class UserController {
       const tokenUserId = parseInt(req.userId!); 
 
       if (isNaN(userId) || userId <= 0) {
-        ResponseHelper.badRequest(res, "Invalid user ID format");
+        ResponseHelper.badRequest(res, "Formato de ID de utilizador inválido");
         return;
       }
 
@@ -251,10 +250,10 @@ export class UserController {
         orderBy: { date: 'desc' }
       });
       
-      ResponseHelper.success(res, closedBets, "Closed bets retrieved successfully");
+      ResponseHelper.success(res, closedBets, "Apostas encerradas obtidas com sucesso");
     } catch (error) {
       console.error("Error fetching closed bets:", error);
-      ResponseHelper.serverError(res, "Failed to fetch closed bets");
+      ResponseHelper.serverError(res, "Falha ao obter apostas encerradas");
     }
   }
 
@@ -265,7 +264,7 @@ export class UserController {
       const tokenUserId = parseInt(req.userId!); 
 
       if (isNaN(userId) || userId <= 0) {
-        ResponseHelper.badRequest(res, "Invalid user ID format");
+        ResponseHelper.badRequest(res, "Formato de ID de utilizador inválido");
         return;
       }
 
@@ -283,10 +282,10 @@ export class UserController {
         orderBy: { date: 'desc' }
       });
       
-      ResponseHelper.success(res, wonBets, "Won bets retrieved successfully");
+      ResponseHelper.success(res, wonBets, "Apostas ganhas obtidas com sucesso");
     } catch (error) {
       console.error("Error fetching won bets:", error);
-      ResponseHelper.serverError(res, "Failed to fetch won bets");
+      ResponseHelper.serverError(res, "Falha ao obter apostas ganhas");
     }
   }
 
@@ -297,7 +296,7 @@ export class UserController {
       const tokenUserId = parseInt(req.userId!); 
 
       if (isNaN(userId) || userId <= 0) {
-        ResponseHelper.badRequest(res, "Invalid user ID format");
+        ResponseHelper.badRequest(res, "Formato de ID de utilizador inválido");
         return;
       }
 
@@ -315,10 +314,10 @@ export class UserController {
         orderBy: { date: 'desc' }
       });
       
-      ResponseHelper.success(res, lostBets, "Lost bets retrieved successfully");
+      ResponseHelper.success(res, lostBets, "Apostas perdidas obtidas com sucesso");
     } catch (error) {
       console.error("Error fetching lost bets:", error);
-      ResponseHelper.serverError(res, "Failed to fetch lost bets");
+      ResponseHelper.serverError(res, "Falha ao obter apostas perdidas");
     }
   }
 
@@ -328,7 +327,7 @@ export class UserController {
       const username = req.params.username;
 
       if (!username || username.trim().length === 0) {
-        ResponseHelper.badRequest(res, "Username is required");
+        ResponseHelper.badRequest(res, "Nome de utilizador é obrigatório");
         return;
       }
 
@@ -337,16 +336,16 @@ export class UserController {
       });
 
       if (!user) {
-        ResponseHelper.notFound(res, "User not found");
+        ResponseHelper.notFound(res, "Utilizador não encontrado");
         return;
       }
 
       // Remove password from response
       const { password, ...userWithoutPassword } = user;
-      ResponseHelper.success(res, userWithoutPassword, "User retrieved successfully");
+      ResponseHelper.success(res, userWithoutPassword, "Utilizador obtido com sucesso");
     } catch (error) {
       console.error("Error fetching user by username:", error);
-      ResponseHelper.serverError(res, "Failed to fetch user");
+      ResponseHelper.serverError(res, "Falha ao obter utilizador");
     }
   }
 
@@ -356,7 +355,7 @@ export class UserController {
       const email = req.params.email;
 
       if (!email || email.trim().length === 0) {
-        ResponseHelper.badRequest(res, "Email is required");
+        ResponseHelper.badRequest(res, "Email é obrigatório");
         return;
       }
 
@@ -365,16 +364,16 @@ export class UserController {
       });
 
       if (!user) {
-        ResponseHelper.notFound(res, "User not found");
+        ResponseHelper.notFound(res, "Utilizador não encontrado");
         return;
       }
 
       // Remove password from response
       const { password, ...userWithoutPassword } = user;
-      ResponseHelper.success(res, userWithoutPassword, "User retrieved successfully");
+      ResponseHelper.success(res, userWithoutPassword, "Utilizador obtido com sucesso");
     } catch (error) {
       console.error("Error fetching user by email:", error);
-      ResponseHelper.serverError(res, "Failed to fetch user");
+      ResponseHelper.serverError(res, "Falha ao obter utilizador");
     }
   }
 
@@ -385,27 +384,27 @@ export class UserController {
 
       // Validation
       if (!name || name.trim().length === 0) {
-        ResponseHelper.badRequest(res, "Name is required");
+        ResponseHelper.badRequest(res, "Nome é obrigatório");
         return;
       }
 
       if (!email || email.trim().length === 0) {
-        ResponseHelper.badRequest(res, "Email is required");
+        ResponseHelper.badRequest(res, "Email é obrigatório");
         return;
       }
 
       if (!username || username.trim().length === 0) {
-        ResponseHelper.badRequest(res, "Username is required");
+        ResponseHelper.badRequest(res, "Nome de utilizador é obrigatório");
         return;
       }
 
       if (!password || password.length < 8) {
-        ResponseHelper.badRequest(res, "Password must be at least 8 characters long");
+        ResponseHelper.badRequest(res, "A palavra-passe deve ter pelo menos 8 caracteres");
         return;
       }
 
       if (!birthdate) {
-        ResponseHelper.badRequest(res, "Birthdate is required");
+        ResponseHelper.badRequest(res, "Data de nascimento é obrigatória");
         return;
       }
 
@@ -421,9 +420,9 @@ export class UserController {
 
       if (existingUser) {
         if (existingUser.email === email.trim()) {
-          ResponseHelper.conflict(res, "Email already exists");
+          ResponseHelper.conflict(res, "Email já existe");
         } else {
-          ResponseHelper.conflict(res, "Username already exists");
+          ResponseHelper.conflict(res, "Nome de utilizador já existe");
         }
         return;
       }
@@ -446,10 +445,10 @@ export class UserController {
 
       // Remove password from response
       const { password: _, ...userWithoutPassword } = newUser;
-      ResponseHelper.created(res, userWithoutPassword, "User created successfully");
+      ResponseHelper.created(res, userWithoutPassword, "Utilizador criado com sucesso");
     } catch (error) {
       console.error("Error creating user:", error);
-      ResponseHelper.serverError(res, "Failed to create user");
+      ResponseHelper.serverError(res, "Falha ao criar utilizador");
     }
   }
 
@@ -460,7 +459,7 @@ export class UserController {
       const tokenUserId = parseInt(req.userId!); 
 
       if (isNaN(userId) || userId <= 0) {
-        ResponseHelper.badRequest(res, "Invalid user ID format");
+        ResponseHelper.badRequest(res, "Formato de ID de utilizador inválido");
         return;
       }
 
@@ -474,7 +473,7 @@ export class UserController {
       });
 
       if (!existingUser) {
-        ResponseHelper.notFound(res, `User with ID ${userId} not found`);
+        ResponseHelper.notFound(res, `Utilizador com ID ${userId} não encontrado`);
         return;
       }
 
@@ -482,10 +481,10 @@ export class UserController {
         where: { id_user: userId }
       });
 
-      ResponseHelper.success(res, null, "User deleted successfully");
+      ResponseHelper.success(res, null, "Utilizador eliminado com sucesso");
     } catch (error) {
       console.error("Error deleting user:", error);
-      ResponseHelper.serverError(res, "Failed to delete user");
+      ResponseHelper.serverError(res, "Falha ao eliminar utilizador");
     }
   }
 
@@ -495,13 +494,13 @@ export class UserController {
       const requestedId = parseInt(req.params.id);
 
       if (isNaN(requestedId) || requestedId <= 0) {
-        ResponseHelper.badRequest(res, "Invalid user ID format");
+        ResponseHelper.badRequest(res, "Formato de ID de utilizador inválido");
         return;
       }
 
       const { password } = req.body;
       if (!password || password.length < 8) {
-        ResponseHelper.badRequest(res, "Password must be at least 8 characters long");
+        ResponseHelper.badRequest(res, "A palavra-passe deve ter pelo menos 8 caracteres");
         return;
       }
 
@@ -510,7 +509,7 @@ export class UserController {
       });
 
       if (!existingUser) {
-        ResponseHelper.notFound(res, `User with ID ${requestedId} not found`);
+        ResponseHelper.notFound(res, `Utilizador com ID ${requestedId} não encontrado`);
         return;
       }
 
@@ -521,10 +520,10 @@ export class UserController {
         data: { password: hashedPassword },
       });
 
-      ResponseHelper.success(res, null, "Password updated successfully");
+      ResponseHelper.success(res, null, "Palavra-passe atualizada com sucesso");
     } catch (error) {
       console.error("Password update error:", error);
-      ResponseHelper.serverError(res, "Failed to update user password");
+      ResponseHelper.serverError(res, "Falha ao atualizar palavra-passe do utilizador");
     }
   }
 
@@ -535,7 +534,7 @@ export class UserController {
       const tokenUserId = parseInt(req.userId!); 
 
       if (isNaN(userId) || userId <= 0) {
-        ResponseHelper.badRequest(res, "Invalid user ID format");
+        ResponseHelper.badRequest(res, "Formato de ID de utilizador inválido");
         return;
       }
 
@@ -548,7 +547,7 @@ export class UserController {
 
       // Check if at least one field is provided
       if (!name && !email && !username && !image) {
-        ResponseHelper.badRequest(res, "At least one field must be provided for update");
+        ResponseHelper.badRequest(res, "Pelo menos um campo deve ser fornecido para atualização");
         return;
       }
 
@@ -557,7 +556,7 @@ export class UserController {
       });
 
       if (!existingUser) {
-        ResponseHelper.notFound(res, `User with ID ${userId} not found`);
+        ResponseHelper.notFound(res, `Utilizador com ID ${userId} não encontrado`);
         return;
       }
 
@@ -579,9 +578,9 @@ export class UserController {
 
         if (duplicateCheck) {
           if (duplicateCheck.email === email?.trim()) {
-            ResponseHelper.conflict(res, "Email already exists");
+            ResponseHelper.conflict(res, "Email já existe");
           } else {
-            ResponseHelper.conflict(res, "Username already exists");
+            ResponseHelper.conflict(res, "Nome de utilizador já existe");
           }
           return;
         }
@@ -599,10 +598,10 @@ export class UserController {
 
       // Remove password from response
       const { password, ...userWithoutPassword } = updatedUser;
-      ResponseHelper.success(res, userWithoutPassword, "User profile updated successfully");
+      ResponseHelper.success(res, userWithoutPassword, "Perfil do utilizador atualizado com sucesso");
     } catch (error) {
       console.error("Error updating user profile:", error);
-      ResponseHelper.serverError(res, "Failed to update user profile");
+      ResponseHelper.serverError(res, "Falha ao atualizar perfil do utilizador");
     }
   }
 
@@ -613,12 +612,12 @@ export class UserController {
       const { money } = req.body;
 
       if (isNaN(userId) || userId <= 0) {
-        ResponseHelper.badRequest(res, "Invalid user ID format");
+        ResponseHelper.badRequest(res, "Formato de ID de utilizador inválido");
         return;
       }
 
       if (typeof money !== 'number' || money < 0) {
-        ResponseHelper.badRequest(res, "Money must be a non-negative number");
+        ResponseHelper.badRequest(res, "Dinheiro deve ser um número não negativo");
         return;
       }
 
@@ -627,7 +626,7 @@ export class UserController {
       });
 
       if (!existingUser) {
-        ResponseHelper.notFound(res, `User with ID ${userId} not found`);
+        ResponseHelper.notFound(res, `Utilizador com ID ${userId} não encontrado`);
         return;
       }
       
@@ -638,10 +637,10 @@ export class UserController {
 
       // Remove password from response
       const { password, ...userWithoutPassword } = updatedUser;
-      ResponseHelper.success(res, userWithoutPassword, "User money updated successfully");
+      ResponseHelper.success(res, userWithoutPassword, "Dinheiro do utilizador atualizado com sucesso");
     } catch (error) {
       console.error("Error updating user money:", error);
-      ResponseHelper.serverError(res, "Failed to update user money");
+      ResponseHelper.serverError(res, "Falha ao atualizar dinheiro do utilizador");
     }
   }
 
@@ -653,7 +652,7 @@ export class UserController {
       const tokenUserId = parseInt(req.userId!); 
 
       if (isNaN(userId) || userId <= 0) {
-        ResponseHelper.badRequest(res, "Invalid user ID format");
+        ResponseHelper.badRequest(res, "Formato de ID de utilizador inválido");
         return;
       }
 
@@ -663,7 +662,7 @@ export class UserController {
       }
 
       if (typeof points !== 'number' || points < 0) {
-        ResponseHelper.badRequest(res, "Points must be a non-negative number");
+        ResponseHelper.badRequest(res, "Pontos devem ser um número não negativo");
         return;
       }
 
@@ -672,7 +671,7 @@ export class UserController {
       });
 
       if (!existingUser) {
-        ResponseHelper.notFound(res, `User with ID ${userId} not found`);
+        ResponseHelper.notFound(res, `Utilizador com ID ${userId} não encontrado`);
         return;
       }
       
@@ -683,10 +682,10 @@ export class UserController {
 
       // Remove password from response
       const { password, ...userWithoutPassword } = updatedUser;
-      ResponseHelper.success(res, userWithoutPassword, "User points updated successfully");
+      ResponseHelper.success(res, userWithoutPassword, "Pontos do utilizador atualizados com sucesso");
     } catch (error) {
       console.error("Error updating user points:", error);
-      ResponseHelper.serverError(res, "Failed to update user points");
+      ResponseHelper.serverError(res, "Falha ao atualizar pontos do utilizador");
     }
   }
 
@@ -698,7 +697,7 @@ export class UserController {
       const tokenUserId = parseInt(req.userId!); 
 
       if (isNaN(userId) || userId <= 0) {
-        ResponseHelper.badRequest(res, "Invalid user ID format");
+        ResponseHelper.badRequest(res, "Formato de ID de utilizador inválido");
         return;
       }
 
@@ -708,7 +707,7 @@ export class UserController {
       }
 
       if (typeof bets_visibility !== 'boolean' || (bets_visibility !== false && bets_visibility !== true)) {
-        ResponseHelper.badRequest(res, "Bets visibility must be 0 (hidden) or 1 (visible)");
+        ResponseHelper.badRequest(res, "Visibilidade de apostas deve ser 0 (oculto) ou 1 (visível)");
         return;
       }
 
@@ -717,7 +716,7 @@ export class UserController {
       });
 
       if (!existingUser) {
-        ResponseHelper.notFound(res, `User with ID ${userId} not found`);
+        ResponseHelper.notFound(res, `Utilizador com ID ${userId} não encontrado`);
         return;
       }
       
@@ -728,10 +727,10 @@ export class UserController {
 
       // Remove password from response
       const { password, ...userWithoutPassword } = updatedUser;
-      ResponseHelper.success(res, userWithoutPassword, "User bets visibility updated successfully");
+      ResponseHelper.success(res, userWithoutPassword, "Visibilidade de apostas do utilizador atualizada com sucesso");
     } catch (error) {
       console.error("Error updating user bets visibility:", error);
-      ResponseHelper.serverError(res, "Failed to update user bets visibility");
+      ResponseHelper.serverError(res, "Falha ao atualizar visibilidade de apostas do utilizador");
     }
   }
 
@@ -743,7 +742,7 @@ export class UserController {
       const tokenUserId = parseInt(req.userId!); 
 
       if (isNaN(userId) || userId <= 0) {
-        ResponseHelper.badRequest(res, "Invalid user ID format");
+        ResponseHelper.badRequest(res, "Formato de ID de utilizador inválido");
         return;
       }
 
@@ -753,7 +752,7 @@ export class UserController {
       }
 
       if (typeof tutorial_verification !== 'boolean' || (tutorial_verification !== false && tutorial_verification !== true)) {
-        ResponseHelper.badRequest(res, "Tutorial verification must be 0 or 1");
+        ResponseHelper.badRequest(res, "Verificação do tutorial deve ser 0 ou 1");
         return;
       }
 
@@ -762,7 +761,7 @@ export class UserController {
       });
 
       if (!existingUser) {
-        ResponseHelper.notFound(res, `User with ID ${userId} not found`);
+        ResponseHelper.notFound(res, `Utilizador com ID ${userId} não encontrado`);
         return;
       }
 
@@ -773,10 +772,10 @@ export class UserController {
 
       // Remove password from response
       const { password, ...userWithoutPassword } = updatedUser;
-      ResponseHelper.success(res, userWithoutPassword, "User tutorial verification updated successfully");
+      ResponseHelper.success(res, userWithoutPassword, "Verificação do tutorial do utilizador atualizada com sucesso");
     } catch (error) {
       console.error("Error updating user tutorial verification:", error);
-      ResponseHelper.serverError(res, "Failed to update user tutorial verification");
+      ResponseHelper.serverError(res, "Falha ao atualizar verificação do tutorial do utilizador");
     }
   }
 
@@ -794,9 +793,9 @@ export class UserController {
         orderBy: { points: 'desc' }
       });
 
-      ResponseHelper.success(res, leaderboard, "Leaderboard retrieved successfully");
+      ResponseHelper.success(res, leaderboard, "Tabela de classificação obtida com sucesso");
     } catch (error) {
-      ResponseHelper.serverError(res, "Failed to fetch leaderboard");
+      ResponseHelper.serverError(res, "Falha ao obter tabela de classificação");
     }
   }
 
@@ -821,15 +820,11 @@ export class UserController {
         orderBy: { points: 'desc' }
       });
       const userPosition = leaderboard.findIndex(user => user.id_user === userId) + 1;
-      ResponseHelper.success(res, userPosition, "Leaderboard retrieved successfully");
+      ResponseHelper.success(res, userPosition, "Tabela de classificação obtida com sucesso");
 
     } catch (error) {
-      ResponseHelper.serverError(res, "Failed to fetch user position in leaderboard");
+      ResponseHelper.serverError(res, "Falha ao obter posição do utilizador na tabela de classificação");
     }
   }
 
 }
-
-
-
-

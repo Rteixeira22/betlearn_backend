@@ -1,4 +1,6 @@
 import { Response } from "express";
+import { Decimal } from "@prisma/client/runtime/library";
+
 
 export interface ApiResponseFormat<T = any> {
   success: boolean;
@@ -126,11 +128,11 @@ export class ResponseHelper {
 export interface Bet {
   id_bets: number;
   date: Date;
-  type: string;
-  amount: number;
-  potential_earning: number;
-  odd: number;
-  ref?: string;
+  type: number;
+  amount: number | Decimal;
+  potential_earning: number | Decimal;
+  odd:  number | Decimal;
+  ref?: number;
   state: number;
   result?: number;
   ref_id_user: number;
@@ -156,7 +158,7 @@ export interface Game {
   visitor_team: string;
   schedule: Date;
   betted_team: string;
-  odd: number;
+  odd: number | Decimal;
   goals_local_team?: number;
   goals_visitor_team?: number;
   image?: string;

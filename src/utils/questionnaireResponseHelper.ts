@@ -1,4 +1,5 @@
 import { Response } from "express";
+import { Decimal } from "@prisma/client/runtime/library";
 
 export interface ApiResponseFormat<T = any> {
   success: boolean;
@@ -7,6 +8,7 @@ export interface ApiResponseFormat<T = any> {
   timestamp: string;
   statusCode: number;
 }
+
 
 export class ResponseHelper {
   private static formatResponse<T>(
@@ -122,23 +124,22 @@ export class ResponseHelper {
   static error = this.serverError;
 }
 
-// Tipos para o modelo QuestionnaireResponse
 export interface QuestionnaireResponse {
   id_questionnaire_response: number;
-  budget?: number | null;
+  budget?: number | Decimal | null;
   verification: boolean;
   salary?: number | null;
   expenses?: number | null;
   available_amount?: number | null;
   debt?: number | null;
-  debt_monthly?: number | null;
-  income_source?: string | null;
+  debt_monthly?: number | Decimal | null;
+  income_source?: string | number | null; // Aceita ambos os tipos
   ref_id_user: number;
   created_at?: Date;
   updated_at?: Date;
 }
 
-// Tipos para requests
+// Interfaces para requests (mantém como number para facilitar o input)
 export interface CreateQuestionnaireRequest {
   budget?: number;
   verification: boolean;

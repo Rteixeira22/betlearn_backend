@@ -1,0 +1,361 @@
+{
+  "championship_id": "1234567890",
+  "championship_name": "Liga Portuguesa de Futebol",
+  "round": 15,
+  "generated_at": "2024-01-15",
+  "classification": [
+    {
+      "position": 1,
+      "team": "FC Dragons",
+      "points": 42,
+      "wins": 13,
+      "draws": 3,
+      "losts": 1,
+      "goals_for": 38,
+      "goals_against": 12,
+      "goals_difference": 26,
+      "total_matches": 17,
+      "form": ["V", "V", "E", "V", "V"]
+    },
+    {
+      "position": 2,
+      "team": "Sporting Lions",
+      "points": 38,
+      "wins": 12,
+      "draws": 2,
+      "losts": 3,
+      "goals_for": 35,
+      "goals_against": 18,
+      "goals_difference": 17,
+      "total_matches": 17,
+      "form": ["V", "D", "V", "V", "E"]
+    },
+    {
+      "position": 3,
+      "team": "Benfica Eagles",
+      "points": 36,
+      "wins": 11,
+      "draws": 3,
+      "losts": 3,
+      "goals_for": 32,
+      "goals_against": 20,
+      "goals_difference": 12,
+      "total_matches": 17,
+      "form": ["E", "V", "V", "D", "V"]
+    },
+    {
+      "position": 4,
+      "team": "FC Braga Warriors",
+      "points": 32,
+      "wins": 10,
+      "draws": 2,
+      "losts": 5,
+      "goals_for": 28,
+      "goals_against": 22,
+      "goals_difference": 6,
+      "total_matches": 17,
+      "form": ["V", "D", "E", "V", "D"]
+    },
+    {
+      "position": 5,
+      "team": "Vitória Wolves",
+      "points": 28,
+      "wins": 8,
+      "draws": 4,
+      "losts": 5,
+      "goals_for": 25,
+      "goals_against": 23,
+      "goals_difference": 2,
+      "total_matches": 17,
+      "form": ["E", "D", "V", "E", "V"]
+    },
+    {
+      "position": 6,
+      "team": "Rio Ave Rapids",
+      "points": 26,
+      "wins": 7,
+      "draws": 5,
+      "losts": 5,
+      "goals_for": 23,
+      "goals_against": 24,
+      "goals_difference": -1,
+      "total_matches": 17,
+      "form": ["D", "E", "V", "D", "E"]
+    },
+    {
+      "position": 7,
+      "team": "Moreirense United",
+      "points": 25,
+      "wins": 7,
+      "draws": 4,
+      "losts": 6,
+      "goals_for": 22,
+      "goals_against": 25,
+      "goals_difference": -3,
+      "total_matches": 17,
+      "form": ["V", "D", "D", "E", "V"]
+    },
+    {
+      "position": 8,
+      "team": "Famalicão Tigers",
+      "points": 23,
+      "wins": 6,
+      "draws": 5,
+      "losts": 6,
+      "goals_for": 21,
+      "goals_against": 26,
+      "goals_difference": -5,
+      "total_matches": 17,
+      "form": ["E", "D", "V", "D", "E"]
+    },
+    {
+      "position": 9,
+      "team": "Paços Ferreira",
+      "points": 22,
+      "wins": 6,
+      "draws": 4,
+      "losts": 7,
+      "goals_for": 20,
+      "goals_against": 27,
+      "goals_difference": -7,
+      "total_matches": 17,
+      "form": ["D", "V", "D", "E", "D"]
+    },
+    {
+      "position": 10,
+      "team": "Gil Vicente Stars",
+      "points": 21,
+      "wins": 5,
+      "draws": 6,
+      "losts": 6,
+      "goals_for": 19,
+      "goals_against": 26,
+      "goals_difference": -7,
+      "total_matches": 17,
+      "form": ["E", "D", "E", "V", "D"]
+    },
+    {
+      "position": 11,
+      "team": "Santa Clara Islanders",
+      "points": 20,
+      "wins": 5,
+      "draws": 5,
+      "losts": 7,
+      "goals_for": 18,
+      "goals_against": 28,
+      "goals_difference": -10,
+      "total_matches": 17,
+      "form": ["D", "E", "D", "V", "E"]
+    },
+    {
+      "position": 12,
+      "team": "Boavista Panthers",
+      "points": 19,
+      "wins": 5,
+      "draws": 4,
+      "losts": 8,
+      "goals_for": 17,
+      "goals_against": 29,
+      "goals_difference": -12,
+      "total_matches": 17,
+      "form": ["D", "D", "E", "V", "D"]
+    },
+    {
+      "position": 13,
+      "team": "Marítimo Sailors",
+      "points": 18,
+      "wins": 4,
+      "draws": 6,
+      "losts": 7,
+      "goals_for": 16,
+      "goals_against": 28,
+      "goals_difference": -12,
+      "total_matches": 17,
+      "form": ["E", "D", "D", "E", "D"]
+    },
+    {
+      "position": 14,
+      "team": "Portimonense Fish",
+      "points": 17,
+      "wins": 4,
+      "draws": 5,
+      "losts": 8,
+      "goals_for": 15,
+      "goals_against": 30,
+      "goals_difference": -15,
+      "total_matches": 17,
+      "form": ["D", "E", "D", "D", "E"]
+    },
+    {
+      "position": 15,
+      "team": "Tondela Miners",
+      "points": 16,
+      "wins": 4,
+      "draws": 4,
+      "losts": 9,
+      "goals_for": 14,
+      "goals_against": 31,
+      "goals_difference": -17,
+      "total_matches": 17,
+      "form": ["D", "D", "E", "D", "V"]
+    },
+    {
+      "position": 16,
+      "team": "Vizela Hawks",
+      "points": 15,
+      "wins": 3,
+      "draws": 6,
+      "losts": 8,
+      "goals_for": 13,
+      "goals_against": 32,
+      "goals_difference": -19,
+      "total_matches": 17,
+      "form": ["E", "D", "D", "E", "D"]
+    },
+    {
+      "position": 17,
+      "team": "Arouca Knights",
+      "points": 13,
+      "wins": 3,
+      "draws": 4,
+      "losts": 10,
+      "goals_for": 12,
+      "goals_against": 34,
+      "goals_difference": -22,
+      "total_matches": 17,
+      "form": ["D", "D", "D", "E", "D"]
+    },
+    {
+      "position": 18,
+      "team": "Estoril Waves",
+      "points": 10,
+      "wins": 2,
+      "draws": 4,
+      "losts": 11,
+      "goals_for": 10,
+      "goals_against": 35,
+      "goals_difference": -25,
+      "total_matches": 17,
+      "form": ["D", "D", "E", "D", "D"]
+    }
+  ],
+  "games": [
+    {
+      "id": 1,
+      "local_team": "FC Dragons",
+      "visitor_team": "Estoril Waves",
+      "odds": {
+        "1": 1.25,
+        "x": 6.50,
+        "2": 12.00
+      },
+      "goals_local_team": 3,
+      "goals_visitor_team": 0,
+      "schedule": "15:00"
+    },
+    {
+      "id": 2,
+      "local_team": "Sporting Lions",
+      "visitor_team": "Arouca Knights",
+      "odds": {
+        "1": 1.40,
+        "x": 5.00,
+        "2": 8.50
+      },
+      "goals_local_team": 2,
+      "goals_visitor_team": 1,
+      "schedule": "17:30"
+    },
+    {
+      "id": 3,
+      "local_team": "Benfica Eagles",
+      "visitor_team": "Vizela Hawks",
+      "odds": {
+        "1": 1.30,
+        "x": 5.50,
+        "2": 10.00
+      },
+      "goals_local_team": 4,
+      "goals_visitor_team": 0,
+      "schedule": "20:00"
+    },
+    {
+      "id": 4,
+      "local_team": "FC Braga Warriors",
+      "visitor_team": "Tondela Miners",
+      "odds": {
+        "1": 1.60,
+        "x": 4.20,
+        "2": 6.00
+      },
+      "goals_local_team": 1,
+      "goals_visitor_team": 0,
+      "schedule": "15:00"
+    },
+    {
+      "id": 5,
+      "local_team": "Vitória Wolves",
+      "visitor_team": "Portimonense Fish",
+      "odds": {
+        "1": 1.80,
+        "x": 3.60,
+        "2": 4.50
+      },
+      "goals_local_team": 2,
+      "goals_visitor_team": 2,
+      "schedule": "17:30"
+    },
+    {
+      "id": 6,
+      "local_team": "Rio Ave Rapids",
+      "visitor_team": "Marítimo Sailors",
+      "odds": {
+        "1": 2.10,
+        "x": 3.40,
+        "2": 3.80
+      },
+      "goals_local_team": 1,
+      "goals_visitor_team": 1,
+      "schedule": "20:00"
+    },
+    {
+      "id": 7,
+      "local_team": "Moreirense United",
+      "visitor_team": "Boavista Panthers",
+      "odds": {
+        "1": 2.20,
+        "x": 3.30,
+        "2": 3.60
+      },
+      "goals_local_team": 0,
+      "goals_visitor_team": 1,
+      "schedule": "15:00"
+    },
+    {
+      "id": 8,
+      "local_team": "Famalicão Tigers",
+      "visitor_team": "Santa Clara Islanders",
+      "odds": {
+        "1": 2.40,
+        "x": 3.20,
+        "2": 3.20
+      },
+      "goals_local_team": 1,
+      "goals_visitor_team": 0,
+      "schedule": "17:30"
+    },
+    {
+      "id": 9,
+      "local_team": "Paços Ferreira",
+      "visitor_team": "Gil Vicente Stars",
+      "odds": {
+        "1": 2.60,
+        "x": 3.10,
+        "2": 2.90
+      },
+      "goals_local_team": 2,
+      "goals_visitor_team": 1,
+      "schedule": "20:00"
+    }
+  ]
+}

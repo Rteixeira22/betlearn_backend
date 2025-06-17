@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { VercelRequest, VercelResponse } from '@vercel/node';
+import { Request, Response } from 'express'
 import { 
   ResponseHelper, 
   ChatbotRequest, 
@@ -8,12 +8,12 @@ import {
 
 const apiKey = process.env.GEMINI_API_KEY;
 
-export default async function handler(req: VercelRequest, res: VercelResponse): Promise<void> {
+export default async function handler(req: Request, res: Response): Promise<void> {
   // Check HTTP method
   if (req.method !== 'POST') {
     ResponseHelper.badRequest(res, 'Método não permitido');
     return;
-  }
+  } 
 
   // Validate API key
   if (!apiKey) {
@@ -108,7 +108,7 @@ Pergunta do utilizador: ${pergunta.trim()}`;
     }
 
     if (err.response?.status === 403) {
-      ResponseHelper.forbidden(res, 'Acesso negado ao bot');
+      ResponseHelper.forbidden(res, 'Acesso restrito ao bot');
       return;
     }
 
