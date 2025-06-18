@@ -302,15 +302,7 @@ async function main() {
           ref_user_has_Challenges_id_user: users[0].id_user,
           ref_user_has_Challenges_id_challenge: challenges[0].id_challenge,
           ref_id_steps: steps[0].id_step,
-          state: 1, // Completo
-        },
-      }),
-      prisma.user_has_Challenges_has_Steps.create({
-        data: {
-          ref_user_has_Challenges_id_user: users[0].id_user,
-          ref_user_has_Challenges_id_challenge: challenges[0].id_challenge,
-          ref_id_steps: steps[1].id_step,
-          state: 0, // Em progresso
+          state: 0, // Completo
         },
       }),
       prisma.user_has_Challenges_has_Steps.create({
@@ -318,15 +310,7 @@ async function main() {
           ref_user_has_Challenges_id_user: users[1].id_user,
           ref_user_has_Challenges_id_challenge: challenges[0].id_challenge,
           ref_id_steps: steps[0].id_step,
-          state: 1, // Completo
-        },
-      }),
-      prisma.user_has_Challenges_has_Steps.create({
-        data: {
-          ref_user_has_Challenges_id_user: users[1].id_user,
-          ref_user_has_Challenges_id_challenge: challenges[0].id_challenge,
-          ref_id_steps: steps[1].id_step,
-          state: 0, // Em progresso
+          state: 0, // Completo
         },
       }),
       prisma.user_has_Challenges_has_Steps.create({
@@ -334,14 +318,6 @@ async function main() {
           ref_user_has_Challenges_id_user: users[2].id_user,
           ref_user_has_Challenges_id_challenge: challenges[0].id_challenge,
           ref_id_steps: steps[0].id_step,
-          state: 0, // Em progresso
-        },
-      }),
-      prisma.user_has_Challenges_has_Steps.create({
-        data: {
-          ref_user_has_Challenges_id_user: users[2].id_user,
-          ref_user_has_Challenges_id_challenge: challenges[0].id_challenge,
-          ref_id_steps: steps[1].id_step,
           state: 0, // Em progresso
         },
       }),
