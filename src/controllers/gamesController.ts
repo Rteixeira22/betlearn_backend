@@ -1,43 +1,87 @@
 import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
+import { 
+  ResponseHelper, 
+  Game, 
+  CreateGameRequest, 
+  UpdateGameStateResponse,
+  MostBettedGameResponse 
+} from "../utils/gamesResponseHelper";
 
-///PRISMA CLIENT
 const prisma = new PrismaClient();
+
 export class GamesController {
-  //IR BUSCAR TODOS OS JOGOS PARA PODER MOSTRAR NA PAGINA DAS APOSTAS
-  async getAllGames(req: Request, res: Response) {
+  // Get all games
+  async getAllGames(req: Request, res: Response): Promise<void> {
     try {
-      //SAVE
-      const games = await prisma.games.findMany();
-      //ENVIAR
-      res.status(200).json(games);
+      const gamesRaw = await prisma.games.findMany({
+        orderBy: {
+          id_game: 'desc'
+        }
+      });
+
+      const games: Game[] = gamesRaw.map(game => ({
+        id_game: game.id_game!,
+        local_team: game.local_team!,
+        visitor_team: game.visitor_team!,
+        schedule: game.schedule!,
+        betted_team: game.betted_team,
+        odd: game.odd !== null && game.odd !== undefined ? Number(game.odd) : undefined,
+        goals_local_team: game.goals_local_team,
+        goals_visitor_team: game.goals_visitor_team,
+        image: game.image,
+        game_state: game.game_state!
+      }));
+
+      ResponseHelper.success(res, games, "Jogos obtidos com sucesso");
     } catch (error) {
-      res.status(500).json({ error: "Erro ao procurar todos os jogos." });
+      console.error("Error fetching games:", error);
+      ResponseHelper.serverError(res, "Falha ao obter jogos");
     }
   }
 
-  //IR BUSACR UM JOGO PELO ID
-  async getGameById(req: Request, res: Response) {
+  // Get game by ID
+  async getGameById(req: Request, res: Response): Promise<void> {
     try {
-      //ID DO JOGO
-      const gameId = parseInt(req.params.id);
+      const gameId: number = parseInt(req.params.id);
 
-      //SAVE
-      const game = await prisma.games.findUnique({
+      if (isNaN(gameId) || gameId <= 0) {
+        ResponseHelper.badRequest(res, "Formato de ID de jogo inválido");
+        return;
+      }
+
+      const gameRaw = await prisma.games.findUnique({
         where: { id_game: gameId },
       });
 
-      //ENVIAR
-      res.status(200).json(game);
+      if (!gameRaw) {
+        ResponseHelper.notFound(res, `Jogo com ID ${gameId} não encontrado`);
+        return;
+      }
+
+      const game: Game = {
+        id_game: gameRaw.id_game!,
+        local_team: gameRaw.local_team!,
+        visitor_team: gameRaw.visitor_team!,
+        schedule: gameRaw.schedule!,
+        betted_team: gameRaw.betted_team,
+        odd: gameRaw.odd !== null && gameRaw.odd !== undefined ? Number(gameRaw.odd) : undefined,
+        goals_local_team: gameRaw.goals_local_team,
+        goals_visitor_team: gameRaw.goals_visitor_team,
+        image: gameRaw.image,
+        game_state: gameRaw.game_state!
+      };
+
+      ResponseHelper.success(res, game, "Jogo obtido com sucesso");
     } catch (error) {
-      res.status(500).json({ error: "Erro ao procurar o jogo." });
+      console.error("Error fetching game:", error);
+      ResponseHelper.serverError(res, "Falha ao obter jogo");
     }
   }
 
-  //CRIAR UM JOGO
-  async createGame(req: Request, res: Response) {
+  // Create game
+  async createGame(req: Request<{}, {}, CreateGameRequest>, res: Response): Promise<void> {
     try {
-      //DADOS
       const {
         local_team,
         visitor_team,
@@ -48,144 +92,281 @@ export class GamesController {
         goals_visitor_team,
         image,
         game_state,
-      } = req.body;
+      }: CreateGameRequest = req.body;
 
-      //CRIAR
-      const newGame = await prisma.games.create({
-        data: {
-          local_team,
-          visitor_team,
-          schedule,
-          betted_team,
-          odd,
-          goals_local_team,
-          goals_visitor_team,
-          image,
-          game_state,
-        },
+      // Validate required fields
+      if (!local_team || typeof local_team !== 'string' || local_team.trim().length === 0) {
+        ResponseHelper.badRequest(res, "Equipa local é obrigatória e deve ser uma string não vazia");
+        return;
+      }
+
+      if (!visitor_team || typeof visitor_team !== 'string' || visitor_team.trim().length === 0) {
+        ResponseHelper.badRequest(res, "Equipa visitante é obrigatória e deve ser uma string não vazia");
+        return;
+      }
+
+      if (!schedule) {
+        ResponseHelper.badRequest(res, "Horário é obrigatório");
+        return;
+      }
+
+      // Validate schedule format
+      const scheduleDate = new Date(schedule);
+      if (isNaN(scheduleDate.getTime())) {
+        ResponseHelper.badRequest(res, "Formato de data de horário inválido");
+        return;
+      }
+
+      // Validate optional numeric fields
+      if (odd !== undefined && (typeof odd !== 'number' || odd < 0)) {
+        ResponseHelper.badRequest(res, "Odd deve ser um número positivo");
+        return;
+      }
+
+      if (goals_local_team !== undefined && (typeof goals_local_team !== 'number' || goals_local_team < 0)) {
+        ResponseHelper.badRequest(res, "Golos da equipa local devem ser um número não negativo");
+        return;
+      }
+
+      if (goals_visitor_team !== undefined && (typeof goals_visitor_team !== 'number' || goals_visitor_team < 0)) {
+        ResponseHelper.badRequest(res, "Golos da equipa visitante devem ser um número não negativo");
+        return;
+      }
+
+      if (game_state !== undefined && (typeof game_state !== 'number' || (game_state !== 0 && game_state !== 1))) {
+        ResponseHelper.badRequest(res, "Estado do jogo deve ser 0 (ativo) ou 1 (terminado)");
+        return;
+      }
+
+      const newGameData: any = {
+        local_team: local_team.trim(),
+        visitor_team: visitor_team.trim(),
+        schedule: scheduleDate,
+        betted_team,
+        goals_local_team,
+        goals_visitor_team,
+        image,
+        game_state: game_state ?? 0,
+      };
+      if (odd !== undefined) {
+        newGameData.odd = odd;
+      }
+
+      const newGameRaw = await prisma.games.create({
+        data: newGameData,
       });
-      //ENVIAR
-      res.status(200).json(newGame);
+
+      const newGame: Game = {
+        id_game: newGameRaw.id_game!,
+        local_team: newGameRaw.local_team!,
+        visitor_team: newGameRaw.visitor_team!,
+        schedule: newGameRaw.schedule!,
+        betted_team: newGameRaw.betted_team,
+        odd: newGameRaw.odd !== null && newGameRaw.odd !== undefined ? Number(newGameRaw.odd) : undefined,
+        goals_local_team: newGameRaw.goals_local_team,
+        goals_visitor_team: newGameRaw.goals_visitor_team,
+        image: newGameRaw.image,
+        game_state: newGameRaw.game_state!
+      };
+
+      ResponseHelper.created(res, newGame, "Jogo criado com sucesso");
     } catch (error) {
-      res.status(500).json({ error: "Erro ao criar o jogo." });
+      console.error("Error creating game:", error);
+      ResponseHelper.serverError(res, "Falha ao criar jogo");
     }
   }
 
-  //ATUALIZAR O ESTADO DE UM JOGO
-  async updateGameState(req: Request, res: Response) {
+  // Update game state
+  async updateGameState(req: Request<{ id: string; betId: string }>, res: Response): Promise<void> {
     try {
-      //VAI VER SE HÁ MAIS JOGOS DAQUELA BET
-      //USA O ID DO JOGO
-      const gameId = parseInt(req.params.id);
-      //E O DA BET
-      const betId = parseInt(req.params.betId);
+      const gameId: number = parseInt(req.params.id);
+      const betId: number = parseInt(req.params.betId);
 
-      //VAI À BETS_HAS_GAMES E VAI VER SE HÁ MAIS JOGOS DAQUELA BET
+      if (isNaN(gameId) || gameId <= 0) {
+        ResponseHelper.badRequest(res, "Formato de ID de jogo inválido");
+        return;
+      }
+
+      if (isNaN(betId) || betId <= 0) {
+        ResponseHelper.badRequest(res, "Formato de ID de aposta inválido");
+        return;
+      }
+
+      // Check if game exists
+      const existingGame = await prisma.games.findUnique({
+        where: { id_game: gameId },
+      });
+
+      if (!existingGame) {
+        ResponseHelper.notFound(res, `Jogo com ID ${gameId} não encontrado`);
+        return;
+      }
+
+      // Check if bet exists
+      const existingBet = await prisma.bets.findUnique({
+        where: { id_bets: betId },
+      });
+
+      if (!existingBet) {
+        ResponseHelper.notFound(res, `Aposta com ID ${betId} não encontrada`);
+        return;
+      }
+
+      // Count games for this bet
       const betsHasGames = await prisma.bets_has_Games.count({
         where: {
           ref_id_bet: betId,
         },
       });
 
-      //SE SÓ HOUVER UM JOGO DAQUELA BET VAI ATUALIZAR O ESTADO DO JOGO E DA BET
+      // If only one game for this bet
       if (betsHasGames === 1) {
-        //JOGO CONCLUIDO
         const updatedSingleGame = await prisma.games.update({
           where: { id_game: gameId },
           data: { game_state: 1 },
         });
 
-        //BET CONCLUIDA
         const updatedBet = await prisma.bets.update({
           where: { id_bets: betId },
           data: { state: 1 },
         });
 
-        //ATUALIZA OS DOIS
-        res.status(200).json({ updatedSingleGame, updatedBet });
+        const response: UpdateGameStateResponse = {
+          game: {
+            id_game: updatedSingleGame.id_game!,
+            local_team: updatedSingleGame.local_team!,
+            visitor_team: updatedSingleGame.visitor_team!,
+            schedule: updatedSingleGame.schedule!,
+            betted_team: updatedSingleGame.betted_team,
+            odd: updatedSingleGame.odd !== null && updatedSingleGame.odd !== undefined ? Number(updatedSingleGame.odd) : undefined,
+            goals_local_team: updatedSingleGame.goals_local_team,
+            goals_visitor_team: updatedSingleGame.goals_visitor_team,
+            image: updatedSingleGame.image,
+            game_state: updatedSingleGame.game_state!
+          },
+          bet_updated: true,
+          unfinished_games_count: 0
+        };
+
+        ResponseHelper.success(res, response, "Estado do jogo e aposta atualizados com sucesso");
+        return;
       }
 
-      //SE HOUVER MAIS JOGOS DAQUELA BET
-      else if (betsHasGames > 1) {
-        //VAI BUSCAR O NÚMERO DE JOGOS DESSA BET COM O STATE A 0
+      // If multiple games for this bet
+      if (betsHasGames > 1) {
         const betsWithUnfinishedGames = await prisma.games.count({
           where: {
-            //JOGO INACABADO
             game_state: 0,
-
-            //OUTRA TABELA
             BetsHasGames: {
-              //BET_ID
               some: {
                 ref_id_bet: betId,
               },
             },
           },
         });
-        res.status(200).json(betsWithUnfinishedGames);
 
-        //SE HOUVER SÓ UM JOGO ATIVO
+        // If only one unfinished game (the current one)
         if (betsWithUnfinishedGames === 1) {
-          //ATUALIZAR O ESTADO DO JOGO
           const updatedExactGame = await prisma.games.update({
             where: { id_game: gameId },
             data: { game_state: 1 },
           });
 
-          //AUALIZAR O ESTADO DA BET
           const updateBetState = await prisma.bets.update({
             where: { id_bets: betId },
             data: { state: 1 },
           });
 
-          //ATUALIZA OS DOIS
-          res.status(200).json({ updatedExactGame, updateBetState });
-        }
+          const response: UpdateGameStateResponse = {
+            game: {
+              id_game: updatedExactGame.id_game!,
+              local_team: updatedExactGame.local_team!,
+              visitor_team: updatedExactGame.visitor_team!,
+              schedule: updatedExactGame.schedule!,
+              betted_team: updatedExactGame.betted_team,
+              odd: updatedExactGame.odd !== null && updatedExactGame.odd !== undefined ? Number(updatedExactGame.odd) : undefined,
+              goals_local_team: updatedExactGame.goals_local_team,
+              goals_visitor_team: updatedExactGame.goals_visitor_team,
+              image: updatedExactGame.image,
+              game_state: updatedExactGame.game_state!
+            },
+            bet_updated: true,
+            unfinished_games_count: 0
+          };
 
-        //SE HOUVER MAIS DE UM JOGO ATIVO
-        else {
-          //ATUALIZAR O ESTADO DO JOGO
+          ResponseHelper.success(res, response, "Estado do jogo e aposta atualizados com sucesso");
+        } else {
+          // Multiple unfinished games remain
           const updatedExactGame = await prisma.games.update({
             where: { id_game: gameId },
             data: { game_state: 1 },
           });
-          res.status(200).json(updatedExactGame);
+
+          const response: UpdateGameStateResponse = {
+            game: {
+              id_game: updatedExactGame.id_game!,
+              local_team: updatedExactGame.local_team!,
+              visitor_team: updatedExactGame.visitor_team!,
+              schedule: updatedExactGame.schedule!,
+              betted_team: updatedExactGame.betted_team,
+              odd: updatedExactGame.odd !== null && updatedExactGame.odd !== undefined ? Number(updatedExactGame.odd) : undefined,
+              goals_local_team: updatedExactGame.goals_local_team,
+              goals_visitor_team: updatedExactGame.goals_visitor_team,
+              image: updatedExactGame.image,
+              game_state: updatedExactGame.game_state!
+            },
+            bet_updated: false,
+            unfinished_games_count: betsWithUnfinishedGames - 1
+          };
+
+          ResponseHelper.success(res, response, "Estado do jogo atualizado com sucesso");
         }
       }
     } catch (error) {
-      res.status(500).json({ error: "Erro ao atualizar o estado do jogo." });
+      console.error("Error updating game state:", error);
+      ResponseHelper.serverError(res, "Falha ao atualizar estado do jogo");
     }
   }
 
-  //APAGAR UM JOGO BY ID -> FERRAMENTA DE ADMINISTRADOR
-  async deleteGame(req: Request, res: Response) {
+  // Delete game
+  async deleteGame(req: Request<{ id: string }>, res: Response): Promise<void> {
     try {
-      //ID DO JOGO
-      const gameId = parseInt(req.params.id);
+      const gameId: number = parseInt(req.params.id);
 
-      //APAGAR O JOGO
-      const deletedGame = await prisma.games.delete({
+      if (isNaN(gameId) || gameId <= 0) {
+        ResponseHelper.badRequest(res, "Formato de ID de jogo inválido");
+        return;
+      }
+
+      const existingGame = await prisma.games.findUnique({
         where: { id_game: gameId },
       });
 
-      //ENVIAR
-      res.status(200).json(deletedGame);
+      if (!existingGame) {
+        ResponseHelper.notFound(res, `Jogo com ID ${gameId} não encontrado`);
+        return;
+      }
+
+      await prisma.games.delete({
+        where: { id_game: gameId },
+      });
+
+      ResponseHelper.success(res, null, "Jogo eliminado com sucesso");
     } catch (error) {
-      res.status(500).json({ error: "Erro ao apagar o jogo." });
+      console.error("Error deleting game:", error);
+      ResponseHelper.serverError(res, "Falha ao eliminar jogo");
     }
   }
 
-  //JOGO MAIS APOSTADO DO DIA
-  async getMostBettedGameOfDay(req: Request, res: Response) {
+  // Get most betted game of the day
+  async getMostBettedGameOfDay(req: Request, res: Response): Promise<void> {
     try {
-      // Obter data atual (apenas o dia)
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       
       const tomorrow = new Date(today);
       tomorrow.setDate(tomorrow.getDate() + 1);
       
-      // Procura todos os jogos apostados hoje com contagem
       const bettedGames = await prisma.games.findMany({
         select: {
           id_game: true,
@@ -219,35 +400,54 @@ export class GamesController {
         },
       });
       
-      // Calcular o jogo com mais apostas
+      if (bettedGames.length === 0) {
+        ResponseHelper.notFound(res, "Nenhuma aposta encontrada para hoje");
+        return;
+      }
+
       const gamesWithCounts = bettedGames.map(game => ({
-        ...game,
+        id_game: game.id_game!,
+        local_team: game.local_team!,
+        visitor_team: game.visitor_team!,
+        schedule: game.schedule!,
+        betted_team: game.betted_team,
+        odd: game.odd,
+        goals_local_team: game.goals_local_team,
+        goals_visitor_team: game.goals_visitor_team,
+        image: game.image,
+        game_state: game.game_state!,
         bet_count: game.BetsHasGames.length,
         championship_json: game.BetsHasGames[0]?.championship.json || null,
       })).sort((a, b) => b.bet_count - a.bet_count);
       
-      // Remover a propriedade BetsHasGames do resultado
       const mostBettedGame = gamesWithCounts[0];
-      if (mostBettedGame) {
-        delete (mostBettedGame.BetsHasGames as unknown as { [key: string]: any })?.BetsHasGames;
-      }
-  
+
       if (!mostBettedGame) {
-        return res.status(404).json({ 
-          message: 'Não foram encontradas apostas para hoje.' 
-        });
+        ResponseHelper.notFound(res, "Nenhuma aposta encontrada para hoje");
+        return;
       }
-  
-      return res.status(200).json({
-        message: 'Jogo mais apostado do dia recuperado com sucesso',
-        data: mostBettedGame
-      });
-      
+
+      const response: MostBettedGameResponse = {
+        game: {
+          id_game: mostBettedGame.id_game,
+          local_team: mostBettedGame.local_team,
+          visitor_team: mostBettedGame.visitor_team,
+          schedule: mostBettedGame.schedule,
+          betted_team: mostBettedGame.betted_team,
+          odd: mostBettedGame.odd !== null && mostBettedGame.odd !== undefined ? Number(mostBettedGame.odd) : undefined,
+          goals_local_team: mostBettedGame.goals_local_team,
+          goals_visitor_team: mostBettedGame.goals_visitor_team,
+          image: mostBettedGame.image,
+          game_state: mostBettedGame.game_state
+        },
+        bet_count: mostBettedGame.bet_count,
+        championship_json: mostBettedGame.championship_json
+      };
+
+      ResponseHelper.success(res, response, "Jogo mais apostado do dia obtido com sucesso");
     } catch (error) {
-      console.error('Erro ao procurar jogo mais apostado:', error);
-      return res.status(500).json({ 
-        message: 'Erro interno do servidor ao procurar o jogo mais apostado' 
-      });
+      console.error("Error fetching most betted game:", error);
+      ResponseHelper.serverError(res, "Falha ao obter jogo mais apostado do dia");
     }
   }
 }

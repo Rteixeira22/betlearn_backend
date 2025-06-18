@@ -121,13 +121,19 @@
 import express from "express";
 import { AuthController } from "../controllers/authController";
 
+import { requireAPIKey } from "../middleware/auth";
+
+import authorize from '../middleware/authorize';
+
+
+
 const router = express.Router();
 const authController = new AuthController();
 
 // Authentication Routes
-router.post("/login", authController.login); // Login route
+router.post("/login", requireAPIKey, authorize('user'), authController.login); // Login route
 
 // Autentication Admin Routes
-router.post("/admin/login", authController.adminLogin); // Admin login route
+router.post("/admin/login", requireAPIKey, authorize('admin'),  authController.adminLogin); // Admin login route
 
 export default router;

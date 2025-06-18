@@ -1,136 +1,257 @@
 import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
+import { 
+  ResponseHelper, 
+  QuestionnaireResponse, 
+  CreateQuestionnaireRequest, 
+  UpdateQuestionnaireRequest 
+} from "../utils/questionnaireResponseHelper";
 
 const prisma = new PrismaClient();
 
 export class QuestionnaireController {
   // Get all questionnaires
-  async getAllQuestionnaires(req: Request, res: Response) {
+  async getAllQuestionnaires(req: Request, res: Response): Promise<void> {
     try {
-      const responses = await prisma.questionnaire_Response.findMany();
-      res.json(responses);
+      const responsesRaw = await prisma.questionnaire_Response.findMany({
+        orderBy: {
+          id_questionnaire_response: 'desc'
+        }
+      });
+
+      const responses: QuestionnaireResponse[] = responsesRaw.map(response => ({
+        ...response,
+        verification: response.verification ?? false
+      }));
+
+      ResponseHelper.success(res, responses, "Questionários obtidos com sucesso");
     } catch (error) {
-      res.status(500).json({ error: "Failed to fetch all questionnaires" });
+      console.error("Error fetching questionnaires:", error);
+      ResponseHelper.serverError(res, "Falha ao obter questionários");
     }
   }
 
   // Get a questionnaire by ID
-  async getQuestionnaireById(req: Request, res: Response) {
+  async getQuestionnaireById(req: Request, res: Response): Promise<void> {
     try {
-      const id = parseInt(req.params.id);
-      const response = await prisma.questionnaire_Response.findUnique({
-        where: { id_questionnaire_response: id },
-      });
-      if (!response) {
-        res.status(404).json({ error: "Questionnaire not found" });
+      const questionnaireId: number = parseInt(req.params.id);
+      
+      if (isNaN(questionnaireId) || questionnaireId <= 0) {
+        ResponseHelper.badRequest(res, "Formato de ID de questionário inválido");
+        return;
       }
-      res.json(response);
+
+      const responseRaw = await prisma.questionnaire_Response.findUnique({
+        where: { id_questionnaire_response: questionnaireId },
+      });
+
+      if (!responseRaw) {
+        ResponseHelper.notFound(res, `Questionário com ID ${questionnaireId} não encontrado`);
+        return;
+      }
+
+      const response: QuestionnaireResponse = {
+        ...responseRaw,
+        verification: responseRaw.verification ?? false
+      };
+ 
+      ResponseHelper.success(res, response, "Questionário obtido com sucesso");
     } catch (error) {
-      res.status(500).json({ error: "Failed to fetch questionnaire by ID" });
+      console.error("Error fetching questionnaire by ID:", error);
+      ResponseHelper.serverError(res, "Falha ao obter questionário");
     }
   }
 
   // Get all questionnaire responses by user ID
-  async getQuestionnaireByUserId(req: Request, res: Response) {
+  async getQuestionnaireByUserId(req: Request, res: Response): Promise<void> {
     try {
-      const userId = parseInt(req.params.userId);
-      const responses = await prisma.questionnaire_Response.findMany({
-        where: { ref_id_user: userId },
+      const role = req.userRole;
+      const requestedId = parseInt(req.params.userId);
+      const tokenUserId = parseInt(req.userId!);
+
+
+      if (role !== 'admin' && requestedId !== tokenUserId) {
+        ResponseHelper.forbidden(res, "Acesso não autorizado");
+        return;
+      }
+      
+      const responsesRaw = await prisma.questionnaire_Response.findMany({
+        where: { ref_id_user: requestedId },
+        orderBy: { id_questionnaire_response: 'desc' }
       });
-      res.json(responses);
+
+      const responses: QuestionnaireResponse[] = responsesRaw.map(response => ({
+        ...response,
+        verification: response.verification ?? false
+      }));
+
+      ResponseHelper.success(res, responses, "Respostas de questionário do utilizador obtidas com sucesso");
     } catch (error) {
-      res
-        .status(500)
-        .json({ error: "Failed to fetch questionnaire responses" });
+      console.error("Error fetching questionnaire responses by user ID:", error);
+      ResponseHelper.serverError(res, "Falha ao obter respostas de questionário");
     }
   }
 
   // Get verified questionnaire responses by user ID
-  async getVerifiedQuestionnaires(req: Request, res: Response) {
+  async getVerifiedQuestionnaires(req: Request, res: Response): Promise<void> {
     try {
-      const userId = parseInt(req.params.userId);
-      const responses = await prisma.questionnaire_Response.findMany({
-        where: { ref_id_user: userId, verification: true },
+      const role = req.userRole;
+      const requestedId = parseInt(req.params.userId);
+      const tokenUserId = parseInt(req.userId!);
+
+      if (isNaN(requestedId) || requestedId <= 0) {
+        ResponseHelper.badRequest(res, "Formato de ID de utilizador inválido");
+        return;
+      }
+
+      if (role !== 'admin' && requestedId !== tokenUserId) {
+        ResponseHelper.forbidden(res, "Acesso não autorizado");
+        return;
+      }
+
+      const responsesRaw = await prisma.questionnaire_Response.findMany({
+        where: { ref_id_user: requestedId, verification: true },
+        orderBy: { id_questionnaire_response: 'desc' }
       });
-      res.json(responses);
+
+      const responses: QuestionnaireResponse[] = responsesRaw.map(response => ({
+        ...response,
+        verification: response.verification ?? false
+      }));
+
+      ResponseHelper.success(res, responses, "Respostas de questionário verificadas obtidas com sucesso");
     } catch (error) {
-      res
-        .status(500)
-        .json({ error: "Failed to fetch verified questionnaire responses" });
+      console.error("Error fetching verified questionnaire responses:", error);
+      ResponseHelper.serverError(res, "Falha ao obter respostas de questionário verificadas");
     }
   }
 
   // Get unverified questionnaire responses by user ID
-  async getUnverifiedQuestionnaires(req: Request, res: Response) {
+  async getUnverifiedQuestionnaires(req: Request, res: Response): Promise<void> {
     try {
-      const userId = parseInt(req.params.userId);
-      const responses = await prisma.questionnaire_Response.findMany({
-        where: { ref_id_user: userId, verification: false },
+      const role = req.userRole;
+      const requestedId = parseInt(req.params.userId);
+      const tokenUserId = parseInt(req.userId!);
+
+      if (isNaN(requestedId) || requestedId <= 0) {
+        ResponseHelper.badRequest(res, "Formato de ID de utilizador inválido");
+        return;
+      }
+
+      if (role !== 'admin' && requestedId !== tokenUserId) {
+        ResponseHelper.forbidden(res, "Acesso não autorizado");
+        return;
+      }
+      
+      const responsesRaw = await prisma.questionnaire_Response.findMany({
+        where: { ref_id_user: requestedId, verification: false },
+        orderBy: { id_questionnaire_response: 'desc' }
       });
-      res.json(responses);
+
+      const responses: QuestionnaireResponse[] = responsesRaw.map(response => ({
+        ...response,
+        verification: response.verification ?? false
+      }));
+
+      ResponseHelper.success(res, responses, "Respostas de questionário não verificadas obtidas com sucesso");
     } catch (error) {
-      res
-        .status(500)
-        .json({ error: "Failed to fetch unverified questionnaire responses" });
+      console.error("Error fetching unverified questionnaire responses:", error);
+      ResponseHelper.serverError(res, "Falha ao obter respostas de questionário não verificadas");
     }
   }
 
   // Get the last questionnaire response by user ID
-  async getLastQuestionnaireResponse(req: Request, res: Response) {
+  async getLastQuestionnaireResponse(req: Request, res: Response): Promise<void> {
     try {
-      const userId = parseInt(req.params.userId);
-      const response = await prisma.questionnaire_Response.findFirst({
-        where: { ref_id_user: userId },
+      const role = req.userRole;
+      const requestedId = parseInt(req.params.userId);
+      const tokenUserId = parseInt(req.userId!);
+
+      if (isNaN(requestedId) || requestedId <= 0) {
+        ResponseHelper.badRequest(res, "Formato de ID de utilizador inválido");
+        return;
+      }
+
+      if (role !== 'admin' && requestedId !== tokenUserId) {
+        ResponseHelper.forbidden(res, "Acesso não autorizado");
+        return;
+      }
+
+      const responseRaw = await prisma.questionnaire_Response.findFirst({
+        where: { ref_id_user: requestedId },
         orderBy: { id_questionnaire_response: "desc" },
       });
-      res.json(response);
+
+      if (!responseRaw) {
+        ResponseHelper.notFound(res, "Nenhuma resposta de questionário encontrada para este utilizador");
+        return;
+      }
+
+      const response: QuestionnaireResponse = {
+        ...responseRaw,
+        verification: responseRaw.verification ?? false
+      };
+
+      ResponseHelper.success(res, response, "Última resposta de questionário obtida com sucesso");
     } catch (error) {
-      res
-        .status(500)
-        .json({ error: "Failed to fetch the last questionnaire response" });
+      console.error("Error fetching last questionnaire response:", error);
+      ResponseHelper.serverError(res, "Falha ao obter a última resposta de questionário");
     }
   }
 
   // Create a new questionnaire response
-  async createQuestionnaireResponse(req: Request, res: Response) {
-    try {
-      const {
-        budget,
-        verification,
-        salary,
-        expenses,
-        available_amount,
-        debt,
-        debt_monthly,
-        income_source,
-        ref_id_user,
-      } = req.body;
-      const newResponse = await prisma.questionnaire_Response.create({
-        data: {
-          budget,
-          verification,
-          salary,
-          expenses,
-          available_amount,
-          debt,
-          debt_monthly,
-          income_source,
-          ref_id_user,
-        },
-      });
-      res.json(newResponse);
-    } catch (error) {
-      console.error(error);
-      res
-        .status(500)
-        .json({ error: "Failed to create questionnaire response" });
-    }
-  }
+  async createQuestionnaireResponse(req: Request<{}, {}, CreateQuestionnaireRequest>, res: Response): Promise<void> {
+  try {
+    const {
+      budget,
+      verification,
+      salary,
+      expenses,
+      available_amount,
+      debt,
+      debt_monthly,
+      income_source,
+      ref_id_user,
+    }: CreateQuestionnaireRequest = req.body;
 
-  // Update a specific questionnaire response
-  async updateQuestionnaireResponse(req: Request, res: Response) {
+    if (typeof verification !== 'boolean') {
+      ResponseHelper.badRequest(res, "Campo de verificação é obrigatório e deve ser booleano");
+      return;
+    }
+
+    // Garantir que os valores numéricos são do tipo correto
+    const questionnaireData = {
+      budget: budget ? Number(budget) : 0,
+      verification: verification ? Boolean(verification) : false,
+      salary: salary ? Number(salary) : 0,
+      expenses: expenses ? Number(expenses) : 0,
+      available_amount: available_amount ? Number(available_amount) : 0,
+      debt: debt ? Number(debt) : 0,
+      debt_monthly: debt_monthly ? Number(debt_monthly) : 0,
+      income_source: income_source ? Number(income_source) : 0,
+      ref_id_user: Number(ref_id_user),
+    };
+
+    const newResponseRaw = await prisma.questionnaire_Response.create({
+      data: questionnaireData,
+    });
+
+    const newResponse: QuestionnaireResponse = {
+      ...newResponseRaw,
+      verification: newResponseRaw.verification ?? false
+    };
+
+    ResponseHelper.created(res, newResponse, "Resposta de questionário criada com sucesso");
+  } catch (error) {
+    console.error("Error creating questionnaire response:", error);
+    ResponseHelper.serverError(res, "Falha ao criar resposta de questionário");
+  }
+}
+
+  // Update a specific questionnaire by user ID
+  async updateQuestionnaireResponse(req: Request<{ id: string }, {}, UpdateQuestionnaireRequest>, res: Response): Promise<void> {
     try {
-      const id = parseInt(req.params.id);
+      const userId = parseInt(req.params.id);
       const {
         budget,
         verification,
@@ -140,9 +261,36 @@ export class QuestionnaireController {
         debt,
         debt_monthly,
         income_source,
-      } = req.body;
-      const updatedResponse = await prisma.questionnaire_Response.update({
-        where: { id_questionnaire_response: id },
+      }: UpdateQuestionnaireRequest = req.body;
+
+      if (isNaN(userId) || userId <= 0) {
+        ResponseHelper.badRequest(res, "Formato de ID de questionário inválido");
+        return;
+      }
+
+      // Verificar se o questionário existe
+      const existingResponse = await prisma.questionnaire_Response.findMany({
+        where: { ref_id_user: userId },
+      });
+
+
+      if (!existingResponse) {
+        ResponseHelper.notFound(res, `Questionário com ID ${userId} não encontrado`);
+        return;
+      }
+
+      const questionnare_Id = existingResponse[0].id_questionnaire_response ;
+
+
+      // Validações para campos que estão sendo atualizados
+      if (verification !== undefined && typeof verification !== 'boolean') {
+        ResponseHelper.badRequest(res, "Verificação deve ser booleana");
+        return;
+      }
+
+    
+      const updatedResponseRaw = await prisma.questionnaire_Response.update({
+        where: { id_questionnaire_response: questionnare_Id },
         data: {
           budget,
           verification,
@@ -151,30 +299,48 @@ export class QuestionnaireController {
           available_amount,
           debt,
           debt_monthly,
-          income_source,
         },
       });
-      res.json(updatedResponse);
+
+      const updatedResponse: QuestionnaireResponse = {
+        ...updatedResponseRaw,
+        verification: updatedResponseRaw.verification ?? false
+      };
+
+      ResponseHelper.success(res, updatedResponse, "Resposta ao questionário atualizada com sucesso");
     } catch (error) {
-      console.error(error);
-      res
-        .status(500)
-        .json({ error: "Failed to update questionnaire response" });
+      console.error("Error updating questionnaire response:", error);
+      ResponseHelper.serverError(res, "Falha ao atualizar resposta de questionário");
     }
   }
 
   // Delete a specific questionnaire response
-  async deleteQuestionnaireResponse(req: Request, res: Response) {
+  async deleteQuestionnaireResponse(req: Request<{ id: string }>, res: Response): Promise<void> {
     try {
-      const id = parseInt(req.params.id);
-      await prisma.questionnaire_Response.delete({
-        where: { id_questionnaire_response: id },
+      const questionnaireId: number = parseInt(req.params.id);
+
+      if (isNaN(questionnaireId) || questionnaireId <= 0) {
+        ResponseHelper.badRequest(res, "Formato de ID de questionário inválido");
+        return;
+      }
+
+      const existingResponse = await prisma.questionnaire_Response.findUnique({
+        where: { id_questionnaire_response: questionnaireId },
       });
-      res.json({ message: "Questionnaire response deleted successfully" });
+
+      if (!existingResponse) {
+        ResponseHelper.notFound(res, `Questionário com ID ${questionnaireId} não encontrado`);
+        return;
+      }
+
+      await prisma.questionnaire_Response.delete({
+        where: { id_questionnaire_response: questionnaireId },
+      });
+
+      ResponseHelper.success(res, null, "Resposta de questionário eliminada com sucesso");
     } catch (error) {
-      res
-        .status(500)
-        .json({ error: "Failed to delete questionnaire response" });
+      console.error("Error deleting questionnaire response:", error);
+      ResponseHelper.serverError(res, "Falha ao eliminar resposta de questionário");
     }
   }
 }

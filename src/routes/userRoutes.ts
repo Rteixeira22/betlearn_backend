@@ -634,50 +634,57 @@
  */
 import express from "express";
 import { UserController } from "../controllers/userController";
+import { requireAPIKey } from "../middleware/auth";
+import { verifyJWT } from '../middleware/verifyJWT';
+import authorize from '../middleware/authorize';
+
+
 
 const router = express.Router();
 const userController = new UserController();
 
 // USER ROUTES
 
+
 // Get all users
-router.get("/", userController.getAllusers);
+router.get("/", requireAPIKey, userController.getAllusers);
 
 // User Profile Routes
-router.get("/:id", userController.getUserById);
-router.get("/username/:username", userController.getUserByUsername);
-router.get("/email/:email", userController.getUserByEmail);
+router.get("/:id", requireAPIKey, verifyJWT, userController.getUserById);
+router.get("/username/:username", requireAPIKey, userController.getUserByUsername);
+router.get("/email/:email",  requireAPIKey, userController.getUserByEmail);
+router.get("/other-user/:id", requireAPIKey, verifyJWT, userController.getOtherUserById);
 
 // User Profile Update Routes
 
-router.patch("/:id/password", userController.updateUserPassword);
-router.patch("/:id/profile", userController.updateUserProfile);
+router.patch("/:id/password", requireAPIKey, userController.updateUserPassword);
+router.patch("/:id/profile", requireAPIKey, verifyJWT, userController.updateUserProfile);
 //esta como string
 router.patch("/:id/money", userController.updateUserMoney);
-router.patch("/:id/points", userController.updateUserPoints);
-router.patch("/:id/bets-visibility", userController.updateUserBetsVisibility);
+router.patch("/:id/points", requireAPIKey, verifyJWT, userController.updateUserPoints);
+router.patch("/:id/bets-visibility", requireAPIKey, verifyJWT, userController.updateUserBetsVisibility);
 router.patch(
-  "/:id/tutorial-verification",
+  "/:id/tutorial-verification", requireAPIKey, verifyJWT,
   userController.updateUserTutorialVerification
 );
 
 // User management routes
-router.post("/", userController.createUser); //aqui ele tem de levar todos os parametros porque nenhum esta default  - garantir que username, email não existem no frontend, para nao dar erro
-router.delete("/:id", userController.deleteUser);
+router.post("/", requireAPIKey, userController.createUser); //aqui ele tem de levar todos os parametros porque nenhum esta default  - garantir que username, email não existem no frontend, para nao dar erro
+router.delete("/:id", requireAPIKey, verifyJWT, userController.deleteUser);
 
 //CHALLENGES ROUTES
 
-router.get("/:id/challenges", userController.getUserChallenges);
+router.get("/:id/challenges", requireAPIKey, verifyJWT, userController.getUserChallenges);
 
 // Bet Routes
-router.get("/:id/bets", userController.getUserBetHistory);
-router.get("/:id/bets/active", userController.getActiveBets);
-router.get("/:id/bets/closed", userController.getClosedBets);
-router.get("/:id/bets/won", userController.getWonBets);
-router.get("/:id/bets/lost", userController.getLostBets);
+router.get("/:id/bets", requireAPIKey, verifyJWT, userController.getUserBetHistory);
+router.get("/:id/bets/active", requireAPIKey, verifyJWT, userController.getActiveBets);
+router.get("/:id/bets/closed", requireAPIKey, verifyJWT, userController.getClosedBets);
+router.get("/:id/bets/won", requireAPIKey, verifyJWT, userController.getWonBets);
+router.get("/:id/bets/lost", requireAPIKey, verifyJWT, userController.getLostBets);
 
 // Leaderboard
-router.get("/classification/all", userController.getLeaderboard); // fiz com all no final para nao entrar noutra rota, ja que isto devia ter outro controlador e outro ficheiro de rotas
-router.get("/position/:id", userController.getUserPositionInLeaderboard); // Get user points
+router.get("/classification/all", requireAPIKey, userController.getLeaderboard); // fiz com all no final para nao entrar noutra rota, ja que isto devia ter outro controlador e outro ficheiro de rotas
+router.get("/position/:id", requireAPIKey, verifyJWT, userController.getUserPositionInLeaderboard); // Get user points
 
 export default router;

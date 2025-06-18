@@ -20,6 +20,7 @@ model Users {
   bets_visibility       Boolean                  @default(true)
   tutorial_verification Boolean
   password              String                   @db.VarChar(255)
+  has_accepted_terms    Boolean                  @default(false)
   Bets                  Bets[]
   QuestionnaireResponse Questionnaire_Response[]
   UserHasChallenges     User_has_Challenges[]

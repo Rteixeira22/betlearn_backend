@@ -1,58 +1,76 @@
 import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
+import { 
+  ResponseHelper, 
+  Championship, 
+  CreateChampionshipRequest, 
+  UpdateChampionshipRequest 
+} from "../utils/championshipsResponseHelper";
 
 import { retryWithFixes } from "../scripts/getDataFromAI";
 
 const prisma = new PrismaClient();
 
 export class ChampionsController {
-  //IR BUSCRAR TODOS OS CAMPEONATOS
-  async getAllChampionships(req: Request, res: Response) {
+  // Get all championships
+  async getAllChampionships(req: Request, res: Response): Promise<void> {
     try {
-      const championships = await prisma.championship.findMany({
+      const championshipsRaw = await prisma.championship.findMany({
         orderBy: {
           creation_date: 'desc', 
-          
         },
       });
+
+      const championships: Championship[] = championshipsRaw.map(championship => ({
+        id_championship: championship.id_championship!,
+        json: championship.json!,
+        creation_date: championship.creation_date!
+      }));
   
-      res.status(200).json(championships);
+      ResponseHelper.success(res, championships, "Campeonatos obtidos com sucesso");
     } catch (error) {
-      res.status(500).json({ error: "Erro ao procurar todos os campeonatos." });
+      console.error("Error fetching championships:", error);
+      ResponseHelper.serverError(res, "Falha ao obter campeonatos");
     }
   }
 
-  //IR BUSCAR os 2 campeonatos com os ultimos ids
-
-  async getLastTwoChampionships (req: Request, res: Response) {
+  // Get last two championships
+  async getLastTwoChampionships(req: Request, res: Response): Promise<void> {
     try {
-      const championships = await prisma.championship.findMany({
+      const championshipsRaw = await prisma.championship.findMany({
         orderBy: {
           creation_date: 'desc',
         },
-        take: 2, // Limita a 2 campeonatos
+        take: 2,
       });
-      res.status(200).json(championships);
+
+      const championships: Championship[] = championshipsRaw.map(championship => ({
+        id_championship: championship.id_championship!,
+        json: championship.json!,
+        creation_date: championship.creation_date!
+      }));
+
+      ResponseHelper.success(res, championships, "Últimos dois campeonatos obtidos com sucesso");
     } catch (error) {
-      res.status(500).json({ error: "Erro ao procurar os campeonatos." });
+      console.error("Error fetching last two championships:", error);
+      ResponseHelper.serverError(res, "Falha ao obter os últimos dois campeonatos");
     }
   }
 
-  async getYesterdayChampionship(req: Request, res: Response) {
+  // Get yesterday's championship
+  async getYesterdayChampionship(req: Request, res: Response): Promise<void> {
     try {
-      // Calcula a data de ontem
       const today = new Date();
       const yesterday = new Date(today);
       yesterday.setDate(today.getDate() - 1);
       
-      // Define o início e o fim do dia de ontem
       const startOfYesterday = new Date(yesterday);
       startOfYesterday.setHours(0, 0, 0, 0);
       
       const endOfYesterday = new Date(yesterday);
       endOfYesterday.setHours(23, 59, 59, 999);
       
-      const championship = await prisma.championship.findFirst({
+      const championshipRaw = await prisma.championship.findFirst({
         where: {
           creation_date: {
             gte: startOfYesterday,
@@ -64,106 +82,199 @@ export class ChampionsController {
         }
       });
       
-      if (!championship) {
-        return res.status(404).json({ error: "Nenhum campeonato encontrado para ontem." });
+      if (!championshipRaw) {
+        ResponseHelper.notFound(res, "Nenhum campeonato encontrado para ontem");
+        return;
       }
+
+      const championship: Championship = {
+        id_championship: championshipRaw.id_championship!,
+        json: championshipRaw.json!,
+        creation_date: championshipRaw.creation_date!
+      };
       
-      res.status(200).json(championship);
+      ResponseHelper.success(res, championship, "Campeonato de ontem obtido com sucesso");
     } catch (error) {
-      res.status(500).json({ error: "Erro ao buscar o campeonato de ontem." });
+      console.error("Error fetching yesterday's championship:", error);
+      ResponseHelper.serverError(res, "Falha ao obter o campeonato de ontem");
     }
   }
 
-  //IR BUSCAR UM CAMPEONATO PELO ID
-  async getChampionshipById(req: Request, res: Response) {
+  // Get championship by ID
+  async getChampionshipById(req: Request, res: Response): Promise<void> {
     try {
-      const championshipId = parseInt(req.params.id);
+      const championshipId: number = parseInt(req.params.id);
 
-      //SAVE
-      const championship = await prisma.championship.findUnique({
+      if (isNaN(championshipId) || championshipId <= 0) {
+        ResponseHelper.badRequest(res, "Formato de ID de campeonato inválido");
+        return;
+      }
+
+      const championshipRaw = await prisma.championship.findUnique({
         where: { id_championship: championshipId },
       });
 
-      //ENVIAR
-      res.status(200).json(championship);
+      if (!championshipRaw) {
+        ResponseHelper.notFound(res, `Campeonato com ID ${championshipId} não encontrado`);
+        return;
+      }
+
+      const championship: Championship = {
+        id_championship: championshipRaw.id_championship!,
+        json: championshipRaw.json!,
+        creation_date: championshipRaw.creation_date!
+      };
+
+      ResponseHelper.success(res, championship, "Campeonato obtido com sucesso");
     } catch (error) {
-      res.status(500).json({ error: "Erro ao procurar campeonato." });
+      console.error("Error fetching championship:", error);
+      ResponseHelper.serverError(res, "Falha ao obter campeonato");
     }
   }
 
-  //CRIAR UM CAMPEONATO
-  async createChampionship(req: Request, res: Response) {
+  // Create championship
+  async createChampionship(req: Request<{}, {}, CreateChampionshipRequest>, res: Response): Promise<void> {
     try {
-      const { json } = req.body;
-      //SAVE
-      const championship = await prisma.championship.create({
+      const { json }: CreateChampionshipRequest = req.body;
+
+      if (!json) {
+        ResponseHelper.badRequest(res, "Dados JSON do campeonato são obrigatórios");
+        return;
+      }
+
+      if (typeof json !== 'string') {
+        ResponseHelper.badRequest(res, "JSON do campeonato deve ser uma string");
+        return;
+      }
+
+      // Validate JSON format
+      try {
+        JSON.parse(json);
+      } catch (jsonError) {
+        ResponseHelper.badRequest(res, "Formato JSON inválido");
+        return;
+      }
+
+      const championshipRaw = await prisma.championship.create({
         data: {
           json,
         },
       });
 
-      //ENVIAR
-      res.status(200).json(championship);
+      const championship: Championship = {
+        id_championship: championshipRaw.id_championship!,
+        json: championshipRaw.json!,
+        creation_date: championshipRaw.creation_date!
+      };
+
+      ResponseHelper.created(res, championship, "Campeonato criado com sucesso");
     } catch (error) {
-      res.status(500).json({ error: "Erro ao criar campeonato." });
+      console.error("Error creating championship:", error);
+      ResponseHelper.serverError(res, "Falha ao criar campeonato");
     }
   }
 
-  //ATUALIZAR UM CAMPEONATO
-  async updateChampionship(req: Request, res: Response) {
+  // Update championship
+  async updateChampionship(req: Request<{ id: string }, {}, UpdateChampionshipRequest>, res: Response): Promise<void> {
     try {
-      //ID DO CAMPEONATO
-      const championshipId = parseInt(req.params.id);
+      const championshipId: number = parseInt(req.params.id);
+      const { json }: UpdateChampionshipRequest = req.body;
 
-      //NOVOS DADOS
-      const { json } = req.body;
+      if (isNaN(championshipId) || championshipId <= 0) {
+        ResponseHelper.badRequest(res, "Formato de ID de campeonato inválido");
+        return;
+      }
 
-      //SAVE
-      const updatedChampionship = await prisma.championship.update({
+      if (!json) {
+        ResponseHelper.badRequest(res, "Dados JSON do campeonato são obrigatórios");
+        return;
+      }
+
+      if (typeof json !== 'string') {
+        ResponseHelper.badRequest(res, "JSON do campeonato deve ser uma string");
+        return;
+      }
+
+      // Validate JSON format
+      try {
+        JSON.parse(json);
+      } catch (jsonError) {
+        ResponseHelper.badRequest(res, "Formato JSON inválido");
+        return;
+      }
+
+      // Check if championship exists
+      const existingChampionship = await prisma.championship.findUnique({
+        where: { id_championship: championshipId },
+      });
+
+      if (!existingChampionship) {
+        ResponseHelper.notFound(res, `Campeonato com ID ${championshipId} não encontrado`);
+        return;
+      }
+
+      const updatedChampionshipRaw = await prisma.championship.update({
         where: { id_championship: championshipId },
         data: { json },
       });
 
-      //ENVIAR
-      res.status(200).json(updatedChampionship);
+      const updatedChampionship: Championship = {
+        id_championship: updatedChampionshipRaw.id_championship!,
+        json: updatedChampionshipRaw.json!,
+        creation_date: updatedChampionshipRaw.creation_date!
+      };
+
+      ResponseHelper.success(res, updatedChampionship, "Campeonato atualizado com sucesso");
     } catch (error) {
-      res.status(500).json({ error: "Erro ao atualizar campeonato." });
+      console.error("Error updating championship:", error);
+      ResponseHelper.serverError(res, "Falha ao atualizar campeonato");
     }
   }
 
-  //APAGAR UM CAMPEONATO
-  async deleteChampionship(req: Request, res: Response) {
+  // Delete championship
+  async deleteChampionship(req: Request<{ id: string }>, res: Response): Promise<void> {
     try {
-      //ID DO CAMPEONATO
-      const championshipId = parseInt(req.params.id);
+      const championshipId: number = parseInt(req.params.id);
 
-      //DELETE
-      const deletedChampionship = await prisma.championship.delete({
+      if (isNaN(championshipId) || championshipId <= 0) {
+        ResponseHelper.badRequest(res, "Formato de ID de campeonato inválido");
+        return;
+      }
+
+      const existingChampionship = await prisma.championship.findUnique({
         where: { id_championship: championshipId },
       });
 
-      //ENVIAR
-      res.status(200).json(deletedChampionship);
+      if (!existingChampionship) {
+        ResponseHelper.notFound(res, `Campeonato com ID ${championshipId} não encontrado`);
+        return;
+      }
+
+      await prisma.championship.delete({
+        where: { id_championship: championshipId },
+      });
+
+      ResponseHelper.success(res, null, "Campeonato eliminado com sucesso");
     } catch (error) {
-      res.status(500).json({ error: "Erro ao apagado campeonato." });
+      console.error("Error deleting championship:", error);
+      ResponseHelper.serverError(res, "Falha ao eliminar campeonato");
     }
   }
 
-  //Generate a new championship automatically
-  async generateChampionship(req: Request, res: Response) {
-
+  // Generate championship automatically
+  async generateChampionship(req: Request, res: Response): Promise<void> {
     try {
-
       const championshipData = await retryWithFixes();
 
-      return res.status(200).json(championshipData);
+      if (!championshipData) {
+        ResponseHelper.serverError(res, "Falha ao gerar dados do campeonato");
+        return;
+      }
 
+      ResponseHelper.success(res, championshipData, "Campeonato gerado com sucesso");
     } catch (error) {
       console.error("Error generating championship:", error);
-      return res.status(500).json({ error: "Failed to generate championship" });
+      ResponseHelper.serverError(res, "Falha ao gerar campeonato");
     }
-
-
   }
-
 }

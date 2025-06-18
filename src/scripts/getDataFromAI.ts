@@ -3,12 +3,12 @@ import * as dotenv from "dotenv";
 import Ajv from "ajv";
 import addFormats from "ajv-formats";
 import axiosInstance from "../configs/axiosConfig";
+import * as fs from 'fs';
+import * as path from 'path';
 
 dotenv.config();
 
-const apiKey = process.env.GEMINI_API_KEY;
-const API_BASE_URL =
-  process.env.API_BASE_URL || "https://api-betlearn-wine.vercel.app/api/";
+const apiKey = process.env.GEMINI_API_KEY ;
 
 // Configuração do Ajv para validação
 const ajv = new Ajv({ allErrors: true });
@@ -106,6 +106,33 @@ const schema = {
   ],
 };
 
+// Função para carregar JSON de fallback
+function loadFallbackJSON(): any {
+  try {
+
+    const championshipRandomNumber = Math.floor(Math.random() * 5) + 1;
+    
+    const fallbackPath = path.join(__dirname, `../championshipsJSON/championship${championshipRandomNumber}.json`);
+    
+    if (!fs.existsSync(fallbackPath)) {
+      throw new Error(`Arquivo de fallback não encontrado em: ${fallbackPath}`);
+    }
+    
+    const fallbackData = fs.readFileSync(fallbackPath, 'utf8');
+    const parsedData = JSON.parse(fallbackData);
+    
+    // Atualizar campos dinâmicos
+    parsedData.generated_at = new Date().toISOString().split('T')[0];
+    parsedData.championship_id = Date.now().toString();
+    
+    console.log('JSON de fallback carregado com sucesso.');
+    return parsedData;
+  } catch (error: any) {
+    console.error('Erro ao carregar JSON de fallback:', error.message);
+    throw error;
+  }
+}
+
 // Função para validar JSON usando o esquema definido
 function validateJSON(data: any): { valid: boolean; errors: any | null } {
   const validate = ajv.compile(schema);
@@ -117,8 +144,67 @@ function validateJSON(data: any): { valid: boolean; errors: any | null } {
   };
 }
 
+// Função para enviar dados para a API
+async function sendToAPI(data: any, isFromFallback: boolean = false): Promise<void> {
+  try {
+    const apiResponse = await axiosInstance.post(
+      "/championships/",
+      { json: JSON.stringify(data) }
+    );
+
+    const notificationMessage = isFromFallback 
+      ? "Um campeonato foi criado usando dados de fallback após falha do AI."
+      : "Um novo campeonato foi criado com sucesso.";
+
+    const notification = await axiosInstance.post(
+      "/admin-notifications/",
+      {
+        title: isFromFallback ? "Campeonato criado (Fallback)" : "Novo campeonato criado",
+        message: notificationMessage,
+        source: "getDataFromAI",
+        type: isFromFallback ? "warning" : "success",
+      }
+    );
+
+    console.log(`Dados do campeonato ${isFromFallback ? '(fallback) ' : ''}adicionados à base de dados com sucesso!`);
+  } catch (error: any) {
+    console.error('Erro ao enviar dados para a API:', error.message);
+    throw error;
+  }
+}
+
+// Função para enviar dados para a API
+async function sendToAPI(data: any, isFromFallback: boolean = false): Promise<void> {
+  try {
+    const apiResponse = await axiosInstance.post(
+      "/championships/",
+      { json: JSON.stringify(data) }
+    );
+
+    const notificationMessage = isFromFallback 
+      ? "Um campeonato foi criado usando dados de fallback após falha do AI."
+      : "Um novo campeonato foi criado com sucesso.";
+
+    const notification = await axiosInstance.post(
+      "/admin-notifications/",
+      {
+        title: isFromFallback ? "Campeonato criado (Fallback)" : "Novo campeonato criado",
+        message: notificationMessage,
+        source: "getDataFromAI",
+        type: isFromFallback ? "warning" : "success",
+      }
+    );
+
+    console.log(`Dados do campeonato ${isFromFallback ? '(fallback) ' : ''}adicionados à base de dados com sucesso!`);
+  } catch (error: any) {
+    console.error('Erro ao enviar dados para a API:', error.message);
+    throw error;
+  }
+}
+
 // Função principal para gerar dados via Gemini e validá-los antes de enviar para a API
 async function generateChampionshipData() {
+
   const prompt = `Atua como um gerador de dados para a minha aplicação de apostas responsáveis. Preciso que crie um JSON com os seguintes dados de um campeonato fictício:
   
   1. Dados do campeonato:
@@ -197,31 +283,8 @@ async function generateChampionshipData() {
       console.log("JSON validado com sucesso. A enviar para a API...");
 
       // Enviar para a API apenas se o JSON for válido
-      /* const apiResponse = await axios.post(
-        `${API_BASE_URL}/championships/`,
-        { json: JSON.stringify(dadosJSON) },
-        {
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        }
-      ); */
-
-      const apiResponse = await axiosInstance.post("/championships/", {
-        json: JSON.stringify(dadosJSON),
-      });
-
-      const notification = await axiosInstance.post("/admin-notifications/", {
-        title: "Novo campeonato criado",
-        message: `Um novo campeonato foi criado com sucesso.`,
-        source: "getDataFromAI",
-        type: "success",
-      });
-
-      console.log(
-        "Dados do campeonato adicionados à base de dados com sucesso!"
-      );
-
+      await sendToAPI(dadosJSON, false);
+      
       return dadosJSON;
     } catch (parseError: any) {
       console.error(
@@ -254,18 +317,44 @@ async function retryWithFixes(maxAttempts = 3): Promise<any> {
       console.error(`Falha na tentativa ${attempts}:`, error.message);
 
       if (attempts >= maxAttempts) {
-        console.error("Número máximo de tentativas atingido.");
-
-        const notification = await axiosInstance.post("/admin-notifications/", {
-          title: "Erro ao gerar campeonato",
-          message: `Não foi possível gerar um campeonato após ${maxAttempts} tentativas.`,
-          source: "getDataFromAI",
-          type: "error",
-        });
-
-        throw new Error(
-          `Não foi possível gerar um JSON válido após ${maxAttempts} tentativas.`
-        );
+        console.error('Número máximo de tentativas atingido. Usar dados de fallback...');
+        
+        try {
+          // Carregar e usar dados de fallback
+          const fallbackData = loadFallbackJSON();
+          
+          // Validar dados de fallback
+          const validationResult = validateJSON(fallbackData);
+          if (!validationResult.valid) {
+            throw new Error('Os dados de fallback não passaram na validação');
+          }
+          
+          // Enviar dados de fallback para a API
+          await sendToAPI(fallbackData, true);
+          
+          console.log('Dados de fallback enviados com sucesso.');
+          return fallbackData;
+          
+        } catch (fallbackError: any) {
+          console.error('Erro ao usar dados de fallback:', fallbackError.message);
+          
+          // Enviar notificação de erro 
+          try {
+            await axiosInstance.post(
+              "/admin-notifications/",
+              {
+                title: "Erro  ao gerar campeonato",
+                message: `Não foi possível gerar um campeonato via AI nem usar dados de fallback. Erro: ${fallbackError.message}`,
+                source: "getDataFromAI",
+                type: "error",
+              }
+            );
+          } catch (notificationError) {
+            console.error('Erro ao enviar notificação:', notificationError);
+          }
+          
+          throw new Error(`Falha completa: AI falhou após ${maxAttempts} tentativas e fallback também falhou. ${fallbackError.message}`);
+        }
       }
 
       // Espera um curto período antes de tentar novamente
@@ -293,4 +382,4 @@ if (require.main === module) {
 }
 
 // Exporta as funções para uso em outros módulos
-export { generateChampionshipData, validateJSON, retryWithFixes };
+export { generateChampionshipData, validateJSON, retryWithFixes, loadFallbackJSON };

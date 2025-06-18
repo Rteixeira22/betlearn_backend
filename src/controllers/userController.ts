@@ -1,357 +1,801 @@
-
-
 import { PrismaClient } from '@prisma/client'
 import { Request, Response } from 'express'
 import bcrypt from 'bcrypt';
+import { 
+  ResponseHelper,
+  User,
+  UserWithoutPassword,
+  UserChallenge,
+  UserBet,
+  LeaderboardEntry,
+  CreateUserRequest,
+  UpdateUserProfileRequest,
+  UpdateUserPasswordRequest,
+  UpdateUserMoneyRequest,
+  UpdateUserPointsRequest,
+  UpdateUserBetsVisibilityRequest,
+  UpdateUserTutorialVerificationRequest
+} from "../utils/userResponseHelper";
+
+// Extend Express Request interface to include userId and userRole
+declare global {
+  namespace Express {
+    interface Request {
+      userId?: string;
+      userRole?: 'user' | 'admin';
+    }
+  }
+}
 
 const prisma = new PrismaClient()
 
 export class UserController {
 
-
- async getAllusers(req: Request, res: Response) {
+  async getAllusers(req: Request, res: Response): Promise<void> {
     try {
-      const users = await prisma.users.findMany(
-        {
-          include: {
-            QuestionnaireResponse: true,
-          }
+      const users = await prisma.users.findMany({
+        select: {
+          id_user: true,
+          name: true,
+          username: true,
+          points: true,
+          image: true,
+          money: true,
+          email: true,
+          birthdate: true,
+        },
+        orderBy: {
+          id_user: 'asc'
         }
-      )
-      res.json(users)
+      });
+      
+      ResponseHelper.success(res, users, "Utilizadores obtidos com sucesso");
     } catch (error) {
-      res.status(500).json({ error: 'Failed to fetch users' })
+      console.error("Error fetching users:", error);
+      ResponseHelper.serverError(res, "Falha ao obter utilizadores");
     }
   }
 
   // Get user by ID
-  async getUserById(req: Request, res: Response) {
+  async getUserById(req: Request, res: Response): Promise<void> {
     try {
-      const userId = parseInt(req.params.id)
+      const role = req.userRole;
+      const requestedId = parseInt(req.params.id);
+      const tokenUserId = parseInt(req.userId!);
+
+      if (isNaN(requestedId) || requestedId <= 0) {
+        ResponseHelper.badRequest(res, "Formato de ID de utilizador inválido");
+        return;
+      }
+
+      if (role !== 'admin' && requestedId !== tokenUserId) {
+        ResponseHelper.forbidden(res, "Acesso não autorizado");
+        return;
+      }
+
       const user = await prisma.users.findUnique({
-        where: { id_user: userId }
-      })
-      res.json(user)
+        select: {
+          id_user: true,
+          name: true,
+          username: true,
+          email: true,
+          birthdate: true,
+          image: true,
+          money: true,
+          points: true,
+          tutorial_verification: true,
+          bets_visibility: true,
+          QuestionnaireResponse: true,
+        },
+        where: { id_user: requestedId },
+      });
+
+      if (!user) {
+        ResponseHelper.notFound(res, `Utilizador com ID ${requestedId} não encontrado`);
+        return;
+      }
+      ResponseHelper.success(res, user, "Utilizador obtido com sucesso");
     } catch (error) {
-      res.status(500).json({ error: 'Failed to fetch user' })
+      console.error("Error fetching user:", error);
+      ResponseHelper.serverError(res, "Falha ao obter dados do utilizador");
     }
   }
 
 
-  // Get user challenges
-  async getUserChallenges(req: Request, res: Response) {
+  async getOtherUserById(req: Request, res: Response): Promise<void> {
     try {
-      const userId = parseInt(req.params.id)
+      const requestedId = parseInt(req.params.id);
+
+      if (isNaN(requestedId) || requestedId <= 0) {
+        ResponseHelper.badRequest(res, "Formato de ID de utilizador inválido");
+        return;
+      }
+
+
+      const user = await prisma.users.findUnique({
+        select: {
+          id_user: true,
+          name: true,
+          username: true,
+          image: true,
+          money: true,
+          points: true,
+          bets_visibility: true,
+        },
+        where: { id_user: requestedId },
+      });
+
+      if (!user) {
+        ResponseHelper.notFound(res, `Utilizador com ID ${requestedId} não encontrado`);
+        return;
+      }
+      ResponseHelper.success(res, user, "Utilizador obtido com sucesso");
+    } catch (error) {
+      console.error("Error fetching user:", error);
+      ResponseHelper.serverError(res, "Falha ao obter dados do utilizador");
+    }
+  }
+
+  // Get user challenges
+  async getUserChallenges(req: Request, res: Response): Promise<void> {
+    try {
+      const role = req.userRole;
+      const requestedId = parseInt(req.params.id);
+      const tokenUserId = parseInt(req.userId!);
+
+      if (isNaN(requestedId) || requestedId <= 0) {
+        ResponseHelper.badRequest(res, "Formato de ID de utilizador inválido");
+        return;
+      }
+
+      if (role !== 'admin' && requestedId !== tokenUserId) {
+        ResponseHelper.forbidden(res, "Acesso não autorizado");
+        return;
+      }
+      
       const challenges = await prisma.user_has_Challenges.findMany({
-        where: { ref_id_user: userId },
+        where: { ref_id_user: requestedId },
         include: {
           challenge: true
         }
-      })
-      res.json(challenges)
+      });
+      
+      ResponseHelper.success(res, challenges, "Desafios do utilizador obtidos com sucesso");
     } catch (error) {
-      res.status(500).json({ error: 'Failed to fetch user challenges' })
+      console.error("Error fetching user challenges:", error);
+      ResponseHelper.serverError(res, "Falha ao obter desafios do utilizador");
     }
   }
 
   // Get user bet history
-  async getUserBetHistory(req: Request, res: Response) {
+  async getUserBetHistory(req: Request, res: Response): Promise<void> {
     try {
-      const userId = parseInt(req.params.id)
+      const userId = parseInt(req.params.id);
+      const tokenUserId = parseInt(req.userId!); 
+
+      if (isNaN(userId) || userId <= 0) {
+        ResponseHelper.badRequest(res, "Formato de ID de utilizador inválido");
+        return;
+      }
+
+      if (userId !== tokenUserId) {
+        ResponseHelper.forbidden(res, "Acesso não autorizado");
+        return;
+      }      
+      
       const bets = await prisma.bets.findMany({
-        where: { ref_id_user: userId }
-      })
-      res.json(bets)
+        where: { ref_id_user: userId },
+        orderBy: { date: 'desc' }
+      });
+      
+      ResponseHelper.success(res, bets, "Histórico de apostas obtido com sucesso");
     } catch (error) {
-      res.status(500).json({ error: 'Failed to fetch bet history' })
+      console.error("Error fetching bet history:", error);
+      ResponseHelper.serverError(res, "Falha ao obter histórico de apostas");
     }
   }
 
   // Get active user bets
-  async getActiveBets(req: Request, res: Response) {
+  async getActiveBets(req: Request, res: Response): Promise<void> {
     try {
-      const userId = parseInt(req.params.id)
+      const userId = parseInt(req.params.id);
+      const tokenUserId = parseInt(req.userId!); 
+
+      if (isNaN(userId) || userId <= 0) {
+        ResponseHelper.badRequest(res, "Formato de ID de utilizador inválido");
+        return;
+      }
+
+      if (userId !== tokenUserId) {
+        ResponseHelper.forbidden(res, "Acesso não autorizado");
+        return;
+      }
+
       const activeBets = await prisma.bets.findMany({
         where: { 
           ref_id_user: userId,
-          state: 0 // Assuming 0 represents active bets
-        }
-      })
-      res.json(activeBets)
+          state: 0 
+        },
+        orderBy: { date: 'desc' }
+      });
+      
+      ResponseHelper.success(res, activeBets, "Apostas ativas obtidas com sucesso");
     } catch (error) {
-      res.status(500).json({ error: 'Failed to fetch active bets' })
+      console.error("Error fetching active bets:", error);
+      ResponseHelper.serverError(res, "Falha ao obter apostas ativas");
     }
   }
 
   // Get closed bets
-  async getClosedBets(req: Request, res: Response) {
+  async getClosedBets(req: Request, res: Response): Promise<void> {
     try {
-      const userId = parseInt(req.params.id)
+      const userId = parseInt(req.params.id);
+      const tokenUserId = parseInt(req.userId!); 
+
+      if (isNaN(userId) || userId <= 0) {
+        ResponseHelper.badRequest(res, "Formato de ID de utilizador inválido");
+        return;
+      }
+
+      if (userId !== tokenUserId) {
+        ResponseHelper.forbidden(res, "Acesso não autorizado");
+        return;
+      }
+
       const closedBets = await prisma.bets.findMany({
         where: { 
           ref_id_user: userId,
-          state: 1 // Assuming 1 represents closed bets
-        }
-      })
-      res.json(closedBets)
+          state: 1 
+        },
+        orderBy: { date: 'desc' }
+      });
+      
+      ResponseHelper.success(res, closedBets, "Apostas encerradas obtidas com sucesso");
     } catch (error) {
-      res.status(500).json({ error: 'Failed to fetch closed bets' })
+      console.error("Error fetching closed bets:", error);
+      ResponseHelper.serverError(res, "Falha ao obter apostas encerradas");
     }
   }
 
   // Get won bets
-  async getWonBets(req: Request, res: Response) {
+  async getWonBets(req: Request, res: Response): Promise<void> {
     try {
-      const userId = parseInt(req.params.id)
+      const userId = parseInt(req.params.id);
+      const tokenUserId = parseInt(req.userId!); 
+
+      if (isNaN(userId) || userId <= 0) {
+        ResponseHelper.badRequest(res, "Formato de ID de utilizador inválido");
+        return;
+      }
+
+      if (userId !== tokenUserId) {
+        ResponseHelper.forbidden(res, "Acesso não autorizado");
+        return;
+      }
+
       const wonBets = await prisma.bets.findMany({
         where: { 
           ref_id_user: userId,
-          state: 1, // Closed bets
-          result: 1 // Won bets
-        }
-      })
-      res.json(wonBets)
+          state: 1, 
+          result: 1 
+        },
+        orderBy: { date: 'desc' }
+      });
+      
+      ResponseHelper.success(res, wonBets, "Apostas ganhas obtidas com sucesso");
     } catch (error) {
-      res.status(500).json({ error: 'Failed to fetch won bets' })
+      console.error("Error fetching won bets:", error);
+      ResponseHelper.serverError(res, "Falha ao obter apostas ganhas");
     }
   }
 
   // Get lost bets
-  async getLostBets(req: Request, res: Response) {
+  async getLostBets(req: Request, res: Response): Promise<void> {
     try {
-      const userId = parseInt(req.params.id)
+      const userId = parseInt(req.params.id);
+      const tokenUserId = parseInt(req.userId!); 
+
+      if (isNaN(userId) || userId <= 0) {
+        ResponseHelper.badRequest(res, "Formato de ID de utilizador inválido");
+        return;
+      }
+
+      if (userId !== tokenUserId) {
+        ResponseHelper.forbidden(res, "Acesso não autorizado");
+        return;
+      }
+
       const lostBets = await prisma.bets.findMany({
         where: { 
           ref_id_user: userId,
-          state: 1, // Closed bets
-          result: 0 // Lost bets
-        }
-      })
-      res.json(lostBets)
+          state: 1, 
+          result: 0 
+        },
+        orderBy: { date: 'desc' }
+      });
+      
+      ResponseHelper.success(res, lostBets, "Apostas perdidas obtidas com sucesso");
     } catch (error) {
-      res.status(500).json({ error: 'Failed to fetch lost bets' })
+      console.error("Error fetching lost bets:", error);
+      ResponseHelper.serverError(res, "Falha ao obter apostas perdidas");
     }
   }
 
-  //Get user by username
-  async getUserByUsername(req: Request, res: Response) {
+  // Get user by username
+  async getUserByUsername(req: Request, res: Response): Promise<void> {
     try {
-      const username = req.params.username
+      const username = req.params.username;
+
+      if (!username || username.trim().length === 0) {
+        ResponseHelper.badRequest(res, "Nome de utilizador é obrigatório");
+        return;
+      }
+
       const user = await prisma.users.findUnique({
         where: { username: username }
-      })
+      });
+
       if (!user) {
-         res.status(404).json({ error: 'User not found' })
+        ResponseHelper.notFound(res, "Utilizador não encontrado");
+        return;
       }
-      res.json(user)
+
+      // Remove password from response
+      const { password, ...userWithoutPassword } = user;
+      ResponseHelper.success(res, userWithoutPassword, "Utilizador obtido com sucesso");
     } catch (error) {
-      res.status(500).json({ error: 'Failed to fetch user' })
+      console.error("Error fetching user by username:", error);
+      ResponseHelper.serverError(res, "Falha ao obter utilizador");
     }
   }
+
   // Get user by email
-  async getUserByEmail(req: Request, res: Response) {
+  async getUserByEmail(req: Request, res: Response): Promise<void> {
     try {
-      const email = req.params.email
+      const email = req.params.email;
+
+      if (!email || email.trim().length === 0) {
+        ResponseHelper.badRequest(res, "Email é obrigatório");
+        return;
+      }
+
       const user = await prisma.users.findUnique({
         where: { email }
-      })
+      });
+
       if (!user) {
-        res.status(404).json({ error: 'User not found' })
+        ResponseHelper.notFound(res, "Utilizador não encontrado");
+        return;
       }
-      res.json(user)
+
+      // Remove password from response
+      const { password, ...userWithoutPassword } = user;
+      ResponseHelper.success(res, userWithoutPassword, "Utilizador obtido com sucesso");
     } catch (error) {
-      res.status(500).json({ error: 'Failed to fetch user' })
+      console.error("Error fetching user by email:", error);
+      ResponseHelper.serverError(res, "Falha ao obter utilizador");
     }
   }
 
   // Create a new user
-  async createUser(req: Request, res: Response) {
+  async createUser(req: Request<{}, {}, CreateUserRequest>, res: Response): Promise<void> {
     try {
-      const { name, email, username, birthdate, password, image, money, points, tutorial_verification } = req.body
-      const hashedPassword = await bcrypt.hash(password, 10)
+      const { name, email, username, birthdate, password, image, money = 0, points = 0, tutorial_verification = false, has_accepted_terms = false } = req.body;
+
+      // Validation
+      if (!name || name.trim().length === 0) {
+        ResponseHelper.badRequest(res, "Nome é obrigatório");
+        return;
+      }
+
+      if (!email || email.trim().length === 0) {
+        ResponseHelper.badRequest(res, "Email é obrigatório");
+        return;
+      }
+
+      if (!username || username.trim().length === 0) {
+        ResponseHelper.badRequest(res, "Nome de utilizador é obrigatório");
+        return;
+      }
+
+      if (!password || password.length < 8) {
+        ResponseHelper.badRequest(res, "A palavra-passe deve ter pelo menos 8 caracteres");
+        return;
+      }
+
+      if (!birthdate) {
+        ResponseHelper.badRequest(res, "Data de nascimento é obrigatória");
+        return;
+      }
+
+      // Check if user already exists
+      const existingUser = await prisma.users.findFirst({
+        where: {
+          OR: [
+            { email: email.trim() },
+            { username: username.trim() }
+          ]
+        }
+      });
+
+      if (existingUser) {
+        if (existingUser.email === email.trim()) {
+          ResponseHelper.conflict(res, "Email já existe");
+        } else {
+          ResponseHelper.conflict(res, "Nome de utilizador já existe");
+        }
+        return;
+      }
+
+      const hashedPassword = await bcrypt.hash(password, 10);
       const newUser = await prisma.users.create({
         data: {
-          name,
-          email,
-          username,
+          name: name.trim(),
+          email: email.trim(),
+          username: username.trim(),
           birthdate: new Date(birthdate),
           password: hashedPassword,
           image,
           money,
           points,
           tutorial_verification,  
+          has_accepted_terms, 
         }
-      })
-      res.status(201).json(newUser)
+      });
+
+      // Remove password from response
+      const { password: _, ...userWithoutPassword } = newUser;
+      ResponseHelper.created(res, userWithoutPassword, "Utilizador criado com sucesso");
     } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: 'Failed to create user' })
+      console.error("Error creating user:", error);
+      ResponseHelper.serverError(res, "Falha ao criar utilizador");
     }
   }
-
-
 
   // Delete a user
-  async deleteUser(req: Request, res: Response) {
+  async deleteUser(req: Request, res: Response): Promise<void> {
     try {
-      const userId = parseInt(req.params.id)
+      const userId = parseInt(req.params.id);
+      const tokenUserId = parseInt(req.userId!); 
+
+      if (isNaN(userId) || userId <= 0) {
+        ResponseHelper.badRequest(res, "Formato de ID de utilizador inválido");
+        return;
+      }
+
+      if (userId !== tokenUserId) {
+        ResponseHelper.forbidden(res, "Acesso não autorizado");
+        return;
+      }
+
+      const existingUser = await prisma.users.findUnique({
+        where: { id_user: userId }
+      });
+
+      if (!existingUser) {
+        ResponseHelper.notFound(res, `Utilizador com ID ${userId} não encontrado`);
+        return;
+      }
+
       await prisma.users.delete({
         where: { id_user: userId }
-      })
-      res.status(204).send()
+      });
+
+      ResponseHelper.success(res, null, "Utilizador eliminado com sucesso");
     } catch (error) {
-      res.status(500).json({ error: 'Failed to delete user' })
+      console.error("Error deleting user:", error);
+      ResponseHelper.serverError(res, "Falha ao eliminar utilizador");
     }
   }
+
   // Update user password
-  async updateUserPassword(req: Request, res: Response) {
+  async updateUserPassword(req: Request<{ id: string }, {}, UpdateUserPasswordRequest>, res: Response): Promise<void> {
     try {
-      console.log("Received ID:", req.params.id);
-      console.log("Received Body:", req.body);
-  
-      const userId = Number(req.params.id);
-      if (isNaN(userId)) {
-         res.status(400).json({ error: "Invalid user ID" });
+      const requestedId = parseInt(req.params.id);
+
+      if (isNaN(requestedId) || requestedId <= 0) {
+        ResponseHelper.badRequest(res, "Formato de ID de utilizador inválido");
+        return;
       }
-  
+
       const { password } = req.body;
       if (!password || password.length < 8) {
-         res.status(400).json({ error: "Password must be at least 8 characters long" });
+        ResponseHelper.badRequest(res, "A palavra-passe deve ter pelo menos 8 caracteres");
+        return;
       }
-  
-      const existingUser = await prisma.users.findUnique({ where: { id_user: userId } });
+
+      const existingUser = await prisma.users.findUnique({ 
+        where: { id_user: requestedId } 
+      });
+
       if (!existingUser) {
-         res.status(404).json({ error: "User not found" });
+        ResponseHelper.notFound(res, `Utilizador com ID ${requestedId} não encontrado`);
+        return;
       }
-  
+
       const hashedPassword = await bcrypt.hash(password, 10);
-  
+
       await prisma.users.update({
-        where: { id_user: userId },
+        where: { id_user: requestedId },
         data: { password: hashedPassword },
       });
-  
-      console.log("Password updated successfully for user:", userId);
-      res.json({ message: "Password updated successfully" });
-    }catch (error) {
-        console.error("Password update error:", error);
-        if (error instanceof Error) {
-          console.error("Error message:", error.message);
-          console.error("Error stack:", error.stack);
-        }
-        res.status(500).json({ error: "Failed to update user password" });
-      }
-  }
-  
-  
 
+      ResponseHelper.success(res, null, "Palavra-passe atualizada com sucesso");
+    } catch (error) {
+      console.error("Password update error:", error);
+      ResponseHelper.serverError(res, "Falha ao atualizar palavra-passe do utilizador");
+    }
+  }
 
   // Update user profile
-  async updateUserProfile(req: Request, res: Response) {
+  async updateUserProfile(req: Request<{ id: string }, {}, UpdateUserProfileRequest>, res: Response): Promise<void> {
     try {
-      const userId = parseInt(req.params.id)
-      const { name, email, username, image } = req.body
+      const userId = parseInt(req.params.id);
+      const tokenUserId = parseInt(req.userId!); 
+
+      if (isNaN(userId) || userId <= 0) {
+        ResponseHelper.badRequest(res, "Formato de ID de utilizador inválido");
+        return;
+      }
+
+      if (userId !== tokenUserId) {
+        ResponseHelper.forbidden(res, "Acesso não autorizado");
+        return;
+      }
+
+      const { name, email, username, image } = req.body;
+
+      // Check if at least one field is provided
+      if (!name && !email && !username && !image) {
+        ResponseHelper.badRequest(res, "Pelo menos um campo deve ser fornecido para atualização");
+        return;
+      }
+
+      const existingUser = await prisma.users.findUnique({
+        where: { id_user: userId }
+      });
+
+      if (!existingUser) {
+        ResponseHelper.notFound(res, `Utilizador com ID ${userId} não encontrado`);
+        return;
+      }
+
+      // Check for duplicate email or username if they are being updated
+      if (email || username) {
+        const duplicateCheck = await prisma.users.findFirst({
+          where: {
+            AND: [
+              { id_user: { not: userId } },
+              {
+                OR: [
+                  ...(email ? [{ email: email.trim() }] : []),
+                  ...(username ? [{ username: username.trim() }] : [])
+                ]
+              }
+            ]
+          }
+        });
+
+        if (duplicateCheck) {
+          if (duplicateCheck.email === email?.trim()) {
+            ResponseHelper.conflict(res, "Email já existe");
+          } else {
+            ResponseHelper.conflict(res, "Nome de utilizador já existe");
+          }
+          return;
+        }
+      }
       
       const updatedUser = await prisma.users.update({
         where: { id_user: userId },
         data: {
-          ...(name && { name }),
-          ...(email && { email }),
-          ...(username && { username }),
-          ...(image && { image })
+          ...(name && { name: name.trim() }),
+          ...(email && { email: email.trim() }),
+          ...(username && { username: username.trim() }),
+          ...(image !== undefined && { image })
         }
-      })
-      
-      res.json(updatedUser)
+      });
+
+      // Remove password from response
+      const { password, ...userWithoutPassword } = updatedUser;
+      ResponseHelper.success(res, userWithoutPassword, "Perfil do utilizador atualizado com sucesso");
     } catch (error) {
-      res.status(500).json({ error: 'Failed to update user profile' })
+      console.error("Error updating user profile:", error);
+      ResponseHelper.serverError(res, "Falha ao atualizar perfil do utilizador");
     }
   }
 
   // Update user money
-  async updateUserMoney(req: Request, res: Response) {
+  async updateUserMoney(req: Request<{ id: string }, {}, UpdateUserMoneyRequest>, res: Response): Promise<void> {
     try {
-      const userId = parseInt(req.params.id)
-      const { money } = req.body
+      const userId = parseInt(req.params.id);
+      const { money } = req.body;
+
+      if (isNaN(userId) || userId <= 0) {
+        ResponseHelper.badRequest(res, "Formato de ID de utilizador inválido");
+        return;
+      }
+
+      if (typeof money !== 'number' || money < 0) {
+        ResponseHelper.badRequest(res, "Dinheiro deve ser um número não negativo");
+        return;
+      }
+
+      const existingUser = await prisma.users.findUnique({
+        where: { id_user: userId }
+      });
+
+      if (!existingUser) {
+        ResponseHelper.notFound(res, `Utilizador com ID ${userId} não encontrado`);
+        return;
+      }
       
       const updatedUser = await prisma.users.update({
         where: { id_user: userId },
         data: { money }
-      })
-      
-      res.json(updatedUser)
+      });
+
+      // Remove password from response
+      const { password, ...userWithoutPassword } = updatedUser;
+      ResponseHelper.success(res, userWithoutPassword, "Dinheiro do utilizador atualizado com sucesso");
     } catch (error) {
-      res.status(500).json({ error: 'Failed to update user money' })
+      console.error("Error updating user money:", error);
+      ResponseHelper.serverError(res, "Falha ao atualizar dinheiro do utilizador");
     }
   }
 
   // Update user points
-  async updateUserPoints(req: Request, res: Response) {
+  async updateUserPoints(req: Request<{ id: string }, {}, UpdateUserPointsRequest>, res: Response): Promise<void> {
     try {
-      const userId = parseInt(req.params.id)
-      const { points } = req.body
+      const userId = parseInt(req.params.id);
+      const { points } = req.body;
+      const tokenUserId = parseInt(req.userId!); 
+
+      if (isNaN(userId) || userId <= 0) {
+        ResponseHelper.badRequest(res, "Formato de ID de utilizador inválido");
+        return;
+      }
+
+      if (userId !== tokenUserId) {
+        ResponseHelper.forbidden(res, "Acesso não autorizado");
+        return;
+      }
+
+      if (typeof points !== 'number' || points < 0) {
+        ResponseHelper.badRequest(res, "Pontos devem ser um número não negativo");
+        return;
+      }
+
+      const existingUser = await prisma.users.findUnique({
+        where: { id_user: userId }
+      });
+
+      if (!existingUser) {
+        ResponseHelper.notFound(res, `Utilizador com ID ${userId} não encontrado`);
+        return;
+      }
       
       const updatedUser = await prisma.users.update({
         where: { id_user: userId },
         data: { points }
-      })
-      
-      res.json(updatedUser)
+      });
+
+      // Remove password from response
+      const { password, ...userWithoutPassword } = updatedUser;
+      ResponseHelper.success(res, userWithoutPassword, "Pontos do utilizador atualizados com sucesso");
     } catch (error) {
-      res.status(500).json({ error: 'Failed to update user points' })
+      console.error("Error updating user points:", error);
+      ResponseHelper.serverError(res, "Falha ao atualizar pontos do utilizador");
     }
   }
 
+  // Update user bets_visibility
+  async updateUserBetsVisibility(req: Request<{ id: string }, {}, UpdateUserBetsVisibilityRequest>, res: Response): Promise<void> {
+    try {
+      const userId = parseInt(req.params.id);
+      const { bets_visibility } = req.body;
+      const tokenUserId = parseInt(req.userId!); 
 
-  //update user bets_visibility
-async updateUserBetsVisibility(req: Request, res: Response) {
-  try {
-    const userId = parseInt(req.params.id)
-    const { bets_visibility } = req.body
-    
-    const updatedUser = await prisma.users.update({
-      where: { id_user: userId },
-      data: { bets_visibility }
-    })
-    
-    res.json(updatedUser)
+      if (isNaN(userId) || userId <= 0) {
+        ResponseHelper.badRequest(res, "Formato de ID de utilizador inválido");
+        return;
+      }
+
+      if (userId !== tokenUserId) {
+        ResponseHelper.forbidden(res, "Acesso não autorizado");
+        return;
+      }
+
+      if (typeof bets_visibility !== 'boolean' || (bets_visibility !== false && bets_visibility !== true)) {
+        ResponseHelper.badRequest(res, "Visibilidade de apostas deve ser 0 (oculto) ou 1 (visível)");
+        return;
+      }
+
+      const existingUser = await prisma.users.findUnique({
+        where: { id_user: userId }
+      });
+
+      if (!existingUser) {
+        ResponseHelper.notFound(res, `Utilizador com ID ${userId} não encontrado`);
+        return;
+      }
+      
+      const updatedUser = await prisma.users.update({
+        where: { id_user: userId },
+        data: { bets_visibility }
+      });
+
+      // Remove password from response
+      const { password, ...userWithoutPassword } = updatedUser;
+      ResponseHelper.success(res, userWithoutPassword, "Visibilidade de apostas do utilizador atualizada com sucesso");
+    } catch (error) {
+      console.error("Error updating user bets visibility:", error);
+      ResponseHelper.serverError(res, "Falha ao atualizar visibilidade de apostas do utilizador");
+    }
   }
-  catch (error) {
-    res.status(500).json({ error: 'Failed to update user bets visibility' })
+
+  // Update user tutorial_verification
+  async updateUserTutorialVerification(req: Request<{ id: string }, {}, UpdateUserTutorialVerificationRequest>, res: Response): Promise<void> {
+    try {
+      const userId = parseInt(req.params.id);
+      const { tutorial_verification } = req.body;
+      const tokenUserId = parseInt(req.userId!); 
+
+      if (isNaN(userId) || userId <= 0) {
+        ResponseHelper.badRequest(res, "Formato de ID de utilizador inválido");
+        return;
+      }
+
+      if (userId !== tokenUserId) {
+        ResponseHelper.forbidden(res, "Acesso não autorizado");
+        return;
+      }
+
+      if (typeof tutorial_verification !== 'boolean' || (tutorial_verification !== false && tutorial_verification !== true)) {
+        ResponseHelper.badRequest(res, "Verificação do tutorial deve ser 0 ou 1");
+        return;
+      }
+
+      const existingUser = await prisma.users.findUnique({
+        where: { id_user: userId }
+      });
+
+      if (!existingUser) {
+        ResponseHelper.notFound(res, `Utilizador com ID ${userId} não encontrado`);
+        return;
+      }
+
+      const updatedUser = await prisma.users.update({
+        where: { id_user: userId },
+        data: { tutorial_verification }
+      });
+
+      // Remove password from response
+      const { password, ...userWithoutPassword } = updatedUser;
+      ResponseHelper.success(res, userWithoutPassword, "Verificação do tutorial do utilizador atualizada com sucesso");
+    } catch (error) {
+      console.error("Error updating user tutorial verification:", error);
+      ResponseHelper.serverError(res, "Falha ao atualizar verificação do tutorial do utilizador");
+    }
   }
-}
-
-//update user tutorial_verification
-async updateUserTutorialVerification(req: Request, res: Response) {
-  try {
-    const userId = parseInt(req.params.id)
-    const { tutorial_verification } = req.body
-    const updatedUser = await prisma.users.update({
-      where: { id_user: userId },
-      data: { tutorial_verification }
-    })
-    res.json(updatedUser)
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to update user tutorial verification' })
-  }
-}
-
-
 
   // Get leaderboard (users ordered by points)
-  async getLeaderboard(req: Request, res: Response) {
+  async getLeaderboard(req: Request, res: Response): Promise<void> {
     try {
       const leaderboard = await prisma.users.findMany({
+        select: {
+          id_user: true,
+          name: true,
+          username: true,
+          points: true,
+          image: true
+        },
         orderBy: { points: 'desc' }
       });
-      res.json(leaderboard);
-    } catch (error: any) {
-      console.error("Erro no getLeaderboard:", error);
-      res.status(500).json({ 
-        error: 'Erro ao buscar o ranking',
-        message: error.message,
-        stack: error.stack
-      });
+
+      ResponseHelper.success(res, leaderboard, "Tabela de classificação obtida com sucesso");
+    } catch (error) {
+      ResponseHelper.serverError(res, "Falha ao obter tabela de classificação");
     }
   }
 
@@ -359,20 +803,28 @@ async updateUserTutorialVerification(req: Request, res: Response) {
   async getUserPositionInLeaderboard(req: Request, res: Response) {
     try {
       const userId = parseInt(req.params.id)
+      const tokenUserId = parseInt(req.userId!); 
+
+      if (!tokenUserId) {
+        ResponseHelper.forbidden(res, "Acesso não autorizado");
+        return;
+      }
       const leaderboard = await prisma.users.findMany({
+        select: {
+          id_user: true,
+          name: true,
+          username: true,
+          points: true,
+          image: true
+        },
         orderBy: { points: 'desc' }
       });
       const userPosition = leaderboard.findIndex(user => user.id_user === userId) + 1;
-      res.json({ position: userPosition });
+      ResponseHelper.success(res, userPosition, "Tabela de classificação obtida com sucesso");
+
     } catch (error) {
-      res.status(500).json({ error: 'Failed to fetch user position in leaderboard' })
+      ResponseHelper.serverError(res, "Falha ao obter posição do utilizador na tabela de classificação");
     }
   }
 
-
-
 }
-
-
-
-

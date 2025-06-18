@@ -378,6 +378,8 @@
 
 import express from "express";
 import { BetsController } from "../controllers/betsController";
+import { requireAPIKey } from "../middleware/auth";
+import { verifyJWT } from '../middleware/verifyJWT';
 
 const router = express.Router();
 const betsController = new BetsController();
@@ -387,18 +389,21 @@ const betsController = new BetsController();
 router.get("/:id/bets/concluded", betsController.getConcludedUserBets); // Get concluded user bets
 router.get("/:id/bets/winning", betsController.getWinningUserBets); // Get winning user bets
 router.get("/:id/bets/losing", betsController.getLosingUserBets); */ // Get losing user bets
-router.get("/last/:id", betsController.getLastUserBets); // Get last bet by user ID
-router.get("/count-today", betsController.getBetsByDate); // Get count of today's bets
-router.get("/count/:id", betsController.countUserBetsById); // Get count of bets by user ID
-router.get("/:id", betsController.getBetsByUserId); // Get bets by user ID
+router.get("/last/:id", requireAPIKey, betsController.getLastUserBets); // Get last bet by user ID
+router.get("/count-today", requireAPIKey, betsController.getBetsByDate); // Get count of today's bets
+router.get("/count/:id", requireAPIKey, betsController.countUserBetsById); // Get count of bets by user ID
+router.get("/:id", requireAPIKey, verifyJWT, betsController.getBetsByUserId); // Get bets by user ID
 
+router.get("/pending/:userId", requireAPIKey, verifyJWT, betsController.getPendingBetsForProcessing); // Get bets ready for processing
+
+router.post("/process-results/:userId", requireAPIKey, verifyJWT, betsController.processBetResults); // Process bet results and update user
 // POST Bet Routes
-router.post("/:id_user/:id_championship", betsController.createBet); // Create a new bet
+router.post("/:id_user/:id_championship", requireAPIKey, verifyJWT, betsController.createBet); // Create a new bet
 
 // Update Bet Routes
-router.patch("/:id", betsController.updateBet); // Update a bet by ID
+router.patch("/:id", requireAPIKey, verifyJWT, betsController.updateBet); // Update a bet by ID
 
 // Delete Bet Routes
-router.delete("/:id", betsController.deleteBet); // Delete a bet by ID
+router.delete("/:id", requireAPIKey, verifyJWT, betsController.deleteBet); // Delete a bet by ID
 
 export default router;

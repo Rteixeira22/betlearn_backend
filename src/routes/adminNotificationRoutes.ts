@@ -49,7 +49,7 @@
  *         is_read: false
  *         created_at: 2023-04-15T14:30:00Z
  * 
- * /api/admin/notifications:
+ * //admin/notifications:
  *   get:
  *     summary: Recupera todas as notificações
  *     description: Retorna uma lista de todas as notificações para administradores, com opção de filtrar por status de leitura
@@ -132,7 +132,7 @@
  *                   type: string
  *                   example: Failed to create notification
  * 
- * /api/admin/notifications/{id}:
+ * /admin/notifications/{id}:
  *   get:
  *     summary: Recupera uma notificação específica
  *     description: Retorna os detalhes de uma notificação com base no ID fornecido
@@ -242,7 +242,7 @@
  *                   type: string
  *                   example: Failed to delete notification
  * 
- * /api/admin/notifications/{id}/read:
+ * /admin/notifications/{id}/read:
  *   put:
  *     summary: Marca uma notificação como lida
  *     description: Atualiza o status de uma notificação para lida
@@ -281,16 +281,20 @@ import { AdminNotificationController } from "../controllers/adminNotificationCon
 const router = express.Router(); 
 const adminNotificationController = new AdminNotificationController(); // Create an instance of the controller
 
-router.get("/", adminNotificationController.getNotifications); // Route to get all notifications
+import { requireAPIKey } from "../middleware/auth";
+import authorize from '../middleware/authorize';
+import { verifyJWT } from '../middleware/verifyJWT';
 
-router.get("/:id", adminNotificationController.getNotificationById); // Route to get notification by ID
+router.get("/", requireAPIKey, authorize('admin'), adminNotificationController.getNotifications); // Route to get all notifications
 
-router.post("/", adminNotificationController.createNotification); // Route to create a new notification
+router.get("/:id",  requireAPIKey, authorize('admin'), adminNotificationController.getNotificationById); // Route to get notification by ID
 
-router.put("/:id", adminNotificationController.updateNotification); // Route to update a notification by ID
+router.post("/",  requireAPIKey, authorize('admin'),  adminNotificationController.createNotification); // Route to create a new notification
 
-router.put("/:id/read", adminNotificationController.markAsRead) // Route to mark a notification as read
+router.put("/:id",  requireAPIKey, authorize('admin'), verifyJWT,  adminNotificationController.updateNotification); // Route to update a notification by ID
 
-router.delete("/:id", adminNotificationController.deleteNotification); // Route to delete a notification by ID
+router.put("/:id/read",  requireAPIKey, authorize('admin'), verifyJWT,  adminNotificationController.markAsRead) // Route to mark a notification as read
+
+router.delete("/:id",  requireAPIKey, authorize('admin'), verifyJWT, adminNotificationController.deleteNotification); // Route to delete a notification by ID
 
 export default router; // Export router

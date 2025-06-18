@@ -183,17 +183,21 @@ import { AdminController } from "../controllers/adminController";
 const router = express.Router();
 const adminController = new AdminController();
 
+import { requireAPIKey } from "../middleware/auth";
+import authorize from '../middleware/authorize';
+import { verifyJWT } from '../middleware/verifyJWT';
+
 // GET Admin Routes
-router.get("/", adminController.getAdmins); // Get all admins
-router.get("/:id", adminController.getAdminById); // Get admin by ID
+router.get("/",  requireAPIKey, authorize('admin'), adminController.getAdmins); // Get all admins
+router.get("/:id", requireAPIKey, verifyJWT, adminController.getAdminById); // Get admin by ID
 
 // POST Admin Routes
-router.post("/", adminController.createAdmin); // Create admin
+router.post("/", requireAPIKey, authorize('admin'), adminController.createAdmin); // Create admin
 
 // PUT Admin Routes
-router.put("/:id", adminController.updateAdmin); // Update admin
+router.put("/:id", requireAPIKey, authorize('admin'), verifyJWT, adminController.updateAdmin); // Update admin
 
 // DELETE Admin Routes
-router.delete("/:id", adminController.deleteAdmin); // Delete admin
+router.delete("/:id", requireAPIKey, authorize('admin'), verifyJWT, adminController.deleteAdmin); // Delete admin
 
 export default router; // Export router

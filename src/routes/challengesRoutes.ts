@@ -948,52 +948,56 @@
 
 import express from "express";
 import { ChallengesController } from "../controllers/challengesController";
+import { requireAPIKey } from "../middleware/auth";
+import { verifyJWT } from '../middleware/verifyJWT';
+import authorize from '../middleware/authorize';
 
 const router = express.Router();
 const challengeController = new ChallengesController();
 
 //GET METHOTHDS
 // Get count of challenges
-router.get("/count", challengeController.countChallenges);
+router.get("/count", requireAPIKey, verifyJWT, challengeController.countChallenges);
 
 // Get all challenges
-router.get("/", challengeController.getAllChallenges);
+router.get("/", requireAPIKey, challengeController.getAllChallenges);
 
 // Get Count of challenges today
-router.get("/count-today", challengeController.getCountChallengesByDate);
+router.get("/count-today", requireAPIKey, verifyJWT, authorize('admin'), challengeController.getCountChallengesByDate);
 
 // GET most completed challenge today
-router.get("/most-completed-today", challengeController.getMostCompletedChallengeToday);
+router.get("/most-completed-today", requireAPIKey, verifyJWT, authorize('admin'), challengeController.getMostCompletedChallengeToday);
 
 // Get challenge by ID
-router.get("/:id", challengeController.getChallengeById);
+router.get("/:id",  requireAPIKey, verifyJWT, challengeController.getChallengeById);
 
 // Get steps by challenge ID
-router.get("/:id/steps", challengeController.getStepsByChallengeId);
+router.get("/:id/steps",  requireAPIKey, verifyJWT, challengeController.getStepsByChallengeId);
 
 // Get Challenge in progress
-router.get('/:id/in-progress', challengeController.getChallengeInProgress);
+router.get('/:id/in-progress',  requireAPIKey, verifyJWT, challengeController.getChallengeInProgress);
 //POST METHOTDS
 
 // Get all challenges by user ID
-router.get("/user/:id_user", challengeController.getChallengeByUserId);
+router.get("/user/:id_user",  requireAPIKey, verifyJWT, challengeController.getChallengeByUserId);
 
 //get all challenges completed by user ID
 router.get(
   "/completed/:id_user",
+   requireAPIKey, verifyJWT,
   challengeController.getAllChallengesCompletedByUserId
 );
 
 
 // Create a new challenge
-router.post("/", challengeController.createChallenge);
+router.post("/", requireAPIKey, verifyJWT, authorize('admin'), challengeController.createChallenge);
 
 //create full challenge
-router.post("/full", challengeController.createFullChallenge);
+router.post("/full",  requireAPIKey, verifyJWT, authorize('admin'), challengeController.createFullChallenge);
 
 //create user has challenge
 router.post(
-  "/:id_user/:id_challenge",
+  "/:id_user/:id_challenge",  requireAPIKey,
   challengeController.createUserHasChallenges
 );
 
@@ -1002,17 +1006,19 @@ router.post(
 // umblock next challenge
 router.post(
   "/:id_user/:id_challenge/unblock-next",
+   requireAPIKey, verifyJWT,
   challengeController.unblockNextChallenge
 );
 
 //UPDATE METHOTDS
 
 //update challenge by ID
-router.patch("/:id", challengeController.updateChallengeById);
+router.patch("/:id",  requireAPIKey, verifyJWT, authorize('admin'), challengeController.updateChallengeById);
 
 //update user has challenges detail_seen
 router.patch(
   "/:id_user/:id_challenge",
+   requireAPIKey, verifyJWT,
   challengeController.updateUserHasChallengesDetailSeen
 );
 
@@ -1020,18 +1026,20 @@ router.patch(
 //este vai fazer com que o umblock next challenge seja chamado
 router.patch(
   "/:id_user/:id_challenge/progress",
+   requireAPIKey, verifyJWT,
   challengeController.updateUserHasChallengesProgressPercentage
 );
 
 //update state dos challenges and update of progress_percentage  (aqui ter em atenção que recebe um array de steps- podemos atualizar o state de todos os steps de uma vez - depois de estarem todos ele vai puxar percentage atualize e se for 100 vai fazer o unblock next challenge)
 router.patch(
   "/:id_user/:id_challenge/:id_step/state",
+   requireAPIKey, verifyJWT,
   challengeController.updateUserHasStepState
 );
 
 //DELETE METHOTDS
 
 //delete challenge by ID
-router.delete("/:id", challengeController.deleteChallengeById);
+router.delete("/:id",  requireAPIKey, verifyJWT, authorize('admin'), challengeController.deleteChallengeById);
 
 export default router;

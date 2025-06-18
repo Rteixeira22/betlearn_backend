@@ -367,25 +367,29 @@
 import express from "express";
 import { GamesController } from "../controllers/gamesController";
 
+import { requireAPIKey } from "../middleware/auth";
+import { verifyJWT } from '../middleware/verifyJWT';
+import authorize from '../middleware/authorize';
+
 const router = express.Router();
 const gamesController = new GamesController();
 
 //GETS
 //TODOS
-router.get("/", gamesController.getAllGames);
+router.get("/", requireAPIKey, verifyJWT, gamesController.getAllGames);
 //Jodo do dia
-router.get("/most-betted-today", gamesController.getMostBettedGameOfDay);
+router.get("/most-betted-today", requireAPIKey, verifyJWT, authorize('admin'), gamesController.getMostBettedGameOfDay);
 //UM
-router.get("/:id", gamesController.getGameById);
+router.get("/:id", requireAPIKey, verifyJWT, gamesController.getGameById);
 
 
 //POST
-router.post("/", gamesController.createGame);
+router.post("/", requireAPIKey, gamesController.createGame);
 
 //UPDATE
-router.put("/:id/:betId", gamesController.updateGameState);
+router.put("/:id/:betId", requireAPIKey, verifyJWT, gamesController.updateGameState);
 
 //DELETE
-router.delete("/:id", gamesController.deleteGame);
+router.delete("/:id", requireAPIKey, verifyJWT, gamesController.deleteGame);
 
 export default router;

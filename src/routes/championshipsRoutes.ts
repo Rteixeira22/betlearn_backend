@@ -270,34 +270,38 @@
  */
 import express from "express";
 import { ChampionsController } from "../controllers/championshipsController";
+import { requireAPIKey } from "../middleware/auth";
+import { verifyJWT } from '../middleware/verifyJWT';
+import authorize from '../middleware/authorize';
+
 
 const router = express.Router();
 const championsController = new ChampionsController();
 
 //GETS
 //TODOS
-router.get("/", championsController.getAllChampionships);
+router.get("/", requireAPIKey, verifyJWT, championsController.getAllChampionships);
 
-router.get("/yesterday", championsController.getYesterdayChampionship);
+router.get("/yesterday", requireAPIKey, verifyJWT, championsController.getYesterdayChampionship);
 
-router.get("/lasttwo", championsController.getLastTwoChampionships);
+router.get("/lasttwo", requireAPIKey, verifyJWT, championsController.getLastTwoChampionships);
 
-router.get("/generate", championsController.generateChampionship); //Gera novo campeonato atraves do script
+router.get("/generate", requireAPIKey, verifyJWT, authorize('admin'), championsController.generateChampionship); //Gera novo campeonato atraves do script
 
 
 //UM
-router.get("/:id", championsController.getChampionshipById);
+router.get("/:id", requireAPIKey, verifyJWT, championsController.getChampionshipById);
 
 //POST
-router.post("/", championsController.createChampionship);
+router.post("/", requireAPIKey, championsController.createChampionship);
 
 
 
 //UPDATE
-router.put("/:id", championsController.updateChampionship);
+router.put("/:id", requireAPIKey, verifyJWT, authorize('admin'), championsController.updateChampionship);
 
 //DELETE
-router.delete("/:id", championsController.deleteChampionship);
+router.delete("/:id", requireAPIKey, verifyJWT, authorize('admin'), championsController.deleteChampionship);
 
 
 

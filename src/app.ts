@@ -21,6 +21,11 @@ import expressBasicAuth from "express-basic-auth";
 
 import path from "path";
 
+const responseHelper = require('express-response-helper').helper();
+
+const app = express();
+
+
 const allowedOrigins = [
   "http://localhost:8081", 
   "http://localhost:3000",
@@ -33,6 +38,7 @@ const allowedOrigins = [
 class App {
   public app: express.Application;
   public prisma: PrismaClient;
+  
 
   constructor() {
     this.app = express();
@@ -59,6 +65,7 @@ class App {
     );
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: true }));
+    this.app.use(responseHelper);
   }
 
   private initializeRoutes() {

@@ -1,37 +1,31 @@
 import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
 import axios from "axios";
+import {
+  ResponseHelper,
+  Challenge,
+  ChallengeWithSteps,
+  UserHasChallenge,
+  UserHasChallengeStep,
+  CreateChallengeRequest,
+  UpdateChallengeRequest,
+  CreateUserHasChallengeRequest,
+  UpdateUserHasChallengeDetailSeenRequest,
+  UpdateUserHasChallengeProgressRequest,
+  UpdateUserHasStepStateRequest,
+  CreateFullChallengeRequest,
+  ChallengeListResponse,
+  ChallengeCountResponse,
+  MostCompletedChallengeResponse,
+  ChallengeInProgressResponse,
+  StepUpdateResponse
+} from "../utils/challengesResponseHelper";
 
 const prisma = new PrismaClient();
 
-interface CreateChallengeRequest {
-  challenge: {
-    number: number;
-    name: string;
-    short_description: string;
-    long_description: string;
-    image: string;
-  };
-  steps: Array<{
-    type: "video" | "bet" | "view" | "questionnaire";
-    data: {
-      // Dados específicos de cada tipo de step
-      video_url?: string;
-      video_description?: string;
-      bet_description?: string;
-      bet_json?: string;
-      view_description?: string;
-      view_page?: string;
-      questionnaire_description?: string;
-      questionnaire_json?: string;
-    };
-  }>;
-}
-
 export class ChallengesController {
   // Get all challenges
-
-  async getAllChallenges(req: Request, res: Response) {
+  async getAllChallenges(req: Request, res: Response): Promise<void> {
     try {
       const minNumber =
         typeof req.query.minNumber === "string"
@@ -76,7 +70,7 @@ export class ChallengesController {
         ? offset + challenges.length < totalChallenges
         : false;
 
-      res.json({
+      const response: ChallengeListResponse = {
         challenges,
         pagination: {
           total: totalChallenges,
@@ -84,16 +78,25 @@ export class ChallengesController {
           offset: offset || 0,
           hasNextPage,
         },
-      });
+      };
+
+      ResponseHelper.success(res, response, "Desafios obtidos com sucesso");
     } catch (error) {
       console.error("Error fetching challenges:", error);
-      res.status(500).json({ error: "Failed to fetch challenges" });
+      ResponseHelper.serverError(res, "Falha ao obter desafios");
     }
   }
+
   // Get challenge by ID
-  async getChallengeById(req: Request, res: Response) {
+  async getChallengeById(req: Request, res: Response): Promise<void> {
     try {
       const challengeId = parseInt(req.params.id);
+      
+      if (isNaN(challengeId) || challengeId <= 0) {
+        ResponseHelper.badRequest(res, "Formato de ID do desafio inválido");
+        return;
+      }
+
       const challenge = await prisma.challenges.findUnique({
         where: { id_challenge: challengeId },
         include: {
@@ -107,28 +110,60 @@ export class ChallengesController {
           },
         },
       });
-      res.json(challenge);
+
+      if (!challenge) {
+        ResponseHelper.notFound(res, `Desafio com ID ${challengeId} não encontrado`);
+        return;
+      }
+
+      ResponseHelper.success(res, challenge, "Desafio obtido com sucesso");
     } catch (error) {
-      res.status(500).json({ error: "Failed to fetch challenge" });
+      console.error("Error fetching challenge:", error);
+      ResponseHelper.serverError(res, "Falha ao obter desafio");
     }
   }
 
-  //Get count of challenges
-  async countChallenges(req: Request, res: Response) {
+  // Get count of challenges
+  async countChallenges(req: Request, res: Response): Promise<void> {
     try {
       const count = await prisma.challenges.count();
-      console.log("Count fetched successfully:", count);
-      res.json({ count });
+      const response: ChallengeCountResponse = { count };
+      
+      ResponseHelper.success(res, response, "Contagem de desafios obtida com sucesso");
     } catch (error) {
-      res.status(500).json({ error: "Failed to count challenges" });
+      console.error("Error counting challenges:", error);
+      ResponseHelper.serverError(res, "Falha ao contar desafios");
     }
   }
 
-  // create challenge
-  async createChallenge(req: Request, res: Response) {
+  // Create challenge
+  async createChallenge(req: Request<{}, {}, CreateChallengeRequest>, res: Response): Promise<void> {
     try {
-      const { number, name, short_description, long_description, image } =
-        req.body;
+      const { number, name, short_description, long_description, image }: CreateChallengeRequest = req.body;
+
+      // Validation
+      if (!number || !name || !short_description || !long_description || !image) {
+        ResponseHelper.badRequest(res, "Todos os campos são obrigatórios: number, name, short_description, long_description, image");
+        return;
+      }
+
+      if (typeof number !== 'number' || number <= 0) {
+        ResponseHelper.badRequest(res, "O número deve ser um número inteiro positivo");
+        return;
+      }
+
+      // Check if challenge number already exists
+      const existingChallenge = await prisma.challenges.findFirst({
+        where: { number }
+      });
+
+      if (existingChallenge) {
+        ResponseHelper.conflict(res, `Desafio com número ${number} já existe`);
+        return;
+      }
+
+      console.log("Creating challenge:")
+
       const newChallenge = await prisma.challenges.create({
         data: {
           number,
@@ -138,26 +173,42 @@ export class ChallengesController {
           image,
         },
       });
-      res.status(201).json(newChallenge);
+
+      ResponseHelper.created(res, newChallenge, "Desafio criado com sucesso");
     } catch (error) {
-      res.status(500).json({ error: "Failed to create challenge" });
+      console.error("Error creating challenge:", error);
+      ResponseHelper.serverError(res, "Falha ao criar desafio");
     }
   }
 
-  //search steps by challenge id
-  async getStepsByChallengeId(req: Request, res: Response) {
+  // Search steps by challenge id
+  async getStepsByChallengeId(req: Request, res: Response): Promise<void> {
     try {
       const challengeId = parseInt(req.params.id);
+      
+      if (isNaN(challengeId) || challengeId <= 0) {
+        ResponseHelper.badRequest(res, "Formato de ID do desafio inválido");
+        return;
+      }
+
       const steps = await prisma.steps.findMany({
         where: { ref_id_challenges: challengeId },
+        include: {
+          Step_Video: true,
+          Step_Bet: true,
+          Step_View: true,
+          Step_Questionnaire: true,
+        },
       });
-      res.json(steps);
+
+      ResponseHelper.success(res, steps, "Passos do desafio obtidos com sucesso");
     } catch (error) {
-      res.status(500).json({ error: "Failed to fetch steps" });
+      console.error("Error fetching steps:", error);
+      ResponseHelper.serverError(res, "Falha ao obter passos");
     }
   }
 
-  async getCountChallengesByDate(req: Request, res: Response) {
+  async getCountChallengesByDate(req: Request, res: Response): Promise<void> {
     try {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
@@ -165,7 +216,7 @@ export class ChallengesController {
       const tomorrow = new Date(today);
       tomorrow.setDate(tomorrow.getDate() + 1);
 
-      const bets = await prisma.user_has_Challenges.count({
+      const count = await prisma.user_has_Challenges.count({
         where: {
           date: {
             gte: today,
@@ -174,14 +225,15 @@ export class ChallengesController {
         },
       });
 
-      res.json({ count: bets });
+      const response: ChallengeCountResponse = { count };
+      ResponseHelper.success(res, response, "Contagem de desafios de hoje obtida com sucesso");
     } catch (error) {
-      console.error("Erro ao ir buscar desafios de hoje:", error);
-      res.status(500).json({ error: "Failed to fetch today's bets" });
+      console.error("Error fetching today's challenges:", error);
+      ResponseHelper.serverError(res, "Falha ao obter desafios de hoje");
     }
   }
 
-  async getMostCompletedChallengeToday(req: Request, res: Response) {
+  async getMostCompletedChallengeToday(req: Request, res: Response): Promise<void> {
     try {
       // Set date range for today
       const today = new Date();
@@ -212,10 +264,12 @@ export class ChallengesController {
       });
 
       if (completedChallenges.length === 0) {
-        return res.json({
-          message: "No challenges were completed today",
+        const response: MostCompletedChallengeResponse = {
+          message: "Nenhum desafio foi completado hoje",
           mostCompleted: null,
-        });
+        };
+        ResponseHelper.success(res, response, "Nenhum desafio completado encontrado para hoje");
+        return;
       }
 
       // Get the most completed challenge ID
@@ -227,27 +281,38 @@ export class ChallengesController {
         where: { id_challenge: mostCompletedChallengeId },
       });
 
-      // Return the result
-      res.json({
+      const response: MostCompletedChallengeResponse = {
         mostCompleted: challengeDetails,
         completionCount: completionCount,
         date: today.toISOString().split("T")[0],
-      });
+      };
+
+      ResponseHelper.success(res, response, "Desafio mais completado obtido com sucesso");
     } catch (error) {
       console.error("Error fetching most completed challenge:", error);
-      res.status(500).json({
-        error: "Failed to fetch most completed challenge today",
-        details: error instanceof Error ? error.message : "Unknown error",
-      });
+      ResponseHelper.serverError(res, "Falha ao obter o desafio mais completado hoje");
     }
   }
 
-  // Get ghallenge by user id
-  async getChallengeByUserId(req: Request, res: Response) {
+  // Get challenge by user id
+  async getChallengeByUserId(req: Request, res: Response): Promise<void> {
     try {
-      const userId = parseInt(req.params.id_user);
+      const role = req.userRole;
+      const requestedId = parseInt(req.params.id_user);
+      const tokenUserId = parseInt(req.userId!);
+
+      if (isNaN(requestedId) || requestedId <= 0) {
+        ResponseHelper.badRequest(res, "Formato de ID do utilizador inválido");
+        return;
+      }
+
+      if (role !== 'admin' && requestedId !== tokenUserId) {
+        ResponseHelper.forbidden(res, "Acesso restrito");
+        return;
+      }
+
       const challenges = await prisma.user_has_Challenges.findMany({
-        where: { ref_id_user: userId },
+        where: { ref_id_user: requestedId },
         include: { challenge: true },
         orderBy: {
           challenge: {
@@ -255,19 +320,33 @@ export class ChallengesController {
           },
         },
       });
-      res.json(challenges);
+
+      ResponseHelper.success(res, challenges, "Desafios do utilizador obtidos com sucesso");
     } catch (error) {
-      res.status(500).json({ error: "Failed to fetch challenges" });
+      console.error("Error fetching user challenges:", error);
+      ResponseHelper.serverError(res, "Falha ao obter desafios");
     }
   }
 
-  //get challenges completed by user
-
-  async getAllChallengesCompletedByUserId(req: Request, res: Response) {
+  // Get challenges completed by user
+  async getAllChallengesCompletedByUserId(req: Request, res: Response): Promise<void> {
     try {
-      const userId = parseInt(req.params.id_user);
+      const role = req.userRole;
+      const requestedId = parseInt(req.params.id_user);
+      const tokenUserId = parseInt(req.userId!);
+
+      if (isNaN(requestedId) || requestedId <= 0) {
+        ResponseHelper.badRequest(res, "Formato de ID do utilizador inválido");
+        return;
+      }
+
+      if (role !== 'admin' && requestedId !== tokenUserId) {
+        ResponseHelper.forbidden(res, "Acesso restrito");
+        return;
+      }
+
       const challenges = await prisma.user_has_Challenges.findMany({
-        where: { ref_id_user: userId, completed: true },
+        where: { ref_id_user: requestedId, completed: true },
         include: { challenge: true },
         orderBy: {
           challenge: {
@@ -275,59 +354,92 @@ export class ChallengesController {
           },
         },
       });
-      res.json(challenges);
+
+      ResponseHelper.success(res, challenges, "Desafios completados obtidos com sucesso");
     } catch (error) {
-      res.status(500).json({ error: "Failed to fetch challenges" });
+      console.error("Error fetching completed challenges:", error);
+      ResponseHelper.serverError(res, "Falha ao obter desafios");
     }
   }
 
   // Update challenge
-  async updateChallengeById(req: Request, res: Response) {
+  async updateChallengeById(req: Request<{ id: string }, {}, UpdateChallengeRequest>, res: Response): Promise<void> {
     try {
       const challengeId = parseInt(req.params.id);
-      const { name, short_description, long_description, image } = req.body;
+      const { name, short_description, long_description, image }: UpdateChallengeRequest = req.body;
+
+      if (isNaN(challengeId) || challengeId <= 0) {
+        ResponseHelper.badRequest(res, "Formato de ID do desafio inválido");
+        return;
+      }
+
+      // Check if challenge exists
+      const existingChallenge = await prisma.challenges.findUnique({
+        where: { id_challenge: challengeId },
+      });
+
+      if (!existingChallenge) {
+        ResponseHelper.notFound(res, `Desafio com ID ${challengeId} não encontrado`);
+        return;
+      }
+
       const updatedChallenge = await prisma.challenges.update({
         where: { id_challenge: challengeId },
         data: {
-          name,
-          short_description,
-          long_description,
-          image,
+          ...(name && { name }),
+          ...(short_description && { short_description }),
+          ...(long_description && { long_description }),
+          ...(image && { image }),
         },
       });
-      res.json(updatedChallenge);
+
+      ResponseHelper.success(res, updatedChallenge, "Desafio atualizado com sucesso");
     } catch (error) {
-      res.status(500).json({ error: "Failed to update challenge" });
+      console.error("Error updating challenge:", error);
+      ResponseHelper.serverError(res, "Falha ao atualizar desafio");
     }
   }
+
   // Delete challenge
-  async deleteChallengeById(req: Request, res: Response) {
+  async deleteChallengeById(req: Request, res: Response): Promise<void> {
     try {
       const challengeId = parseInt(req.params.id);
+
+      if (isNaN(challengeId) || challengeId <= 0) {
+        ResponseHelper.badRequest(res, "Formato de ID do desafio inválido");
+        return;
+      }
+
+      // Check if challenge exists
+      const existingChallenge = await prisma.challenges.findUnique({
+        where: { id_challenge: challengeId },
+      });
+
+      if (!existingChallenge) {
+        ResponseHelper.notFound(res, `Desafio com ID ${challengeId} não encontrado`);
+        return;
+      }
+
       await prisma.challenges.delete({
         where: { id_challenge: challengeId },
       });
-      res.status(204).send();
+
+      ResponseHelper.noContent(res, "Desafio eliminado com sucesso");
     } catch (error) {
-      res.status(500).json({ error: "Failed to delete challenge" });
+      console.error("Error deleting challenge:", error);
+      ResponseHelper.serverError(res, "Falha ao eliminar desafio");
     }
   }
 
-  //Create user has challenges
-  async createUserHasChallenges(req: Request, res: Response) {
+  // Create user has challenges
+  async createUserHasChallenges(req: Request<{ id_user: string, id_challenge: string }, {}, CreateUserHasChallengeRequest>, res: Response): Promise<void> {
     try {
-      const { completed, blocked, detail_seen } = req.body;
+      const { completed, blocked, detail_seen }: CreateUserHasChallengeRequest = req.body;
 
       // Ensure all required fields are provided
-      if (
-        completed === undefined ||
-        blocked === undefined ||
-        detail_seen === undefined
-      ) {
-        res.status(400).json({
-          error:
-            "Missing required fields: completed, blocked, and detail_seen are required",
-        });
+      if (completed === undefined || blocked === undefined || detail_seen === undefined) {
+        ResponseHelper.badRequest(res, "Campos obrigatórios em falta: completed, blocked, e detail_seen são obrigatórios");
+        return;
       }
 
       // Validate IDs
@@ -335,9 +447,8 @@ export class ChallengesController {
       const challengeId = parseInt(req.params.id_challenge);
 
       if (isNaN(userId) || isNaN(challengeId)) {
-        res.status(400).json({
-          error: "Invalid user ID or challenge ID",
-        });
+        ResponseHelper.badRequest(res, "ID do utilizador ou ID do desafio inválido");
+        return;
       }
 
       // Check if user and challenge exist
@@ -349,10 +460,14 @@ export class ChallengesController {
         where: { id_challenge: challengeId },
       });
 
-      if (!userExists || !challengeExists) {
-        res.status(404).json({
-          error: !userExists ? "User not found" : "Challenge not found",
-        });
+      if (!userExists) {
+        ResponseHelper.notFound(res, "Utilizador não encontrado");
+        return;
+      }
+
+      if (!challengeExists) {
+        ResponseHelper.notFound(res, "Desafio não encontrado");
+        return;
       }
 
       // Try to create the record
@@ -363,16 +478,15 @@ export class ChallengesController {
           completed,
           blocked,
           detail_seen,
-          // progress_percentage will use its default value
         },
       });
 
-      //Pra ir buscar os passos do desafio
+      // Get steps for the challenge
       const steps = await prisma.steps.findMany({
         where: { ref_id_challenges: challengeId },
       });
 
-      // Cria relação de cada step para este user/challenge
+      // Create relation between user/challenge and steps
       const stepsToCreate = steps.map((step) =>
         prisma.user_has_Challenges_has_Steps.create({
           data: {
@@ -386,36 +500,51 @@ export class ChallengesController {
 
       await Promise.all(stepsToCreate);
 
-      res.status(201).json(newUserHasChallenge);
+      ResponseHelper.created(res, newUserHasChallenge, "Relação utilizador-desafio criada com sucesso");
     } catch (error) {
       console.error("Error details:", error);
 
       // Check for specific error types
       if ((error as any).code === "P2002") {
-        res.status(409).json({
-          error: "This user already has this challenge assigned",
-        });
+        ResponseHelper.conflict(res, "Este utilizador já tem este desafio atribuído");
+        return;
       }
 
-      res.status(500).json({
-        error: "Failed to create user has challenge",
-        details: error instanceof Error ? error.message : "Unknown error",
-      });
+      ResponseHelper.serverError(res, "Falha ao criar relação utilizador-desafio");
     }
   }
 
-  //update user has challenges blocked
-  async unblockNextChallenge(req: Request, res: Response) {
+  // Update user has challenges blocked
+  async unblockNextChallenge(req: Request, res: Response): Promise<void> {
     try {
-      const userId = parseInt(req.params.id_user);
+      const role = req.userRole;
+      const requestedId = parseInt(req.params.id_user);
+      const tokenUserId = parseInt(req.userId!);
+
+      if (isNaN(requestedId) || requestedId <= 0) {
+        ResponseHelper.badRequest(res, "Formato de ID do utilizador inválido");
+        return;
+      }
+
+      if (role !== 'admin' && requestedId !== tokenUserId) {
+        ResponseHelper.forbidden(res, "Acesso restrito");
+        return;
+      }
+
       const currentChallengeId = parseInt(req.params.id_challenge);
+
+      if (isNaN(currentChallengeId) || currentChallengeId <= 0) {
+        ResponseHelper.badRequest(res, "Formato de ID do desafio inválido");
+        return;
+      }
 
       const currentChallenge = await prisma.challenges.findUnique({
         where: { id_challenge: currentChallengeId },
       });
 
       if (!currentChallenge) {
-        return res.status(404).json({ error: "Current challenge not found" });
+        ResponseHelper.notFound(res, "Desafio atual não encontrado");
+        return;
       }
 
       const nextChallenge = await prisma.challenges.findFirst({
@@ -430,13 +559,14 @@ export class ChallengesController {
       });
 
       if (!nextChallenge) {
-        return res.status(404).json({ error: "No next challenge found" });
+        ResponseHelper.notFound(res, "Próximo desafio não encontrado");
+        return;
       }
 
       const existingRelationship = await prisma.user_has_Challenges.findUnique({
         where: {
           ref_id_user_ref_id_challenge: {
-            ref_id_user: userId,
+            ref_id_user: requestedId,
             ref_id_challenge: nextChallenge.id_challenge,
           },
         },
@@ -444,26 +574,25 @@ export class ChallengesController {
 
       if (existingRelationship) {
         // Unblock challenge if it already exists
-        const updatedUserHasChallenge = await prisma.user_has_Challenges.update(
-          {
-            where: {
-              ref_id_user_ref_id_challenge: {
-                ref_id_user: userId,
-                ref_id_challenge: nextChallenge.id_challenge,
-              },
+        const updatedUserHasChallenge = await prisma.user_has_Challenges.update({
+          where: {
+            ref_id_user_ref_id_challenge: {
+              ref_id_user: requestedId,
+              ref_id_challenge: nextChallenge.id_challenge,
             },
-            data: {
-              blocked: false,
-            },
-          }
-        );
+          },
+          data: {
+            blocked: false,
+          },
+        });
 
-        return res.json(updatedUserHasChallenge);
+        ResponseHelper.success(res, updatedUserHasChallenge, "Próximo desafio desbloqueado com sucesso");
+        return;
       } else {
         // Create new relation
         const newUserHasChallenge = await prisma.user_has_Challenges.create({
           data: {
-            ref_id_user: userId,
+            ref_id_user: requestedId,
             ref_id_challenge: nextChallenge.id_challenge,
             completed: false,
             blocked: false,
@@ -479,7 +608,7 @@ export class ChallengesController {
         // Create relation between user/challenge and steps
         await prisma.user_has_Challenges_has_Steps.createMany({
           data: steps.map((step) => ({
-            ref_user_has_Challenges_id_user: userId,
+            ref_user_has_Challenges_id_user: requestedId,
             ref_user_has_Challenges_id_challenge: nextChallenge.id_challenge,
             ref_id_steps: step.id_step,
             state: 0,
@@ -487,27 +616,49 @@ export class ChallengesController {
           skipDuplicates: true,
         });
 
-        return res.status(201).json(newUserHasChallenge);
+        ResponseHelper.created(res, newUserHasChallenge, "Próximo desafio criado e desbloqueado com sucesso");
+        return;
       }
     } catch (error) {
       console.error("Error details:", error);
-      return res.status(500).json({
-        error: "Failed to unblock next challenge",
-        details: error instanceof Error ? error.message : "Unknown error",
-      });
+      ResponseHelper.serverError(res, "Falha ao desbloquear próximo desafio");
     }
   }
 
   //update user has challenges detail_seen
-  async updateUserHasChallengesDetailSeen(req: Request, res: Response) {
+  async updateUserHasChallengesDetailSeen(req: Request, res: Response): Promise<void> {
     try {
-      const userId = parseInt(req.params.id_user);
+      const role = req.userRole;
+      const requestedId = parseInt(req.params.id_user);
+      const tokenUserId = parseInt(req.userId!);
+
+      if (isNaN(requestedId) || requestedId <= 0) {
+        ResponseHelper.badRequest(res, "Formato de ID do utilizador inválido");
+        return;
+      }
+
+      if (role !== 'admin' && requestedId !== tokenUserId) {
+        ResponseHelper.forbidden(res, "Acesso restrito");
+        return;
+      }
+      
       const challengeId = parseInt(req.params.id_challenge);
       const { detail_seen } = req.body;
+
+      if (isNaN(challengeId) || challengeId <= 0) {
+        ResponseHelper.badRequest(res, "Formato de ID do desafio inválido");
+        return;
+      }
+
+      if (typeof detail_seen !== 'boolean') {
+        ResponseHelper.badRequest(res, "detail_seen deve ser um valor booleano");
+        return;
+      }
+
       const updatedUserHasChallenge = await prisma.user_has_Challenges.update({
         where: {
           ref_id_user_ref_id_challenge: {
-            ref_id_user: userId,
+            ref_id_user: requestedId,
             ref_id_challenge: challengeId,
           },
         },
@@ -515,22 +666,38 @@ export class ChallengesController {
           detail_seen,
         },
       });
-      res.json(updatedUserHasChallenge);
+
+      ResponseHelper.success(res, updatedUserHasChallenge, "Estado de visualização de detalhes do desafio atualizado com sucesso");
     } catch (error) {
-      res.status(500).json({ error: "Failed to update user has challenge" });
+      console.error("Error updating challenge detail seen:", error);
+      ResponseHelper.serverError(res, "Falha ao atualizar relação utilizador-desafio");
     }
   }
 
   //update user has challenges progress_percentage
-  async updateUserHasChallengesProgressPercentage(req: Request, res: Response) {
+  async updateUserHasChallengesProgressPercentage(req: Request, res: Response): Promise<void> {
     try {
-      const userId = Number(req.params.id_user);
-      const challengeId = Number(req.params.id_challenge);
+      const role = req.userRole;
+      const requestedId = parseInt(req.params.id_user);
+      const tokenUserId = parseInt(req.userId!);
+
+      if (isNaN(requestedId) || requestedId <= 0) {
+        ResponseHelper.badRequest(res, "Formato de ID do utilizador inválido");
+        return;
+      }
+
+      if (role !== 'admin' && requestedId !== tokenUserId) {
+        ResponseHelper.forbidden(res, "Acesso restrito");
+        return;
+      }
+      
+      const challengeId = parseInt(req.params.id_challenge);
       const { progress_percentage } = req.body;
 
       // Verificação básica de IDs
-      if (isNaN(userId) || isNaN(challengeId)) {
-        res.status(400).json({ error: "Invalid user or challenge ID" });
+      if (isNaN(requestedId) || isNaN(challengeId)) {
+        ResponseHelper.badRequest(res, "ID do utilizador ou ID do desafio inválido");
+        return;
       }
 
       // Verificação do progresso
@@ -539,14 +706,15 @@ export class ChallengesController {
         progress_percentage < 0 ||
         progress_percentage > 100
       ) {
-        res.status(400).json({ error: "Invalid progress percentage" });
+        ResponseHelper.badRequest(res, "Percentagem de progresso inválida - deve ser um número entre 0 e 100");
+        return;
       }
 
       // Atualizar o progresso
       const updatedUserHasChallenge = await prisma.user_has_Challenges.update({
         where: {
           ref_id_user_ref_id_challenge: {
-            ref_id_user: userId,
+            ref_id_user: requestedId,
             ref_id_challenge: challengeId,
           },
         },
@@ -561,7 +729,7 @@ export class ChallengesController {
         await prisma.user_has_Challenges.update({
           where: {
             ref_id_user_ref_id_challenge: {
-              ref_id_user: userId,
+              ref_id_user: requestedId,
               ref_id_challenge: challengeId,
             },
           },
@@ -570,45 +738,58 @@ export class ChallengesController {
           },
         });
 
-           try {
-        await axios.post(
-          `https://api-betlearn-wine.vercel.app/api/challenges/${userId}/${challengeId}/unblock-next`
-        );
-      } catch (axiosError) {
-        console.error("Failed to unblock next challenge:", axiosError);
-      }
+        try {
+          await axios.post(
+            `https://api-betlearn-wine.vercel.app/api/challenges/${requestedId}/${challengeId}/unblock-next`
+          );
+        } catch (axiosError) {
+          console.error("Failed to unblock next challenge:", axiosError);
+        }
       }
 
-      res.json(updatedUserHasChallenge);
+      ResponseHelper.success(res, updatedUserHasChallenge, "Progresso do desafio atualizado com sucesso");
     } catch (error) {
       console.error("Error updating challenge progress:", error);
-      res
-        .status(500)
-        .json({ error: "Failed to update user challenge progress" });
+      ResponseHelper.serverError(res, "Falha ao atualizar progresso do desafio do utilizador");
     }
   }
 
-  async updateUserHasStepState(req: Request, res: Response) {
-    const { id_user, id_challenge, id_step } = req.params;
-    const { state } = req.body;
-
-    const debugLogs: string[] = [];
-
+  async updateUserHasStepState(req: Request, res: Response): Promise<void> {
     try {
-      debugLogs.push(
-        `Starting update for user: ${id_user}, challenge: ${id_challenge}, step: ${id_step}, state: ${state}`
-      );
+      const role = req.userRole;
+      const { id_user, id_challenge, id_step } = req.params;
+      const tokenUserId = parseInt(req.userId!);
+      const userId = parseInt(id_user);
 
-      if (!id_user || !id_challenge || !id_step) {
-        debugLogs.push("Missing required parameters");
-        return res
-          .status(400)
-          .json({ error: "Missing parameters", debug_logs: debugLogs });
+      if (isNaN(userId) || userId <= 0) {
+        ResponseHelper.badRequest(res, "Formato de ID de utilizador inválido");
+        return;
       }
 
-      const userId = parseInt(id_user);
+      if (role !== 'admin' && userId !== tokenUserId) {
+        ResponseHelper.forbidden(res, "Acesso restrito");
+        return;
+      }
+      
+      const { state } = req.body;
       const challengeId = parseInt(id_challenge);
       const stepId = parseInt(id_step);
+
+      if (isNaN(challengeId) || isNaN(stepId)) {
+        ResponseHelper.badRequest(res, "ID de desafio ou ID de passo inválido");
+        return;
+      }
+
+      if (typeof state !== 'number' || (state !== 0 && state !== 1)) {
+        ResponseHelper.badRequest(res, "O estado deve ser 0 ou 1");
+        return;
+      }
+
+      const debugLogs: string[] = [];
+
+      debugLogs.push(
+        `Starting update for user: ${userId}, challenge: ${challengeId}, step: ${stepId}, state: ${state}`
+      );
 
       const existingRecord =
         await prisma.user_has_Challenges_has_Steps.findFirst({
@@ -621,9 +802,8 @@ export class ChallengesController {
 
       if (!existingRecord) {
         debugLogs.push("Step record not found");
-        return res
-          .status(404)
-          .json({ error: "Step not found", debug_logs: debugLogs });
+        ResponseHelper.notFound(res, "Passo não encontrado");
+        return;
       }
 
       debugLogs.push(
@@ -632,10 +812,15 @@ export class ChallengesController {
 
       if (existingRecord.state === state) {
         debugLogs.push("State is already up to date");
-        return res.status(200).json({
-          message: "Step already updated",
+        const response: StepUpdateResponse = {
+          message: "Passo já atualizado",
           progress_percentage: 0,
-        });
+          updatedStep: existingRecord,
+          total_steps: 0,
+          debug_logs: debugLogs,
+        };
+        ResponseHelper.success(res, response, "Passo já atualizado");
+        return;
       }
 
       // Atualizar o estado do step
@@ -711,42 +896,38 @@ export class ChallengesController {
         `Updated user_has_Challenges: ${progressUpdate.count} record(s)`
       );
 
-      res.status(200).json({
-        message: "Step updated and progress recalculated",
+      const response: StepUpdateResponse = {
+        message: "Passo atualizado e progresso recalculado",
         progress_percentage: stepPercentage,
         updatedStep,
         total_steps: totalSteps,
         debug_logs: debugLogs,
-      });
-    } catch (error) {
-      debugLogs.push(
-        `Main error: ${error instanceof Error ? error.message : String(error)}`
-      );
-      console.error("Error:", error);
+      };
 
-      res.status(500).json({
-        error: "Internal server error",
-        details: error instanceof Error ? error.message : "Unknown error",
-        debug_logs: debugLogs,
-      });
+      ResponseHelper.success(res, response, "Passo atualizado e progresso recalculado com sucesso");
+    } catch (error) {
+      console.error("Error:", error);
+      ResponseHelper.serverError(res, `Erro interno do servidor: ${error instanceof Error ? error.message : "Erro desconhecido"}`);
     }
   }
 
   //Função para ir buscar o desafio em progresso
-  async getChallengeInProgress(req: Request, res: Response) {
+  //Função para ir buscar o desafio em progresso
+  async getChallengeInProgress(req: Request, res: Response): Promise<void> {
     try {
-      const userId = parseInt(req.params.id);
+      const requestedId = parseInt(req.params.id);
 
-      // Verifica se o ID do utilizador é válido
-      if (isNaN(userId)) {
-        return res.status(400).json({ error: "Invalid user ID" });
+      if (isNaN(requestedId) || requestedId <= 0) {
+        ResponseHelper.badRequest(res, "Formato de ID de utilizador inválido");
+        return;
       }
 
+
       // Vai buscar um desafio que tenha progress_percentage >= 0 e < 100 (em progresso)
-      // e que não esteja completado (completed = false)
+      // e que não esteja completo (completed = false)
       const challengeInProgress = await prisma.user_has_Challenges.findFirst({
         where: {
-          ref_id_user: userId,
+          ref_id_user: requestedId,
           completed: false,
           blocked: false,
           progress_percentage: {
@@ -760,15 +941,14 @@ export class ChallengesController {
       });
 
       if (!challengeInProgress) {
-        return res.status(404).json({
-          message: "No challenge in progress found for this user",
-        });
+        ResponseHelper.notFound(res, "Nenhum desafio em progresso encontrado para este utilizador");
+        return;
       }
 
       // Vai buscar os steps do desafio em progresso
       const steps = await prisma.user_has_Challenges_has_Steps.findMany({
         where: {
-          ref_user_has_Challenges_id_user: userId,
+          ref_user_has_Challenges_id_user: requestedId,
           ref_user_has_Challenges_id_challenge:
             challengeInProgress.ref_id_challenge,
         },
@@ -787,49 +967,91 @@ export class ChallengesController {
         },
       });
 
-      // Retorna o desafio com sua informação de progresso e steps
-      res.json({
-        challenge: challengeInProgress.challenge,
+      const response: ChallengeInProgressResponse = {
+        challenge: challengeInProgress.challenge!,
         progress: {
           progress_percentage: challengeInProgress.progress_percentage,
           detail_seen: challengeInProgress.detail_seen,
         },
         steps: steps,
-      });
+      };
+
+      ResponseHelper.success(res, response, "Desafio em progresso obtido com sucesso");
     } catch (error) {
       console.error("Error fetching challenge in progress:", error);
-      res.status(500).json({
-        error: "Failed to fetch challenge in progress",
-        details: error instanceof Error ? error.message : "Unknown error",
-      });
+      ResponseHelper.serverError(res, "Falha ao obter desafio em progresso");
     }
   }
 
-  async createFullChallenge(req: Request, res: Response) {
-    const data = req.body as CreateChallengeRequest;
-
+   async createFullChallenge(req: Request<{}, {}, CreateFullChallengeRequest>, res: Response): Promise<void> {
     try {
+
+
+      const { challenge, steps }: CreateFullChallengeRequest = req.body;
+
+      // Validation
+      if (!challenge || !steps || !Array.isArray(steps)) {
+        ResponseHelper.badRequest(res, "Pedido inválido: desafio e passos são obrigatórios");
+        return;
+      }
+
+      if( !challenge.image){
+        challenge.image = 'https://cdn-icons-png.flaticon.com/512/2583/2583319.png';
+      }
+
+      if (!challenge.number || !challenge.name || !challenge.short_description || !challenge.long_description || !challenge.image) {
+        ResponseHelper.badRequest(res, "Todos os campos do desafio são obrigatórios: número, nome, descrição curta, descrição longa, imagem");
+        return;
+      }
+
+      if (typeof challenge.number !== 'number' || challenge.number <= 0) {
+        ResponseHelper.badRequest(res, "O número do desafio deve ser um número inteiro positivo");
+        return;
+      }
+
+      if (steps.length === 0) {
+        ResponseHelper.badRequest(res, "Pelo menos um passo é obrigatório");
+        return;
+      }
+
+      // Check if challenge number already exists
+      const existingChallenge = await prisma.challenges.findFirst({
+        where: { number: challenge.number }
+      });
+
+      if (existingChallenge) {
+        ResponseHelper.conflict(res, `Desafio com número ${challenge.number} já existe`);
+        return;
+      }
+
+      console.log("Creating challenge with steps:", challenge, steps);
+
       // Usar transação para garantir que todas as operações sejam bem-sucedidas
       const result = await prisma.$transaction(async (tx) => {
         // 1. Criar o challenge
-        const challenge = await tx.challenges.create({
+        const createdChallenge = await tx.challenges.create({
           data: {
-            number: data.challenge.number,
-            name: data.challenge.name,
-            short_description: data.challenge.short_description,
-            long_description: data.challenge.long_description,
-            image: data.challenge.image,
+            number: challenge.number,
+            name: challenge.name,
+            short_description: challenge.short_description,
+            long_description: challenge.long_description,
+            image: challenge.image,
           },
         });
 
         // 2. Criar cada step do challenge
         const createdSteps = [];
 
-        for (const stepData of data.steps) {
+        for (const stepData of steps) {
           let stepVideoId = null;
           let stepBetId = null;
           let stepViewId = null;
           let stepQuestionnaireId = null;
+
+          // Validar tipo de step
+          if (!['video', 'bet', 'view', 'questionnaire'].includes(stepData.type)) {
+            throw new Error(`Tipo de passo inválido: ${stepData.type}`);
+          }
 
           // Criar o tipo específico de step
           if (
@@ -846,13 +1068,11 @@ export class ChallengesController {
             stepVideoId = video.id_step_video;
           } else if (
             stepData.type === "bet" &&
-            stepData.data.bet_description &&
-            stepData.data.bet_json
+            stepData.data.bet_description
           ) {
             const bet = await tx.step_Bet.create({
               data: {
                 bet_description: stepData.data.bet_description,
-                bet_json: stepData.data.bet_json,
               },
             });
             stepBetId = bet.id_step_bet;
@@ -875,12 +1095,13 @@ export class ChallengesController {
           ) {
             const questionnaire = await tx.step_Questionnaire.create({
               data: {
-                questionnaire_description:
-                  stepData.data.questionnaire_description,
+                questionnaire_description: stepData.data.questionnaire_description,
                 questionnaire_json: stepData.data.questionnaire_json,
               },
             });
             stepQuestionnaireId = questionnaire.id_step_questionnaire;
+          } else {
+            throw new Error(`Dados obrigatórios em falta para o tipo de passo: ${stepData.type}`);
           }
 
           // Criar o registro na tabela Steps
@@ -890,7 +1111,7 @@ export class ChallengesController {
               ref_id_step_bet: stepBetId,
               ref_id_step_view: stepViewId,
               ref_id_step_questionnaire: stepQuestionnaireId,
-              ref_id_challenges: challenge.id_challenge,
+              ref_id_challenges: createdChallenge.id_challenge,
             },
           });
 
@@ -899,21 +1120,15 @@ export class ChallengesController {
 
         // Retornar todos os dados criados
         return {
-          challenge,
+          challenge: createdChallenge,
           steps: createdSteps,
         };
       });
 
-      res.status(201).json({
-        message: "Challenge created successfully with all steps",
-        data: result,
-      });
+      ResponseHelper.created(res, result, "Desafio criado com sucesso com todos os passos");
     } catch (error) {
       console.error("Error creating challenge:", error);
-      res.status(500).json({
-        error: "Failed to create challenge with steps",
-        details: error instanceof Error ? error.message : "Unknown error",
-      });
+      ResponseHelper.serverError(res, "Falha ao criar desafio com passos");
     }
   }
 }
