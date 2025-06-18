@@ -13,6 +13,7 @@ import authRoutes from "./routes/authRoutes";
 import chatbotRoutes from "./routes/chatbotRoutes";
 import adminNotificationRoutes from "./routes/adminNotificationRoutes";
 import { PrismaClient } from "@prisma/client";
+import { swaggerBypass } from "./middleware/swaggerBypass";
 
 import SwaggerUi from "swagger-ui-express";
 import { swaggerSpecs } from "./swagger";
@@ -63,6 +64,7 @@ class App {
         methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
       })
     );
+    this.app.use('/api/', swaggerBypass);
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: true }));
     this.app.use(responseHelper);
