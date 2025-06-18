@@ -144,34 +144,6 @@ function validateJSON(data: any): { valid: boolean; errors: any | null } {
   };
 }
 
-// Função para enviar dados para a API
-async function sendToAPI(data: any, isFromFallback: boolean = false): Promise<void> {
-  try {
-    const apiResponse = await axiosInstance.post(
-      "/championships/",
-      { json: JSON.stringify(data) }
-    );
-
-    const notificationMessage = isFromFallback 
-      ? "Um campeonato foi criado usando dados de fallback após falha do AI."
-      : "Um novo campeonato foi criado com sucesso.";
-
-    const notification = await axiosInstance.post(
-      "/admin-notifications/",
-      {
-        title: isFromFallback ? "Campeonato criado (Fallback)" : "Novo campeonato criado",
-        message: notificationMessage,
-        source: "getDataFromAI",
-        type: isFromFallback ? "warning" : "success",
-      }
-    );
-
-    console.log(`Dados do campeonato ${isFromFallback ? '(fallback) ' : ''}adicionados à base de dados com sucesso!`);
-  } catch (error: any) {
-    console.error('Erro ao enviar dados para a API:', error.message);
-    throw error;
-  }
-}
 
 // Função para enviar dados para a API
 async function sendToAPI(data: any, isFromFallback: boolean = false): Promise<void> {
