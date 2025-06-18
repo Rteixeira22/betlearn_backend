@@ -401,7 +401,6 @@ export class BetsController {
         return;
       }
 
-      // Check if bet exists
       const existingBet = await prisma.bets.findUnique({
         where: { id_bets: id_bets },
       });
@@ -487,7 +486,7 @@ public getPendingBetsForProcessing = async (req: Request, res: Response): Promis
 public processBetResults = async (req: Request, res: Response): Promise<void> => {
   try {
     const userId = parseInt(req.params.userId);
-    const { processedBets } = req.body; // Array of bets with their results
+    const { processedBets } = req.body; 
     
     if (isNaN(userId) || userId <= 0) {
       ResponseHelper.badRequest(res, "Formato de ID de utilizador inválido");
@@ -513,12 +512,11 @@ public processBetResults = async (req: Request, res: Response): Promise<void> =>
     let pointsLost = 0;
     const updatedBets = [];
 
-    // Process each bet
     for (const betData of processedBets) {
       const { betId, isWin } = betData;
       
       if (!betId || isWin === undefined) {
-        continue; // Skip invalid bet data
+        continue; 
       }
       
       // Get the bet details
@@ -529,27 +527,23 @@ public processBetResults = async (req: Request, res: Response): Promise<void> =>
       if (!bet) continue;
 
       if (isWin) {
-        // User wins - add potential earnings to total
         totalWinnings += parseFloat(bet.potential_earning.toString());
         
-        // Update bet as won
         await prisma.bets.update({
           where: { id_bets: betId },
           data: {
-            result: 1, // Win
-            state: 1   // Concluded
+            result: 1, 
+            state: 1   
           }
         });
       } else {
-        // User loses - deduct 50 points
         pointsLost += 50;
         
-        // Update bet as lost
         await prisma.bets.update({
           where: { id_bets: betId },
           data: {
-            result: 2, // Loss
-            state: 1   // Concluded
+            result: 2, 
+            state: 1   
           }
         });
       }
@@ -564,7 +558,7 @@ public processBetResults = async (req: Request, res: Response): Promise<void> =>
 
     // Update user money and points
     const newMoney = parseFloat(user.money.toString()) + totalWinnings;
-    const newPoints = Math.max(0, user.points - pointsLost); // Ensure points don't go negative
+    const newPoints = Math.max(0, user.points - pointsLost); 
 
     await prisma.users.update({
       where: { id_user: userId },
