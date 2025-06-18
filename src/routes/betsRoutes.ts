@@ -394,6 +394,9 @@ router.get("/count-today", requireAPIKey, betsController.getBetsByDate); // Get 
 router.get("/count/:id", requireAPIKey, betsController.countUserBetsById); // Get count of bets by user ID
 router.get("/:id", requireAPIKey, verifyJWT, betsController.getBetsByUserId); // Get bets by user ID
 
+router.get("/pending/:userId", requireAPIKey, verifyJWT, betsController.getPendingBetsForProcessing); // Get bets ready for processing
+
+router.post("/process-results/:userId", requireAPIKey, verifyJWT, betsController.processBetResults); // Process bet results and update user
 // POST Bet Routes
 router.post("/:id_user/:id_championship", requireAPIKey, verifyJWT, betsController.createBet); // Create a new bet
 

@@ -421,4 +421,176 @@ export class BetsController {
       ResponseHelper.serverError(res, "Falha ao eliminar aposta");
     }
   }
+
+   
+ 
+// Get pending bets that are ready for processing (1.5h+ after game time)
+public getPendingBetsForProcessing = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const userId = parseInt(req.params.userId);
+
+    if (isNaN(userId) || userId <= 0) {
+      ResponseHelper.badRequest(res, "Formato de ID de utilizador inválido");
+      return;
+    }
+
+    // Calculate the cutoff time (1.5 hours ago)
+    const cutoffTime = new Date();
+    cutoffTime.setHours(cutoffTime.getHours() - 1.5);
+
+    const gameEndTime = new Date();
+    gameEndTime.setHours(gameEndTime.getHours() - 1.5);
+
+    const pendingBets = await prisma.bets.findMany({
+      where: {
+        ref_id_user: userId,
+        state: 0, 
+        result: 0, 
+        BetsHasGames: {
+          some: {
+            game: {
+              schedule: {
+                lt: gameEndTime 
+              }
+            }
+          }
+        }
+      },
+      include: {
+        BetsHasGames: {
+          include: {
+            game: true,
+            championship: true
+          }
+        }
+      }
+    });
+
+    if (pendingBets.length === 0) {
+      ResponseHelper.success(res, [], "Nenhuma aposta pendente para processar");
+      return;
+    }
+
+    ResponseHelper.success(
+      res, 
+      pendingBets, 
+      `${pendingBets.length} aposta(s) pronta(s) para processamento`
+    );
+
+  } catch (error) {
+    console.error("Error fetching pending bets:", error);
+    ResponseHelper.serverError(res, "Falha ao obter apostas pendentes");
+  }
+};
+
+// Process bet results and update user money/points
+public processBetResults = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const userId = parseInt(req.params.userId);
+    const { processedBets } = req.body; // Array of bets with their results
+    
+    if (isNaN(userId) || userId <= 0) {
+      ResponseHelper.badRequest(res, "Formato de ID de utilizador inválido");
+      return;
+    }
+
+    if (!processedBets || !Array.isArray(processedBets)) {
+      ResponseHelper.badRequest(res, "Array de apostas processadas é obrigatório");
+      return;
+    }
+
+    // Get current user data
+    const user = await prisma.users.findUnique({
+      where: { id_user: userId }
+    });
+
+    if (!user) {
+      ResponseHelper.notFound(res, "Utilizador não encontrado");
+      return;
+    }
+
+    let totalWinnings = 0;
+    let pointsLost = 0;
+    const updatedBets = [];
+
+    // Process each bet
+    for (const betData of processedBets) {
+      const { betId, isWin } = betData;
+      
+      if (!betId || isWin === undefined) {
+        continue; // Skip invalid bet data
+      }
+      
+      // Get the bet details
+      const bet = await prisma.bets.findUnique({
+        where: { id_bets: betId }
+      });
+
+      if (!bet) continue;
+
+      if (isWin) {
+        // User wins - add potential earnings to total
+        totalWinnings += parseFloat(bet.potential_earning.toString());
+        
+        // Update bet as won
+        await prisma.bets.update({
+          where: { id_bets: betId },
+          data: {
+            result: 1, // Win
+            state: 1   // Concluded
+          }
+        });
+      } else {
+        // User loses - deduct 50 points
+        pointsLost += 50;
+        
+        // Update bet as lost
+        await prisma.bets.update({
+          where: { id_bets: betId },
+          data: {
+            result: 2, // Loss
+            state: 1   // Concluded
+          }
+        });
+      }
+
+      updatedBets.push({
+        betId,
+        isWin,
+        amount: parseFloat(bet.amount.toString()),
+        potentialEarning: parseFloat(bet.potential_earning.toString())
+      });
+    }
+
+    // Update user money and points
+    const newMoney = parseFloat(user.money.toString()) + totalWinnings;
+    const newPoints = Math.max(0, user.points - pointsLost); // Ensure points don't go negative
+
+    await prisma.users.update({
+      where: { id_user: userId },
+      data: {
+        money: newMoney,
+        points: newPoints
+      }
+    });
+
+    const responseData = {
+      processedBets: updatedBets.length,
+      totalWinnings,
+      pointsLost,
+      newBalance: {
+        money: newMoney,
+        points: newPoints
+      }
+    };
+
+    ResponseHelper.success(res, responseData, "Resultados das apostas processados com sucesso");
+
+  } catch (error) {
+    console.error("Error processing bet results:", error);
+    ResponseHelper.serverError(res, "Falha ao processar resultados das apostas");
+  }
+};
+
+
 }
