@@ -51,11 +51,6 @@ export class AdminController {
       return;
     }
 
-    if (adminId !== tokenUserId) {
-      ResponseHelper.forbidden(res, "Não está autorizado a aceder ao perfil de outro utilizador");
-      return;
-    }
-
     const adminRaw = await prisma.admin.findUnique({
       where: { id: adminId },
       select: {
@@ -189,11 +184,6 @@ export class AdminController {
 
     if (isNaN(tokenUserId)) {
       ResponseHelper.unauthorized(res, "Token inválido");
-      return;
-    }
-
-    if (adminId !== tokenUserId) {
-      ResponseHelper.forbidden(res, "Acesso restrito");
       return;
     }
 
@@ -339,11 +329,6 @@ export class AdminController {
 
     if (isNaN(tokenUserId)) {
       ResponseHelper.unauthorized(res, "Token inválido");
-      return;
-    }
-
-    if (adminId !== tokenUserId) {
-      ResponseHelper.forbidden(res, "Acesso restrito");
       return;
     }
 
