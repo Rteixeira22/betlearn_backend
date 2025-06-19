@@ -8,14 +8,14 @@ const swaggerDefinition = {
   },
   basePath: "/api",
   servers: [
-    {
+     {
       url: "https://api-betlearn-wine.vercel.app/api/",
       description: "API hospedada na Vercel",
     },
     /* {
       url: "http://localhost:3000/api/",
       description: "API local para desenvolvimento",
-    }, */
+    },  */
   ],
 };
 //ADAPTA-SE AO AMBIENTE
