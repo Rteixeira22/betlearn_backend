@@ -517,17 +517,9 @@ export class ChallengesController {
   async unblockNextChallenge(req: Request, res: Response): Promise<void> {
     try {
       const requestedId = parseInt(req.params.id_user);
-      const tokenUserId = parseInt(req.userId!);
-      const role = req.userRole;
-
 
       if (isNaN(requestedId) || requestedId <= 0) {
         ResponseHelper.badRequest(res, "Formato de ID do utilizador inválido");
-        return;
-      }
-
-      if (role !== 'admin' && requestedId !== tokenUserId) {
-        ResponseHelper.forbidden(res, "Acesso restrito");
         return;
       }
 
