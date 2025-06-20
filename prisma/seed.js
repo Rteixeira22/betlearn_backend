@@ -262,7 +262,7 @@ async function main() {
           completed: false,
           blocked: false,
           detail_seen: true,
-          progress_percentage: 50,
+          progress_percentage: 0,
         },
       }),
       // Associar segundo utilizador ao primeiro desafio
@@ -273,7 +273,7 @@ async function main() {
           completed: false,
           blocked: false,
           detail_seen: true,
-          progress_percentage: 50,
+          progress_percentage: 0,
         },
       }),
       // Associar terceiro utilizador ao primeiro desafio
