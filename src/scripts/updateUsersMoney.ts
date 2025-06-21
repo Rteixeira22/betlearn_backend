@@ -16,9 +16,6 @@ const axiosConfig = {
 
 const UpdateMoney = async () => {
 
-  console.log("API URL:", !!API_URL);
-  console.log("API Key:", !!API_KEY);
-
   console.log("Updating users money...");
   try {
     console.log("Fetching users...");
