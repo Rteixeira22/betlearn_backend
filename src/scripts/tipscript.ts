@@ -5,7 +5,7 @@ import axiosInstance from "../configs/axiosConfig";
 
 dotenv.config();
 
-const API_URL = process.env.VERCEL_URL || 'http://localhost:3000/api/';
+const API_URL = process.env.VERCEL_URL;
 
 const updateTipStates = async () => {
   try {
