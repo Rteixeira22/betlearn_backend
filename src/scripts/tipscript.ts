@@ -5,13 +5,13 @@ import axiosInstance from "../configs/axiosConfig";
 
 dotenv.config();
 
-const API_URL = process.env.VERCEL_URL || 'http://localhost:3000/api/';
+const API_URL = process.env.VERCEL_URL;
 
 const updateTipStates = async () => {
   try {
     console.log("Fetching active tip...");
     // TIP ATIVA
-    const activeTipResponse = await axiosInstance.get(`${API_URL}tips`);
+    const activeTipResponse = await axiosInstance.get(`/tips`);
     const activeTip = activeTipResponse.data.data.find(
       (tip: { active: number }) => tip.active === 1
     );
@@ -19,7 +19,7 @@ const updateTipStates = async () => {
 
     if (activeTip) {
       console.log(`Deactivating tip ${activeTip.id_tip}...`);
-      await axiosInstance.put(`${API_URL}tips/${activeTip.id_tip}/state`, {
+      await axiosInstance.put(`/tips/${activeTip.id_tip}/state`, {
         active: 0,
       });
       console.log(`Deactivated tip ${activeTip.id_tip}.`);
@@ -42,7 +42,7 @@ const updateTipStates = async () => {
       nextTip = nextTipResponse.data.data.find(
         (tip: { active: number }) => tip.active === 0
       );
-      await axiosInstance.put(`${API_URL}tips/${nextTip.id_tip}/state`, {
+      await axiosInstance.put(`/tips/${nextTip.id_tip}/state`, {
         active: 1,
       });
       console.log(`Activated tip ${nextTip.id_tip}.`);
@@ -50,7 +50,7 @@ const updateTipStates = async () => {
     //SE HOUVER
     else if (nextTip) {
       console.log(`Activating tip ${nextTip.id_tip}...`);
-      await axiosInstance.put(`${API_URL}tips/${nextTip.id_tip}/state`, {
+      await axiosInstance.put(`/tips/${nextTip.id_tip}/state`, {
         active: 1,
       });
       console.log(`Activated tip ${nextTip.id_tip}.`);
