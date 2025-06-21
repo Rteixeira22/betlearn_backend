@@ -16,16 +16,21 @@ const axiosConfig = {
 
 const updateTipStates = async () => {
   console.log("API URL:", API_URL);
-  console.log("API KEY exists:", API_KEY);
+  console.log("API KEY exists:", !!API_KEY);
   
   try {
     console.log("Fetching active tip...");
     
     // TIP ATIVA
     const activeTipResponse = await axios.get(`${API_URL}tips`, axiosConfig);
+
+    console.log("Active tips fetched:", activeTipResponse.data.data.length);
+
     const activeTip = activeTipResponse.data.data.find(
       (tip: { active: number }) => tip.active === 1
     );
+
+    console.log("Active tip found:", activeTip ? activeTip.id_tip : "None");
 
     if (activeTip) {
       console.log(`Deactivating tip ${activeTip.id_tip}...`);
