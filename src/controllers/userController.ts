@@ -46,6 +46,11 @@ export class UserController {
           money: true,
           email: true,
           birthdate: true,
+          QuestionnaireResponse: {
+            select: {
+              budget: true
+            }
+          }
         },
         orderBy: {
           id_user: 'asc'
