@@ -36,4 +36,7 @@ jobs:
         run: npm install
 
       - name: Executar o Script
+        env:
+          API_BASE_URL: ${{ secrets.API_BASE_URL }}
+          API_KEY: ${{ secrets.API_KEY }}
         run: npx ts-node src/scripts/updateUsersMoney.ts
