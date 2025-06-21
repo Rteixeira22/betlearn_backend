@@ -4,12 +4,16 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { 
   ResponseHelper, 
+} from "../utils/responseHelper";
+
+import { 
   LoginRequest, 
   AdminLoginRequest, 
   LoginResponse, 
   AdminLoginResponse 
-} from "../utils/authResponseHelper";
-      import axiosInstance from '../configs/axiosConfig';
+} from "../utils/authDataType";
+      
+import axiosInstance from '../configs/axiosConfig';
 
 
 

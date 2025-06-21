@@ -3,11 +3,17 @@ import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import { 
   ResponseHelper, 
+ 
+} from "../utils/responseHelper";
+
+import { 
   Admin, 
   AdminPublic,
   CreateAdminRequest, 
   UpdateAdminRequest
-} from "../utils/adminResponseHelper";
+} from "../utils/adminDataType";
+
+
 
 const prisma = new PrismaClient();
 

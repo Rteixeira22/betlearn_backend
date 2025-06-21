@@ -1,12 +1,13 @@
 import { PrismaClient } from '@prisma/client';
 import { Request, Response } from 'express';
 import { 
-  ResponseHelper, 
   AdminNotification, 
   CreateNotificationRequest, 
   UpdateNotificationRequest,
   NotificationFilters
-} from "../utils/adminNotificationResponseHelper";
+} from "../utils/adminNotificationDataType";
+
+import { ResponseHelper } from '../utils/responseHelper';
 
 const prisma = new PrismaClient();
 

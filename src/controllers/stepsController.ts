@@ -1,7 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
 import { 
-  ResponseHelper, 
   Step,
   StepVideo,
   StepBet,
@@ -18,7 +17,12 @@ import {
   UpdateStepQuestionnaireRequest,
   CreateStepRequest,
   UpdateStepProgressRequest
-} from "../utils/stepsResponseHelper";
+} from "../utils/stepsDataType";
+
+import { 
+  ResponseHelper, 
+} from "../utils/responseHelper";
+
 
 const prisma = new PrismaClient();
 

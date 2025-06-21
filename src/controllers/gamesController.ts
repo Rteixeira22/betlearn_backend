@@ -1,12 +1,16 @@
 import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
 import { 
-  ResponseHelper, 
   Game, 
   CreateGameRequest, 
   UpdateGameStateResponse,
   MostBettedGameResponse 
-} from "../utils/gamesResponseHelper";
+} from "../utils/gamesDataType";
+
+import { 
+  ResponseHelper, 
+} from "../utils/responseHelper";
+
 
 const prisma = new PrismaClient();
 

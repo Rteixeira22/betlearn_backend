@@ -2,7 +2,6 @@ import { PrismaClient } from '@prisma/client'
 import { Request, Response } from 'express'
 import bcrypt from 'bcrypt';
 import { 
-  ResponseHelper,
   User,
   UserWithoutPassword,
   UserChallenge,
@@ -15,7 +14,11 @@ import {
   UpdateUserPointsRequest,
   UpdateUserBetsVisibilityRequest,
   UpdateUserTutorialVerificationRequest
-} from "../utils/userResponseHelper";
+} from "../utils/userDataType";
+
+import { 
+  ResponseHelper, 
+} from "../utils/responseHelper";
 
 // Extend Express Request interface to include userId and userRole
 declare global {

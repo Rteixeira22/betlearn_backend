@@ -3,7 +3,6 @@ import { Request, Response } from "express";
 import axios from "axios";
 import axiosInstance from "../configs/axiosConfig";
 import {
-  ResponseHelper,
   Challenge,
   ChallengeWithSteps,
   UserHasChallenge,
@@ -20,7 +19,12 @@ import {
   MostCompletedChallengeResponse,
   ChallengeInProgressResponse,
   StepUpdateResponse
-} from "../utils/challengesResponseHelper";
+} from "../utils/challengesDataType";
+
+import { 
+  ResponseHelper, 
+} from "../utils/responseHelper";
+
 
 const prisma = new PrismaClient();
 

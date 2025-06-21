@@ -1,12 +1,16 @@
 import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
 import { 
-  ResponseHelper, 
   Tip, 
   CreateTipRequest, 
   UpdateTipRequest, 
   UpdateTipStateRequest 
-} from "../utils/tipsResponseHelper";
+} from "../utils/tipsDataType";
+
+import { 
+  ResponseHelper, 
+} from "../utils/responseHelper";
+
 
 const prisma = new PrismaClient();
 

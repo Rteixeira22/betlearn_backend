@@ -1,11 +1,15 @@
 import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
 import { 
-  ResponseHelper, 
   QuestionnaireResponse, 
   CreateQuestionnaireRequest, 
   UpdateQuestionnaireRequest 
-} from "../utils/questionnaireResponseHelper";
+} from "../utils/questionnaireDataType";
+
+import { 
+  ResponseHelper, 
+} from "../utils/responseHelper";
+
 
 const prisma = new PrismaClient();
 
