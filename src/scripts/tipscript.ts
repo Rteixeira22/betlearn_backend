@@ -8,6 +8,9 @@ dotenv.config();
 const API_URL = process.env.VERCEL_URL;
 
 const updateTipStates = async () => {
+
+  console.log ("API URL:", API_URL);
+  
   try {
     console.log("Fetching active tip...");
     // TIP ATIVA
