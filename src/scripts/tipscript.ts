@@ -16,9 +16,7 @@ const axiosConfig = {
 };
 
 const updateTipStates = async () => {
-  console.log("API URL:", API_URL);
-  console.log("API KEY exists:", !!API_KEY);
-  
+
   try {
     console.log("Fetching active tip...");
     

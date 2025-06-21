@@ -2,13 +2,22 @@ import axios from "axios";
 import * as dotenv from "dotenv";
 import Ajv from "ajv";
 import addFormats from "ajv-formats";
-import axiosInstance from "../configs/axiosConfig";
 import * as fs from 'fs';
 import * as path from 'path';
 
 dotenv.config();
 
-const apiKey = process.env.GEMINI_API_KEY ;
+const apiKey = process.env.GEMINI_API_KEY;
+const API_URL = process.env.API_BASE_URL;
+const API_KEY = process.env.API_KEY;
+
+// Configuração do axios com API key
+const axiosConfig = {
+  headers: {
+    'Content-Type': 'application/json',
+    apikey: API_KEY,
+  },
+};
 
 // Configuração do Ajv para validação
 const ajv = new Ajv({ allErrors: true });
@@ -109,7 +118,6 @@ const schema = {
 // Função para carregar JSON de fallback
 function loadFallbackJSON(): any {
   try {
-
     const championshipRandomNumber = Math.floor(Math.random() * 5) + 1;
     
     const fallbackPath = path.join(__dirname, `../championshipsJSON/championship${championshipRandomNumber}.json`);
@@ -144,27 +152,28 @@ function validateJSON(data: any): { valid: boolean; errors: any | null } {
   };
 }
 
-
 // Função para enviar dados para a API
 async function sendToAPI(data: any, isFromFallback: boolean = false): Promise<void> {
   try {
-    const apiResponse = await axiosInstance.post(
-      "/championships/",
-      { json: JSON.stringify(data) }
+    const apiResponse = await axios.post(
+      `${API_URL}championships/`,
+      { json: JSON.stringify(data) },
+      axiosConfig
     );
 
     const notificationMessage = isFromFallback 
       ? "Um campeonato foi criado usando dados de fallback após falha do AI."
       : "Um novo campeonato foi criado com sucesso.";
 
-    const notification = await axiosInstance.post(
-      "/admin-notifications/",
+    const notification = await axios.post(
+      `${API_URL}admin-notifications/`,
       {
         title: isFromFallback ? "Campeonato criado (Fallback)" : "Novo campeonato criado",
         message: notificationMessage,
         source: "getDataFromAI",
         type: isFromFallback ? "warning" : "success",
-      }
+      },
+      axiosConfig
     );
 
     console.log(`Dados do campeonato ${isFromFallback ? '(fallback) ' : ''}adicionados à base de dados com sucesso!`);
@@ -176,7 +185,6 @@ async function sendToAPI(data: any, isFromFallback: boolean = false): Promise<vo
 
 // Função principal para gerar dados via Gemini e validá-los antes de enviar para a API
 async function generateChampionshipData() {
-
   const prompt = `Atua como um gerador de dados para a minha aplicação de apostas responsáveis. Preciso que crie um JSON com os seguintes dados de um campeonato fictício:
   
   1. Dados do campeonato:
@@ -312,14 +320,15 @@ async function retryWithFixes(maxAttempts = 3): Promise<any> {
           
           // Enviar notificação de erro 
           try {
-            await axiosInstance.post(
-              "/admin-notifications/",
+            await axios.post(
+              `${API_URL}admin-notifications/`,
               {
-                title: "Erro  ao gerar campeonato",
+                title: "Erro ao gerar campeonato",
                 message: `Não foi possível gerar um campeonato via AI nem usar dados de fallback. Erro: ${fallbackError.message}`,
                 source: "getDataFromAI",
                 type: "error",
-              }
+              },
+              axiosConfig
             );
           } catch (notificationError) {
             console.error('Erro ao enviar notificação:', notificationError);
@@ -342,6 +351,10 @@ if (require.main === module) {
     console.error("ERRO: GEMINI_API_KEY não está definida no ambiente.");
     process.exit(1);
   }
+
+  console.log("API URL:", API_URL);
+  console.log("API KEY exists:", !!API_KEY);
+  console.log("GEMINI API KEY exists:", !!apiKey);
 
   retryWithFixes()
     .then(() => {
