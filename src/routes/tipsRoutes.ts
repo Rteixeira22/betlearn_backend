@@ -236,7 +236,7 @@ router.post("/", requireAPIKey, verifyJWT, authorize('admin'), tipsController.cr
 router.put("/:id", requireAPIKey, verifyJWT, authorize('admin'), tipsController.updateTip); // Update tip
 
 // Put Tip State Routes
-router.put("/:id/state", tipsController.updateTipState); // Update tip state
+router.put("/:id/state", requireAPIKey, tipsController.updateTipState); // Update tip state
 
 // DELETE Tip Routes
 router.delete("/:id", requireAPIKey, verifyJWT, authorize('admin'), tipsController.deleteTip); // Delete tip
