@@ -3,8 +3,8 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const API_URL = process.env.VERCEL_URL;
-const API_KEY = process.env.API_KEY;
+const API_URL =  'https://api-betlearn-wine.vercel.app/api/'/* process.env.VERCEL_URL */;
+const API_KEY = 'sx_betlearn_DB0rKNAc9Eh38cEOfhcnGZOts6VpPnCN0wH87N8UTIYJ1uEAMAOvH310mdgIFmFZ3ig5GiN6Ns1Y48vsN8fzwm1ZocGcZ2kJCrXMEEGa2FJ0THGyb6Pk89pnaYktvyR2bIaxTXu77V0NkahiY1kEKnqfORDrlixrHZjWAs4MbA42dvTJ9N6D9HZsJkTgLzEThdSEmdjeSIO23466LAjhao35KjaiN2rzMcyv8mrjc1O1quV3LeHHsJg'/* process.env.API_KEY */;
 
 // Configuração do axios com API key
 const axiosConfig = {
