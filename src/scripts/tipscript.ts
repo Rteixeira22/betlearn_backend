@@ -12,6 +12,7 @@ const axiosConfig = {
     'Content-Type': 'application/json',
     apikey: API_KEY,
   },
+  
 };
 
 const updateTipStates = async () => {
