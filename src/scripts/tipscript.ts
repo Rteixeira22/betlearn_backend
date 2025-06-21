@@ -30,7 +30,7 @@ const updateTipStates = async () => {
     console.log("Fetching next tip to activate...");
     // VAI BUSCAR A PROXIMA TIP
     // ATIVA A PROXIMA TIP
-    const nextTipResponse = await axiosInstance.get(`${API_URL}tips`);
+    const nextTipResponse = await axiosInstance.get(`/tips`);
     let nextTip = nextTipResponse.data.data.find(
       (tip: { active: number; id_tip: number }) =>
         tip.active === 0 && tip.id_tip > activeTip.id_tip
