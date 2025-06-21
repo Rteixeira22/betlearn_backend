@@ -15,10 +15,11 @@ const axiosConfig = {
 };
 
 const UpdateMoney = async () => {
+
   console.log("Updating users money...");
   try {
     console.log("Fetching users...");
-    const usersResponse = await axios.get("/users");
+    const usersResponse = await axios.get(`${API_URL}/users`);
     if (usersResponse.status !== 200) {
       throw new Error("Failed to fetch users");
     }
