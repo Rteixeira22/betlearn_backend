@@ -106,7 +106,8 @@ async function main() {
           short_description: "Descubra como navegar na plataforma",
           long_description:
             "Este desafio é uma introdução à plataforma, ensina como navegar e utilizar as principais funcionalidades disponíveis.",
-          image: "https://res.cloudinary.com/dw3aj5xgm/image/upload/v1748471464/9746403_w0o9p8.png",
+          image:
+            "https://res.cloudinary.com/dw3aj5xgm/image/upload/v1748471464/9746403_w0o9p8.png",
         },
       }),
       prisma.challenges.create({
@@ -116,7 +117,8 @@ async function main() {
           short_description: "Aprenda a gerir a sua banca e emoções",
           long_description:
             "Este desafio foca na importância da gestão de banca e emocional ao fazer apostas. Aprenda a controlar as suas emoções e a tomar decisões racionais.",
-          image: "https://res.cloudinary.com/dw3aj5xgm/image/upload/v1748471606/4838640_lzve8c.png",
+          image:
+            "https://res.cloudinary.com/dw3aj5xgm/image/upload/v1748471606/4838640_lzve8c.png",
         },
       }),
       prisma.challenges.create({
@@ -126,7 +128,8 @@ async function main() {
           short_description: "Entenda o que são odds e como funcionam",
           long_description:
             "Neste desafio, você aprenderá o que são odds, como funcionam e como utilizá-las a seu favor nas apostas.",
-          image: "https://res.cloudinary.com/dw3aj5xgm/image/upload/v1748465719/challenge2_yfhsme.png",
+          image:
+            "https://res.cloudinary.com/dw3aj5xgm/image/upload/v1748465719/challenge2_yfhsme.png",
         },
       }),
 
@@ -137,7 +140,8 @@ async function main() {
           short_description: "Aposte num evento simples",
           long_description:
             "Neste desafio, aprenderá a fazer uma aposta simples num evento desportivo. Aprenda a escolher o evento certo e a calcular as suas odds.",
-          image: "https://res.cloudinary.com/dw3aj5xgm/image/upload/v1748471810/8959073_qa8fqk.png",
+          image:
+            "https://res.cloudinary.com/dw3aj5xgm/image/upload/v1748471810/8959073_qa8fqk.png",
         },
       }),
     ]);
@@ -149,25 +153,25 @@ async function main() {
     const stepVideos = await Promise.all([
       prisma.step_Video.create({
         data: {
-          video_url: "https://www.youtube.com/watch?v=oOrLdaEgqsU",
+          video_url: "https://www.youtube.com/embed/oOrLdaEgqsU",
           video_description: "Observar o video de Navegação na plataforma",
         },
       }),
       prisma.step_Video.create({
         data: {
-          video_url: "https://www.youtube.com/watch?v=KLb6vuO_UW4",
+          video_url: "https://www.youtube.com/embed/KLb6vuO_UW4",
           video_description: "Gestão de banca e emocional",
         },
       }),
       prisma.step_Video.create({
         data: {
-          video_url: "https://www.youtube.com/watch?v=FFqhv7zuoN0",
+          video_url: "https://www.youtube.com/embed/FFqhv7zuoN0",
           video_description: "O que são odds?",
         },
       }),
       prisma.step_Video.create({
         data: {
-          video_url: "https://www.youtube.com/watch?v=lw1oPDARuaQ",
+          video_url: "https://www.youtube.com/embed/lw1oPDARuaQ",
           video_description: "Aprenda a fazer uma aposta simples",
         },
       }),
@@ -181,23 +185,41 @@ async function main() {
       },
     });
 
-    const stepQuestionnaire = await prisma.step_Questionnaire.create({
-      data: {
-        questionnaire_description: "Avalie o seu conhecimento sobre apostas",
-        questionnaire_json: JSON.stringify({
-          question: "O que significam odds decimais de 2.00 nas apostas?",
-          options: [
-            "Você duplica o valor apostado se ganhar",
-            "Você perde metade do valor apostado",
-            "Você triplica o valor apostado se ganhar",
-            "Você perde todo o valor apostado",
-          ],
-          correctAnswer: "Você duplica o valor apostado se ganhar",
-        }),
-      },
-    });
+    const stepQuestionnaire = await Promise.all([
+      prisma.step_Questionnaire.create({
+        data: {
+          questionnaire_description: "Avalie o seu conhecimento sobre apostas",
+          questionnaire_json: JSON.stringify({
+            question: "O que significam odds decimais de 2.00 nas apostas?",
+            options: [
+              "Você duplica o valor apostado se ganhar",
+              "Você perde metade do valor apostado",
+              "Você triplica o valor apostado se ganhar",
+              "Você perde todo o valor apostado",
+            ],
+            correctAnswer: "Você duplica o valor apostado se ganhar",
+          }),
+        },
+      }),
+      prisma.step_Questionnaire.create({
+        data: {
+          questionnaire_description:
+            "Avalie o seu conhecimento sobre gestão de banca",
+          questionnaire_json: JSON.stringify({
+            question:
+              "Qual é a percentagem máxima recomendada da sua banca para apostar numa única aposta?",
+            options: [
+              "Entre 1% a 5% da banca total",
+              "Entre 10% a 20% da banca total",
+              "Entre 25% a 50% da banca total",
+              "Toda a banca disponível para maximizar lucros",
+            ],
+            correctAnswer: "Entre 1% a 5% da banca total",
+          }),
+        },
+      }),
+    ]);
 
-   
     // Agora criar os Steps e associá-los aos desafios
     const steps = await Promise.all([
       // Steps para o primeiro desafio_ Navegação
@@ -215,7 +237,7 @@ async function main() {
       // Steps para o segundo desafio_gestão de banca e emocional
       prisma.steps.create({
         data: {
-          ref_id_step_questionnaire: stepQuestionnaire.id_step_questionnaire,
+          ref_id_step_questionnaire: stepQuestionnaire[1].id_step_questionnaire,
           ref_id_challenges: challenges[1].id_challenge,
         },
       }),
@@ -234,7 +256,7 @@ async function main() {
       }),
       prisma.steps.create({
         data: {
-          ref_id_step_questionnaire: stepQuestionnaire.id_step_questionnaire,
+          ref_id_step_questionnaire: stepQuestionnaire[0].id_step_questionnaire,
           ref_id_challenges: challenges[2].id_challenge,
         },
       }),
