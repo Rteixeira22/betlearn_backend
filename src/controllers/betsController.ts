@@ -536,7 +536,7 @@ public processBetResults = async (req: Request, res: Response): Promise<void> =>
         await prisma.bets.update({
           where: { id_bets: betId },
           data: {
-            result: 0, 
+            result: 1, 
             state: 1   
           }
         });
@@ -546,7 +546,7 @@ public processBetResults = async (req: Request, res: Response): Promise<void> =>
         await prisma.bets.update({
           where: { id_bets: betId },
           data: {
-            result: 1, 
+            result: 0, 
             state: 1   
           }
         });
