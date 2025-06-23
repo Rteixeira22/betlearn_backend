@@ -4,8 +4,8 @@ name: Update_Users_Money_Monthly
 # Ocasioes em que o workflow comeca a trabalhar
 on:
   #push: # Em qualquer commit para ca feito na Pipeline
-  #branches:
-  #  - main
+    #branches:
+    #- main
   #- Pipeline #so para a construcao
   schedule:
     - cron: "0 23 1 * *" # Todos os dias 1 de cada mes  é:  cron: "0 23 1 * *"
@@ -36,4 +36,7 @@ jobs:
         run: npm install
 
       - name: Executar o Script
+        env:
+          API_BASE_URL: ${{ secrets.API_BASE_URL }}
+          API_KEY: ${{ secrets.API_KEY }}
         run: npx ts-node src/scripts/updateUsersMoney.ts

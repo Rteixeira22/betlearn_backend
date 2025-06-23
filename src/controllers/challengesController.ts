@@ -1,8 +1,8 @@
 import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
 import axios from "axios";
+import axiosInstance from "../configs/axiosConfig";
 import {
-  ResponseHelper,
   Challenge,
   ChallengeWithSteps,
   UserHasChallenge,
@@ -19,7 +19,12 @@ import {
   MostCompletedChallengeResponse,
   ChallengeInProgressResponse,
   StepUpdateResponse
-} from "../utils/challengesResponseHelper";
+} from "../utils/challengesDataType";
+
+import { 
+  ResponseHelper, 
+} from "../utils/responseHelper";
+
 
 const prisma = new PrismaClient();
 
@@ -161,8 +166,6 @@ export class ChallengesController {
         ResponseHelper.conflict(res, `Desafio com número ${number} já existe`);
         return;
       }
-
-      console.log("Creating challenge:")
 
       const newChallenge = await prisma.challenges.create({
         data: {
@@ -517,17 +520,10 @@ export class ChallengesController {
   // Update user has challenges blocked
   async unblockNextChallenge(req: Request, res: Response): Promise<void> {
     try {
-      const role = req.userRole;
       const requestedId = parseInt(req.params.id_user);
-      const tokenUserId = parseInt(req.userId!);
 
       if (isNaN(requestedId) || requestedId <= 0) {
         ResponseHelper.badRequest(res, "Formato de ID do utilizador inválido");
-        return;
-      }
-
-      if (role !== 'admin' && requestedId !== tokenUserId) {
-        ResponseHelper.forbidden(res, "Acesso restrito");
         return;
       }
 
@@ -562,6 +558,8 @@ export class ChallengesController {
         ResponseHelper.notFound(res, "Próximo desafio não encontrado");
         return;
       }
+
+      
 
       const existingRelationship = await prisma.user_has_Challenges.findUnique({
         where: {
@@ -677,9 +675,9 @@ export class ChallengesController {
   //update user has challenges progress_percentage
   async updateUserHasChallengesProgressPercentage(req: Request, res: Response): Promise<void> {
     try {
-      const role = req.userRole;
       const requestedId = parseInt(req.params.id_user);
       const tokenUserId = parseInt(req.userId!);
+      const role = req.userRole;
 
       if (isNaN(requestedId) || requestedId <= 0) {
         ResponseHelper.badRequest(res, "Formato de ID do utilizador inválido");
@@ -690,6 +688,7 @@ export class ChallengesController {
         ResponseHelper.forbidden(res, "Acesso restrito");
         return;
       }
+      
       
       const challengeId = parseInt(req.params.id_challenge);
       const { progress_percentage } = req.body;
@@ -739,8 +738,8 @@ export class ChallengesController {
         });
 
         try {
-          await axios.post(
-            `https://api-betlearn-wine.vercel.app/api/challenges/${requestedId}/${challengeId}/unblock-next`
+          await axiosInstance.post(
+            `/challenges/${requestedId}/${challengeId}/unblock-next`
           );
         } catch (axiosError) {
           console.error("Failed to unblock next challenge:", axiosError);
@@ -760,6 +759,7 @@ export class ChallengesController {
       const { id_user, id_challenge, id_step } = req.params;
       const tokenUserId = parseInt(req.userId!);
       const userId = parseInt(id_user);
+
 
       if (isNaN(userId) || userId <= 0) {
         ResponseHelper.badRequest(res, "Formato de ID de utilizador inválido");
@@ -845,6 +845,7 @@ export class ChallengesController {
         },
       });
 
+
       const completedSteps = await prisma.user_has_Challenges_has_Steps.count({
         where: {
           ref_user_has_Challenges_id_user: userId,
@@ -852,6 +853,9 @@ export class ChallengesController {
           state: 1,
         },
       });
+      
+
+
 
       const stepPercentage =
         totalSteps > 0 ? Math.round((completedSteps / totalSteps) * 100) : 0;
@@ -866,6 +870,7 @@ export class ChallengesController {
           progress_percentage: stepPercentage,
         },
       });
+
 
       // Se completou o desafio (progress_percentage == 100)
       if (stepPercentage === 100) {
@@ -884,8 +889,8 @@ export class ChallengesController {
 
         // Desbloquear o próximo desafio chamando diretamente a função (se possível)
         try {
-          await axios.post(
-            `https://api-betlearn-wine.vercel.app/api/challenges/${userId}/${challengeId}/unblock-next`
+          await axiosInstance.post(
+            `/challenges/${userId}/${challengeId}/unblock-next`
           );
         } catch (axiosError) {
           console.error("Failed to unblock next challenge:", axiosError);
@@ -1023,8 +1028,6 @@ export class ChallengesController {
         ResponseHelper.conflict(res, `Desafio com número ${challenge.number} já existe`);
         return;
       }
-
-      console.log("Creating challenge with steps:", challenge, steps);
 
       // Usar transação para garantir que todas as operações sejam bem-sucedidas
       const result = await prisma.$transaction(async (tx) => {

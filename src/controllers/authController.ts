@@ -4,11 +4,17 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { 
   ResponseHelper, 
+} from "../utils/responseHelper";
+
+import { 
   LoginRequest, 
   AdminLoginRequest, 
   LoginResponse, 
   AdminLoginResponse 
-} from "../utils/authResponseHelper";
+} from "../utils/authDataType";
+      
+import axiosInstance from '../configs/axiosConfig';
+
 
 
 const prisma = new PrismaClient();
@@ -61,6 +67,13 @@ export class AuthController {
         process.env.JWT_SECRET || "seu_secret_key",
         { expiresIn: "12h" }
       );
+
+
+      if (token) {
+        axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      } else {
+        delete axiosInstance.defaults.headers.common['Authorization'];
+      }
 
     
       // Retornar utilizador e token
@@ -122,6 +135,12 @@ export class AuthController {
         process.env.JWT_SECRET || "seu_secret_key",
         { expiresIn: "12h" }
       );
+
+      if (token) {
+        axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      } else {
+        delete axiosInstance.defaults.headers.common['Authorization'];
+      }
 
 
       // Retornar administrador e token

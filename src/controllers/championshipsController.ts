@@ -1,11 +1,14 @@
 import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
 import { 
-  ResponseHelper, 
   Championship, 
   CreateChampionshipRequest, 
   UpdateChampionshipRequest 
-} from "../utils/championshipsResponseHelper";
+} from "../utils/championshipsDataType";
+
+import { 
+  ResponseHelper, 
+} from "../utils/responseHelper";
 
 import { retryWithFixes } from "../scripts/getDataFromAI";
 

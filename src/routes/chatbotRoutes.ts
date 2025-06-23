@@ -1,10 +1,14 @@
 import axios from 'axios';
 import { Request, Response } from 'express'
 import { 
-  ResponseHelper, 
   ChatbotRequest, 
   ChatbotResponse 
-} from '../utils/chatbotResponseHelper';
+} from '../utils/chatbotDataType';
+
+
+import { 
+  ResponseHelper, 
+} from "../utils/responseHelper";
 
 const apiKey = process.env.GEMINI_API_KEY;
 

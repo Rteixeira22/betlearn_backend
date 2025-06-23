@@ -3,6 +3,10 @@ import { Request, Response } from "express";
 import axiosInstance from "../configs/axiosConfig";
 import { 
   ResponseHelper, 
+} from "../utils/responseHelper";
+
+
+import { 
   BetWithGames, 
   CreateBetRequest, 
   UpdateBetRequest, 
@@ -10,7 +14,7 @@ import {
   PaginatedBetsResponse,
   BetCountResponse,
   CreateBetTransactionResponse
-} from "../utils/betsResponseHelper";
+} from "../utils/betsDataType";
 
 const prisma = new PrismaClient();
 

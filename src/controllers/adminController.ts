@@ -3,11 +3,17 @@ import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import { 
   ResponseHelper, 
+ 
+} from "../utils/responseHelper";
+
+import { 
   Admin, 
   AdminPublic,
   CreateAdminRequest, 
   UpdateAdminRequest
-} from "../utils/adminResponseHelper";
+} from "../utils/adminDataType";
+
+
 
 const prisma = new PrismaClient();
 
@@ -48,11 +54,6 @@ export class AdminController {
 
     if (isNaN(tokenUserId)) {
       ResponseHelper.unauthorized(res, "Token inválido");
-      return;
-    }
-
-    if (adminId !== tokenUserId) {
-      ResponseHelper.forbidden(res, "Não está autorizado a aceder ao perfil de outro utilizador");
       return;
     }
 
@@ -189,11 +190,6 @@ export class AdminController {
 
     if (isNaN(tokenUserId)) {
       ResponseHelper.unauthorized(res, "Token inválido");
-      return;
-    }
-
-    if (adminId !== tokenUserId) {
-      ResponseHelper.forbidden(res, "Acesso restrito");
       return;
     }
 
@@ -339,11 +335,6 @@ export class AdminController {
 
     if (isNaN(tokenUserId)) {
       ResponseHelper.unauthorized(res, "Token inválido");
-      return;
-    }
-
-    if (adminId !== tokenUserId) {
-      ResponseHelper.forbidden(res, "Acesso restrito");
       return;
     }
 

@@ -4,8 +4,8 @@ name: Swap_Current_Tip
 # Ocasioes em que o workflow comeca a trabalhar
 on:
   #push: # Em qualquer commit para ca feito na Pipeline
-  #branches:
-  # - Pipeline # Pipeline so para a construcao
+    #branches:
+      #- main # Pipeline so para a construcao
   schedule:
     - cron: "00 23 * * *" # Todos os dias desbloquear a proxima
 
@@ -36,6 +36,7 @@ jobs:
 
       - name: Executar o Script
         env:
-          VERCEL_URL: ${{ secrets.VERCEL_URL }}
+          API_BASE_URL: ${{ secrets.API_BASE_URL }}
+          API_KEY: ${{ secrets.API_KEY }}
         run: npx ts-node src/scripts/tipscript.ts # Executar o script
 

@@ -1006,7 +1006,7 @@ router.post(
 // umblock next challenge
 router.post(
   "/:id_user/:id_challenge/unblock-next",
-   requireAPIKey, verifyJWT,
+  requireAPIKey,
   challengeController.unblockNextChallenge
 );
 
