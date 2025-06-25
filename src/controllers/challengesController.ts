@@ -946,7 +946,7 @@ export class ChallengesController {
       });
 
       if (!challengeInProgress) {
-        ResponseHelper.notFound(res, "Nenhum desafio em progresso encontrado para este utilizador");
+        ResponseHelper.noContent(res, "Nenhum desafio em progresso encontrado para este utilizador");
         return;
       }
 

@@ -67,10 +67,10 @@ export class UserController {
   // Get user by ID
   async getUserById(req: Request, res: Response): Promise<void> {
     try {
+      
       const role = req.userRole;
       const requestedId = parseInt(req.params.id);
       const tokenUserId = parseInt(req.userId!);
-
 
       if (role !== 'admin' && requestedId !== tokenUserId) {
         ResponseHelper.forbidden(res, "Acesso não autorizado");
