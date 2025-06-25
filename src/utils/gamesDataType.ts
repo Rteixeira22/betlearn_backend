@@ -36,7 +36,6 @@ export interface UpdateGameStateResponse {
 export interface MostBettedGameResponse {
   game: Game;
   bet_count: number;
-  championship_json: string | null;
 }
 
 // Types for internal use (Bet model reference)

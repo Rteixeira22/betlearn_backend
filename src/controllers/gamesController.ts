@@ -364,94 +364,102 @@ export class GamesController {
 
   // Get most betted game of the day
   async getMostBettedGameOfDay(req: Request, res: Response): Promise<void> {
-    try {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      
-      const tomorrow = new Date(today);
-      tomorrow.setDate(tomorrow.getDate() + 1);
-      
-      const bettedGames = await prisma.games.findMany({
-        select: {
-          id_game: true,
-          local_team: true,
-          visitor_team: true,
-          schedule: true,
-          betted_team: true,
-          odd: true,
-          goals_local_team: true,
-          goals_visitor_team: true,
-          image: true,
-          game_state: true,
-          BetsHasGames: {
-            select: {
-              championship: {
-                select: {
-                  json: true,
-                },
-              },
-              bet: true,
-            },
-            where: {
-              bet: {
-                date: {
-                  gte: today,
-                  lt: tomorrow,
-                },
+  try {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    
+    const bettedGames = await prisma.games.findMany({
+      select: {
+        id_game: true,
+        local_team: true,
+        visitor_team: true,
+        schedule: true,
+        betted_team: true,
+        odd: true,
+        goals_local_team: true,
+        goals_visitor_team: true,
+        image: true,
+        game_state: true,
+        BetsHasGames: {
+          select: {
+            bet: true,
+          },
+          where: {
+            bet: {
+              date: {
+                gte: today,
+                lt: tomorrow,
               },
             },
           },
         },
-      });
-      
-      if (bettedGames.length === 0) {
-        ResponseHelper.notFound(res, "Nenhuma aposta encontrada para hoje");
-        return;
-      }
-
-      const gamesWithCounts = bettedGames.map(game => ({
-        id_game: game.id_game!,
-        local_team: game.local_team!,
-        visitor_team: game.visitor_team!,
-        schedule: game.schedule!,
-        betted_team: game.betted_team,
-        odd: game.odd,
-        goals_local_team: game.goals_local_team,
-        goals_visitor_team: game.goals_visitor_team,
-        image: game.image,
-        game_state: game.game_state!,
-        bet_count: game.BetsHasGames.length,
-        championship_json: game.BetsHasGames[0]?.championship.json || null,
-      })).sort((a, b) => b.bet_count - a.bet_count);
-      
-      const mostBettedGame = gamesWithCounts[0];
-
-      if (!mostBettedGame) {
-        ResponseHelper.notFound(res, "Nenhuma aposta encontrada para hoje");
-        return;
-      }
-
-      const response: MostBettedGameResponse = {
-        game: {
-          id_game: mostBettedGame.id_game,
-          local_team: mostBettedGame.local_team,
-          visitor_team: mostBettedGame.visitor_team,
-          schedule: mostBettedGame.schedule,
-          betted_team: mostBettedGame.betted_team,
-          odd: mostBettedGame.odd !== null && mostBettedGame.odd !== undefined ? Number(mostBettedGame.odd) : undefined,
-          goals_local_team: mostBettedGame.goals_local_team,
-          goals_visitor_team: mostBettedGame.goals_visitor_team,
-          image: mostBettedGame.image,
-          game_state: mostBettedGame.game_state
-        },
-        bet_count: mostBettedGame.bet_count,
-        championship_json: mostBettedGame.championship_json
-      };
-
-      ResponseHelper.success(res, response, "Jogo mais apostado do dia obtido com sucesso");
-    } catch (error) {
-      console.error("Error fetching most betted game:", error);
-      ResponseHelper.serverError(res, "Falha ao obter jogo mais apostado do dia");
+      },
+    });
+    
+    if (bettedGames.length === 0) {
+      ResponseHelper.notFound(res, "Nenhuma aposta encontrada para hoje");
+      return;
     }
+
+    const gameGroups = new Map<string, any[]>();
+    
+    bettedGames.forEach(game => {
+      const gameKey = `${game.local_team}_vs_${game.visitor_team}`;
+      if (!gameGroups.has(gameKey)) {
+        gameGroups.set(gameKey, []);
+      }
+      gameGroups.get(gameKey)!.push(game);
+    });
+
+    const gamesWithCounts = Array.from(gameGroups.entries()).map(([gameKey, games]) => {
+      const firstGame = games[0]; 
+      const totalBets = games.reduce((sum, game) => sum + game.BetsHasGames.length, 0);
+      
+      return {
+        id_game: firstGame.id_game!,
+        local_team: firstGame.local_team!,
+        visitor_team: firstGame.visitor_team!,
+        schedule: firstGame.schedule!,
+        betted_team: firstGame.betted_team,
+        odd: firstGame.odd,
+        goals_local_team: firstGame.goals_local_team,
+        goals_visitor_team: firstGame.goals_visitor_team,
+        image: firstGame.image,
+        game_state: firstGame.game_state!,
+        bet_count: totalBets,
+      };
+    }).sort((a, b) => b.bet_count - a.bet_count);
+    
+    const mostBettedGame = gamesWithCounts[0];
+
+    if (!mostBettedGame) {
+      ResponseHelper.notFound(res, "Nenhuma aposta encontrada para hoje");
+      return;
+    }
+
+    const response: MostBettedGameResponse = {
+      game: {
+        id_game: mostBettedGame.id_game,
+        local_team: mostBettedGame.local_team,
+        visitor_team: mostBettedGame.visitor_team,
+        schedule: mostBettedGame.schedule,
+        betted_team: mostBettedGame.betted_team,
+        odd: mostBettedGame.odd !== null && mostBettedGame.odd !== undefined ? Number(mostBettedGame.odd) : undefined,
+        goals_local_team: mostBettedGame.goals_local_team,
+        goals_visitor_team: mostBettedGame.goals_visitor_team,
+        image: mostBettedGame.image,
+        game_state: mostBettedGame.game_state
+      },
+      bet_count: mostBettedGame.bet_count 
+    };
+
+    ResponseHelper.success(res, response, "Jogo mais apostado do dia obtido com sucesso");
+  } catch (error) {
+    console.error("Error fetching most betted game:", error);
+    ResponseHelper.serverError(res, "Falha ao obter jogo mais apostado do dia");
   }
+}
 }
